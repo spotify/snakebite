@@ -1,0 +1,11 @@
+Source: snakebite
+Section: net
+Priority: extra
+Maintainer: Wouter de Bie <wouter@spotify.com>
+Build-Depends: python (>= 2.6.6-3~), debhelper (>= 8), python-unittest2, python-protobuf, hadoop-client, hadoop-mapreduce, oracle-java6-jre
+Standards-Version: 3.9.3
+
+Package: spotify-snakebite
+Architecture: all
+Depends: ${python:Depends}, python-protobuf
+Description: Pure Python HDFS client

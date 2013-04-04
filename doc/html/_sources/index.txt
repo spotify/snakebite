@@ -1,0 +1,127 @@
+.. snakebite documentation master file, created by
+   sphinx-quickstart on Tue Apr 30 11:39:44 2013.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Snakebite documentation
+=====================================
+Snakebite is a pure python HDFS client. It uses protobuf messages over Hadoop
+RPC to communicate with the namenode.
+
+Snakebite can be used as a library and comes with a command line interface (CLI). 
+The CLI mimicks the `hadoop` client as good as possible
+
+Client library
+==============
+.. automodule:: client
+
+.. autoclass:: Client
+    :members:
+
+CLI client
+==========
+::
+
+    Usage: snakebite [options] cmd [args]
+
+    Options:
+      -h, --help            show this help message and exit
+      -D, --debug           Show debug information
+      -j, --json            JSON output
+      -n NAMENODE, --namenode=NAMENODE
+                            namenode host (default: localhost)
+      -p PORT, --port=PORT  namenode RPC port (default: 54310)
+      -R, --recurse         recurse into subdirectories
+      -d, --directory       show only the path and no children / check if path is
+                            a dir
+      -H, --human           human readable output
+      -s, --summary         print summarized output
+      -z, --zero            check for zero length
+      -e, --exists          check if file exists
+
+    Commands:
+      chgrp <grp> [paths]            change group
+      chmod <mode> [paths]           change file mode (octal)
+      chown <owner:grp> [paths]      change owner
+      count [paths]                  display stats for paths
+      df                             display fs stats
+      du [paths]                     display disk usage statistics
+      ls [path]                      list a path
+      mkdir [paths]                  create directories
+      mkdirp [paths]                 create directories and their parents
+      mv [paths] dst                 move paths to destination
+      rm [paths]                     remove paths
+      rmdir [dirs]                   delete a directory
+      serverdefaults                 show server information
+      setrep <rep> [paths]           set replication factor
+      stat [paths]                   stat information
+      test path                      test a path
+      touchz [paths]                 creates a file of zero length
+      usage <cmd>                    show cmd usage
+
+Testing
+=======
+Tests can be run with ``nosetests``. Currently, only integration tests are
+provided and use ``minicluster.py`` to spawn an HDFS minicluster. 
+
+When running the tests, make sure that the ``HADOOP_HOME`` environment variable is set.
+The minicluster uses the ``hadoop-mapreduce-client-jobclient.<version>-tests.jar`` and
+assumes this is located in ``HADOOP_HOME``. The job client test jar can also be specified
+by using the ``HADOOP_JOBCLIENT_JAR`` environment variable.
+
+Also, make sure the ``JAVA_HOME`` environment variable is set.
+
+.. note:: A hadoop installation is only required for testing.
+
+TODO
+====
+* Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well
+* More tests. Currently only integration tests with a minicluster are available.
+* Tests for the CLI.
+* Move to argparse to have arguments per command
+* Return correct exit codes from cli client.
+* Use generators when receiving messages (if and wherever possible).
+
+* Improve methods:
+    * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f and -skipTrash)
+
+* Implement more methods:
+    * [-expunge]
+    * [-cat [-ignoreCrc] <src> ...]
+    * [-copyFromLocal <localsrc> ... <dst>]
+    * [-copyToLocal [-ignoreCrc] [-crc] <src> ... <localdst>]
+    * [-cp <src> ... <dst>]
+    * [-get [-ignoreCrc] [-crc] <src> ... <localdst>]
+    * [-getmerge [-nl] <src> <localdst>]
+    * [-moveFromLocal <localsrc> ... <dst>]
+    * [-moveToLocal <src> <localdst>]
+    * [-put <localsrc> ... <dst>]
+    * [-tail [-f] <file>]
+    * [-text [-ignoreCrc] <src> ...]
+
+LICENSE
+=======
+Copyright (c) 2013 Spotify AB
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.
+
+Some code was borrowed from https://code.google.com/p/protobuf-socket-rpc/ and
+carries it's respective license.
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

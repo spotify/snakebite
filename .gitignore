@@ -1,0 +1,8 @@
+*.pyc
+*~
+.nicesetup
+*.rej
+*.orig
+*/build
+build/
+snakebite.egg-info/

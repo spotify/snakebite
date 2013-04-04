@@ -1,0 +1,593 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Snakebite documentation &mdash; snakebite 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="snakebite 1.0 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">snakebite 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="snakebite-documentation">
+<h1>Snakebite documentation<a class="headerlink" href="#snakebite-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Snakebite is a pure python HDFS client. It uses protobuf messages over Hadoop
+RPC to communicate with the namenode.</p>
+<p>Snakebite can be used as a library and comes with a command line interface (CLI).
+The CLI mimicks the <cite>hadoop</cite> client as good as possible</p>
+</div>
+<div class="section" id="module-client">
+<span id="client-library"></span><h1>Client library<a class="headerlink" href="#module-client" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="client.Client">
+<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">Client</tt><big>(</big><em>host</em>, <em>port</em><big>)</big><a class="headerlink" href="#client.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that acts as a client to HDFS.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotify.snakebite.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">paths</span></tt> parameters in methods are often passed as lists, since operations can work on multiple
+paths. The return values of methods are always lists of results.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Parameters like <tt class="docutils literal"><span class="pre">include_children</span></tt>, <tt class="docutils literal"><span class="pre">include_toplevel</span></tt> and <tt class="docutils literal"><span class="pre">recurse</span></tt> are not used
+when paths contain globs.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<em>string</em>) &#8211; Hostname or IP address of the NameNode</li>
+<li><strong>port</strong> (<em>int</em>) &#8211; RPC Port of the NameNode</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="client.Client.chgrp">
+<tt class="descname">chgrp</tt><big>(</big><em>paths</em>, <em>group</em>, <em>recurse=False</em><big>)</big><a class="headerlink" href="#client.Client.chgrp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the group of paths.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; List of paths to chgrp</li>
+<li><strong>group</strong> &#8211; New group</li>
+<li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive chgrp</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.chmod">
+<tt class="descname">chmod</tt><big>(</big><em>paths</em>, <em>mode</em>, <em>recurse=False</em><big>)</big><a class="headerlink" href="#client.Client.chmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the mode for paths. This returns a list of maps containing the resut of the operation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; List of paths to chmod</li>
+<li><strong>mode</strong> (<em>int</em>) &#8211; Octal mode (e.g. 0755)</li>
+<li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive chmod</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The top level directory is always included when <cite>recurse=True</cite></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.chown">
+<tt class="descname">chown</tt><big>(</big><em>paths</em>, <em>owner</em>, <em>recurse=False</em><big>)</big><a class="headerlink" href="#client.Client.chown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the owner for paths. The owner can be specified as <cite>user</cite> or <cite>user:group</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; List of paths to chmod</li>
+<li><strong>owner</strong> (<em>string</em>) &#8211; New owner</li>
+<li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive chown</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This always include the toplevel when recursing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.count">
+<tt class="descname">count</tt><big>(</big><em>paths</em><big>)</big><a class="headerlink" href="#client.Client.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count files in a path</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) &#8211; List of paths to count</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">count</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">])</span>
+<span class="go">[{&#39;spaceConsumed&#39;: 260185L, &#39;quota&#39;: 2147483647L, &#39;spaceQuota&#39;: 18446744073709551615L, &#39;length&#39;: 260185L, &#39;directoryCount&#39;: 9L, &#39;path&#39;: &#39;/&#39;, &#39;fileCount&#39;: 34L}]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.delete">
+<tt class="descname">delete</tt><big>(</big><em>paths</em>, <em>recurse=False</em><big>)</big><a class="headerlink" href="#client.Client.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete paths</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; Paths to delete</li>
+<li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive delete (use with care!)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.df">
+<tt class="descname">df</tt><big>(</big><big>)</big><a class="headerlink" href="#client.Client.df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get FS information</p>
+<p><strong>Examples:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">df</span><span class="p">()</span>
+<span class="go">[{&#39;used&#39;: 491520L, &#39;capacity&#39;: 120137519104L, &#39;under_replicated&#39;: 0L, &#39;missing_blocks&#39;: 0L, &#39;filesystem&#39;: &#39;hdfs://localhost:54310&#39;, &#39;remaining&#39;: 19669295104L, &#39;corrupt_blocks&#39;: 0L}]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.du">
+<tt class="descname">du</tt><big>(</big><em>paths</em>, <em>include_toplevel=False</em>, <em>include_children=True</em><big>)</big><a class="headerlink" href="#client.Client.du" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns size information for paths</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; Paths to du</li>
+<li><strong>include_toplevel</strong> (<em>boolean</em>) &#8211; Include the given path in the result. If the path is a file, include_toplevel is always True.</li>
+<li><strong>include_children</strong> (<em>boolean</em>) &#8211; Include child nodes in the result.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<p>Children:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">du</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">])</span>
+<span class="go">[{&#39;path&#39;: &#39;/Makefile&#39;, &#39;length&#39;: 6783L}, {&#39;path&#39;: &#39;/build&#39;, &#39;length&#39;: 244778L}, {&#39;path&#39;: &#39;/index.asciidoc&#39;, &#39;length&#39;: 100L}, {&#39;path&#39;: &#39;/source&#39;, &#39;length&#39;: 8524L}]</span>
+</pre></div>
+</div>
+<p>Directory only:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">du</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">],</span> <span class="n">include_toplevel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">include_children</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="go">[{&#39;path&#39;: &#39;/&#39;, &#39;length&#39;: 260185L}]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.ls">
+<tt class="descname">ls</tt><big>(</big><em>paths</em>, <em>recurse=False</em>, <em>include_toplevel=False</em>, <em>include_children=True</em><big>)</big><a class="headerlink" href="#client.Client.ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Issues &#8216;ls&#8217; command and returns a list of maps that contain fileinfo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; Paths to list</li>
+<li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive listing</li>
+<li><strong>include_toplevel</strong> (<em>boolean</em>) &#8211; Include the given path in the listing. If the path is a file, include_toplevel is always True.</li>
+<li><strong>include_children</strong> (<em>boolean</em>) &#8211; Include child nodes in the listing.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<p>Directory listing</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/&quot;</span><span class="p">])</span>
+<span class="go">[{&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;access_time&#39;: 1367317324982L, &#39;block_replication&#39;: 1, &#39;modification_time&#39;: 1367317325346L, &#39;length&#39;: 6783L, &#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/Makefile&#39;}, {&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 493, &#39;file_type&#39;: &#39;d&#39;, &#39;access_time&#39;: 0L, &#39;block_replication&#39;: 0, &#39;modification_time&#39;: 1367317325431L, &#39;length&#39;: 0L, &#39;blocksize&#39;: 0L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/build&#39;}, {&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;access_time&#39;: 1367317326510L, &#39;block_replication&#39;: 1, &#39;modification_time&#39;: 1367317326522L, &#39;length&#39;: 100L, &#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/index.asciidoc&#39;}, {&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 493, &#39;file_type&#39;: &#39;d&#39;, &#39;access_time&#39;: 0L, &#39;block_replication&#39;: 0, &#39;modification_time&#39;: 1367317326628L, &#39;length&#39;: 0L, &#39;blocksize&#39;: 0L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/source&#39;}]</span>
+</pre></div>
+</div>
+<p>File listing</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/Makefile&quot;</span><span class="p">])</span>
+<span class="go">[{&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;access_time&#39;: 1367317324982L, &#39;block_replication&#39;: 1, &#39;modification_time&#39;: 1367317325346L, &#39;length&#39;: 6783L, &#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/Makefile&#39;}]</span>
+</pre></div>
+</div>
+<p>Get directory information</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/source&quot;</span><span class="p">],</span> <span class="n">include_toplevel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">include_children</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="go">[{&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 493, &#39;file_type&#39;: &#39;d&#39;, &#39;access_time&#39;: 0L, &#39;block_replication&#39;: 0, &#39;modification_time&#39;: 1367317326628L, &#39;length&#39;: 0L, &#39;blocksize&#39;: 0L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/source&#39;}]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.mkdir">
+<tt class="descname">mkdir</tt><big>(</big><em>paths</em>, <em>create_parent=False</em>, <em>mode=493</em><big>)</big><a class="headerlink" href="#client.Client.mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a directoryCount</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list of strings</em>) &#8211; Paths to create</li>
+<li><strong>create_parent</strong> (<em>boolean</em>) &#8211; Also create the parent directories</li>
+<li><strong>mode</strong> (<em>int</em>) &#8211; Mode the directory should be created with</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.rename">
+<tt class="descname">rename</tt><big>(</big><em>paths</em>, <em>dst</em><big>)</big><a class="headerlink" href="#client.Client.rename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename (move) path(s) to a destination</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; Source paths</li>
+<li><strong>dst</strong> (<em>string</em>) &#8211; destination</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.rmdir">
+<tt class="descname">rmdir</tt><big>(</big><em>paths</em><big>)</big><a class="headerlink" href="#client.Client.rmdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a directory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) &#8211; Paths to delete</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.serverdefaults">
+<tt class="descname">serverdefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#client.Client.serverdefaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get server defaults</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">serverdefaults</span><span class="p">()</span>
+<span class="go">{&#39;writePacketSize&#39;: 65536, &#39;fileBufferSize&#39;: 4096, &#39;replication&#39;: 1, &#39;bytesPerChecksum&#39;: 512, &#39;trashInterval&#39;: 0L, &#39;blockSize&#39;: 134217728L, &#39;encryptDataTransfer&#39;: False, &#39;checksumType&#39;: 2}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.setrep">
+<tt class="descname">setrep</tt><big>(</big><em>paths</em>, <em>replication</em>, <em>recurse=False</em><big>)</big><a class="headerlink" href="#client.Client.setrep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the replication factor for paths</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; Paths</li>
+<li><strong>replication</strong> &#8211; Replication factor</li>
+<li><strong>recurse</strong> (<em>boolean</em>) &#8211; Apply replication factor recursive</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.stat">
+<tt class="descname">stat</tt><big>(</big><em>paths</em><big>)</big><a class="headerlink" href="#client.Client.stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stat a fileCount</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>string</em>) &#8211; Path</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">stat</span><span class="p">([</span><span class="s">&#39;/index.asciidoc&#39;</span><span class="p">])</span>
+<span class="go">[{&#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;length&#39;: 100L, &#39;access_time&#39;: 1367317326510L, &#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;path&#39;: &#39;/index.asciidoc&#39;, &#39;modification_time&#39;: 1367317326522L, &#39;block_replication&#39;: 1}]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.test">
+<tt class="descname">test</tt><big>(</big><em>path</em>, <em>exists=False</em>, <em>directory=False</em>, <em>zero_length=False</em><big>)</big><a class="headerlink" href="#client.Client.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if a paht exist, is a directory or has zero length</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>string</em>) &#8211; Path to test</li>
+<li><strong>exists</strong> (<em>boolean</em>) &#8211; Check if the path exists</li>
+<li><strong>directory</strong> &#8211; Check if the path exists</li>
+<li><strong>zero_length</strong> (<em>boolean</em>) &#8211; Check if the path is zero-length</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">directory and zero lenght are AND&#8217;d.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.touchz">
+<tt class="descname">touchz</tt><big>(</big><em>paths</em>, <em>replication=None</em>, <em>blocksize=None</em><big>)</big><a class="headerlink" href="#client.Client.touchz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a zero length file or updates the timestamp on a zero length file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paths</strong> (<em>list</em>) &#8211; Paths</li>
+<li><strong>replication</strong> &#8211; Replication factor</li>
+<li><strong>blocksize</strong> (<em>int</em>) &#8211; Block size (in bytes) of the newly created file</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="cli-client">
+<h1>CLI client<a class="headerlink" href="#cli-client" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><pre>Usage: snakebite [options] cmd [args]
+
+Options:
+  -h, --help            show this help message and exit
+  -D, --debug           Show debug information
+  -j, --json            JSON output
+  -n NAMENODE, --namenode=NAMENODE
+                        namenode host (default: localhost)
+  -p PORT, --port=PORT  namenode RPC port (default: 54310)
+  -R, --recurse         recurse into subdirectories
+  -d, --directory       show only the path and no children / check if path is
+                        a dir
+  -H, --human           human readable output
+  -s, --summary         print summarized output
+  -z, --zero            check for zero length
+  -e, --exists          check if file exists
+
+Commands:
+  chgrp &lt;grp&gt; [paths]            change group
+  chmod &lt;mode&gt; [paths]           change file mode (octal)
+  chown &lt;owner:grp&gt; [paths]      change owner
+  count [paths]                  display stats for paths
+  df                             display fs stats
+  du [paths]                     display disk usage statistics
+  ls [path]                      list a path
+  mkdir [paths]                  create directories
+  mkdirp [paths]                 create directories and their parents
+  mv [paths] dst                 move paths to destination
+  rm [paths]                     remove paths
+  rmdir [dirs]                   delete a directory
+  serverdefaults                 show server information
+  setrep &lt;rep&gt; [paths]           set replication factor
+  stat [paths]                   stat information
+  test path                      test a path
+  touchz [paths]                 creates a file of zero length
+  usage &lt;cmd&gt;                    show cmd usage</pre>
+</div>
+</div>
+<div class="section" id="testing">
+<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<p>Tests can be run with <tt class="docutils literal"><span class="pre">nosetests</span></tt>. Currently, only integration tests are
+provided and use <tt class="docutils literal"><span class="pre">minicluster.py</span></tt> to spawn an HDFS minicluster.</p>
+<p>When running the tests, make sure that the <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt> environment variable is set.
+The minicluster uses the <tt class="docutils literal"><span class="pre">hadoop-mapreduce-client-jobclient.&lt;version&gt;-tests.jar</span></tt> and
+assumes this is located in <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt>. The job client test jar can also be specified
+by using the <tt class="docutils literal"><span class="pre">HADOOP_JOBCLIENT_JAR</span></tt> environment variable.</p>
+<p>Also, make sure the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable is set.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A hadoop installation is only required for testing.</p>
+</div>
+</div>
+<div class="section" id="todo">
+<h1>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p class="first">Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well</p>
+</li>
+<li><p class="first">More tests. Currently only integration tests with a minicluster are available.</p>
+</li>
+<li><p class="first">Tests for the CLI.</p>
+</li>
+<li><p class="first">Move to argparse to have arguments per command</p>
+</li>
+<li><p class="first">Return correct exit codes from cli client.</p>
+</li>
+<li><p class="first">Use generators when receiving messages (if and wherever possible).</p>
+</li>
+<li><dl class="first docutils">
+<dt>Improve methods:</dt>
+<dd><ul class="first last simple">
+<li>[-rm [-f] [-r|-R] [-skipTrash] &lt;src&gt; ...] (implement -f and -skipTrash)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Implement more methods:</dt>
+<dd><ul class="first last simple">
+<li>[-expunge]</li>
+<li>[-cat [-ignoreCrc] &lt;src&gt; ...]</li>
+<li>[-copyFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</li>
+<li>[-copyToLocal [-ignoreCrc] [-crc] &lt;src&gt; ... &lt;localdst&gt;]</li>
+<li>[-cp &lt;src&gt; ... &lt;dst&gt;]</li>
+<li>[-get [-ignoreCrc] [-crc] &lt;src&gt; ... &lt;localdst&gt;]</li>
+<li>[-getmerge [-nl] &lt;src&gt; &lt;localdst&gt;]</li>
+<li>[-moveFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</li>
+<li>[-moveToLocal &lt;src&gt; &lt;localdst&gt;]</li>
+<li>[-put &lt;localsrc&gt; ... &lt;dst&gt;]</li>
+<li>[-tail [-f] &lt;file&gt;]</li>
+<li>[-text [-ignoreCrc] &lt;src&gt; ...]</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="license">
+<h1>LICENSE<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2013 Spotify AB</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at</p>
+<p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.</p>
+<p>Some code was borrowed from <a class="reference external" href="https://code.google.com/p/protobuf-socket-rpc/">https://code.google.com/p/protobuf-socket-rpc/</a> and
+carries it&#8217;s respective license.</p>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Snakebite documentation</a></li>
+<li><a class="reference internal" href="#module-client">Client library</a></li>
+<li><a class="reference internal" href="#cli-client">CLI client</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#todo">TODO</a></li>
+<li><a class="reference internal" href="#license">LICENSE</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">snakebite 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Wouter de Bie.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
