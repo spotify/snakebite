@@ -613,7 +613,7 @@ class Client(object):
         else:
             return path
 
-    def _findItems(self, paths, processor, include_toplevel=False, include_children=False, recurse=False, check_nonexistence=False, _glob_check=None):
+    def _findItems(self, paths, processor, include_toplevel=False, include_children=False, recurse=False, check_nonexistence=False):
         ''' Request file info from the NameNode and call the processor on the node(s) returned
 
         :param paths:
@@ -648,7 +648,7 @@ class Client(object):
 
             if glob.has_magic(path):
                 log.debug("Dealing with globs in %s" % path)
-                collection += self._globFind(path, processor)
+                collection += self._globFind(path, processor, include_toplevel)
             else:
                 fileinfo = self._getFileInfo(path)
                 if not fileinfo and not check_nonexistence:
@@ -690,7 +690,7 @@ class Client(object):
         request.needLocation = False
         return self.service.getListing(request)
 
-    def _globFind(self, path, processor):
+    def _globFind(self, path, processor, include_toplevel):
         '''Handle globs in paths.
         This is done by listing the directory before a glob and checking which
         node matches the initial glob. If there are more globs in the path,
@@ -735,11 +735,15 @@ class Client(object):
                     # If we have a match, but need to go deeper, we recurse
                     if rest and glob.has_magic(rest):
                         traverse_path = "/".join([full_path, rest])
-                        collection += self._globFind(traverse_path, processor)
+                        collection += self._globFind(traverse_path, processor, include_toplevel)
                     else:
                         # If the matching node is a directory, we list the directory
                         # This is what the hadoop client does at least.
                         if self._isDir(node):
+                            if include_toplevel:
+                                entry = processor(full_path, node)
+                                collection.append(entry)
+                                
                             fp = self._getFullPath(check_path, node)
                             dir_list = self._getDirListing(fp)
                             for n in dir_list.dirList.partialListing:
