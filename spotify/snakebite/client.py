@@ -14,7 +14,6 @@
 # the License.
 
 import spotify.snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
-import spotify.snakebite.protobuf.hdfs_pb2 as hdfs_proto
 import spotify.snakebite.glob as glob
 from spotify.snakebite.errors import RequestError
 from spotify.snakebite.service import RpcService
@@ -26,7 +25,6 @@ from spotify.snakebite.errors import InvalidInputException
 import logging
 import os
 import os.path
-import re
 import fnmatch
 
 log = logging.getLogger(__name__)
@@ -332,6 +330,11 @@ class Client(object):
         :type paths: list
         :param recurse: Recursive delete (use with care!)
         :type recurse: boolean
+
+        .. note:: Recursive deletion uses the NameNode recursive deletion functionality
+                 instead of letting the client recurse. Hadoops client recurses
+                 by itself and thus showing all files and directories that are
+                 deleted. Snakebite doesn't.
         '''
         if not type(paths) == type([]):
             raise InvalidInputException("Paths should be a list")
@@ -743,13 +746,13 @@ class Client(object):
                             if include_toplevel:
                                 entry = processor(full_path, node)
                                 collection.append(entry)
-                                
                             fp = self._getFullPath(check_path, node)
                             dir_list = self._getDirListing(fp)
-                            for n in dir_list.dirList.partialListing:
-                                full_child_path = self._getFullPath(fp, n)
-                                entry = processor(full_child_path, n)
-                                collection.append(entry)
+                            if dir_list:  # It might happen that the directory above has been removed
+                                for n in dir_list.dirList.partialListing:
+                                    full_child_path = self._getFullPath(fp, n)
+                                    entry = processor(full_child_path, n)
+                                    collection.append(entry)
                         else:
                             entry = processor(full_path, node)
                             collection.append(entry)

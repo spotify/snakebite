@@ -36,4 +36,16 @@ class DeleteTest(MiniClusterTestBase):
         self.assertRaises(FileNotFoundException, self.client.delete, ['/doesnotexist'])
 
     def test_invalid_input(self):
-            self.assertRaises(InvalidInputException, self.client.delete, '/stringpath')
+        self.assertRaises(InvalidInputException, self.client.delete, '/stringpath')
+
+    def test_recurse(self):
+        self.client.delete(['/foo'], recurse=True)
+        client_output = self.client.ls(['/'])
+        paths = [node['path'] for node in client_output]
+        self.assertFalse('/foo' in paths)
+
+    def test_glob(self):
+        self.client.delete(['/ba*'], recurse=True)
+        client_output = self.client.ls(['/'])
+        paths = [node['path'] for node in client_output]
+        self.assertFalse('/bar' in paths)

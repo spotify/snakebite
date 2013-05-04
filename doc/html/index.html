@@ -181,6 +181,13 @@ when paths contain globs.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Recursive deletion uses the NameNode recursive deletion functionality
+instead of letting the client recurse. Hadoops client recurses
+by itself and thus showing all files and directories that are
+deleted. Snakebite doesn&#8217;t.</p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -474,6 +481,8 @@ by using the <tt class="docutils literal"><span class="pre">HADOOP_JOBCLIENT_JAR
 <li><p class="first">More tests. Currently only integration tests with a minicluster are available.</p>
 </li>
 <li><p class="first">Tests for the CLI.</p>
+</li>
+<li><p class="first">Add tab-completion</p>
 </li>
 <li><p class="first">Move to argparse to have arguments per command</p>
 </li>
