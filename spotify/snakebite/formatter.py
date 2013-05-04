@@ -87,7 +87,9 @@ def formatListing(listing, json_output=False, human_readable=False):
     columns = ['file_type', 'permission', 'block_replication', 'owner', 'group', 'length', 'modification_time', 'path']
 
     max_len = max([len(str(node.get('length'))) for node in listing] + [10])
-    templ = "%%s%%s %%3s %%-12s %%-12s %%%ds %%s %%s" % max_len
+    max_owner = max([len(str(node.get('owner'))) for node in listing] + [10])
+    max_group = max([len(str(node.get('group'))) for node in listing] + [10])
+    templ = "%%s%%s %%3s %%-%ds %%-%ds %%%ds %%s %%s" % (max_owner, max_group, max_len)
     for node in listing:
         cols = [str(formatColumn(col, node, human_readable)) for col in columns]
         ret.append(templ % tuple(cols))
