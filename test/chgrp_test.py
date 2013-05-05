@@ -12,7 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-from minicluster import MiniClusterTestBase
+from minicluster_testbase import MiniClusterTestBase
 from spotify.snakebite.errors import FileNotFoundException
 from spotify.snakebite.errors import InvalidInputException
 

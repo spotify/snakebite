@@ -16,14 +16,52 @@ import os
 import subprocess
 import select
 import re
-import unittest2
 import datetime
-
-from spotify.snakebite.client import Client
 
 
 class MiniCluster(object):
-    def __init__(self, testfiles_path, jar_search_paths=[]):
+    ''' Class that spawns a hadoop mini cluster and wrap hadoop functionality
+
+    This class requires the ``HADOOP_HOME`` environment variable to be set to run the ``hadoop`` command.
+    It will search ``HADOOP_HOME`` for ``hadoop-mapreduce-client-jobclient<version>-tests.jar``, but the
+    location of this jar can also be supplied by the ``HADOOP_JOBCLIENT_JAR`` environment variable.
+
+    Since the current minicluster interface doesn't provide for specifying the namenode post number, and
+    chooses a random one, this class parses the output from the minicluster to find the port numer.
+
+    All supplied methods (like :py:func:`put`, :py:func:`ls`, etc) use the hadoop command to perform operations, and not
+    the snakebite client, since this is used for testing snakebite itself.
+
+    All methods return a list of maps that are snakebite compatible.
+
+    Example without :mod:`spotify.snakebite.client <client>`
+
+    >>> from spotify.snakebite.minicluster import MiniCluster
+    >>> cluster = Minicluster("/path/to/test/files")
+    >>> ls_output = cluster.ls(["/"])
+
+    Example with :mod:`spotify.snakebite.client <client>`
+
+    >>> from spotify.snakebite.minicluster import MiniCluster
+    >>> from spotify.snakebite.client import Client
+    >>> cluster = Minicluster("/path/to/test/files")
+    >>> client = Client('localhost', cluster.port)
+    >>> ls_output = client.ls(["/"])
+
+    Just as the snakebite client, the cluster methods take a list of strings as paths. Wherever a method
+    takes ``extra_args``, normal hadoop command arguments can be given (like -r, -f, etc).
+
+    More info can be found at http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/CLIMiniCluster.html
+
+    .. note:: A minicluster will be started at instantiation
+    .. note:: Not all hadoop commands have been implemented, only the ones that
+              were necessary for testing the snakebite client, but please feel free to add them
+    '''
+    def __init__(self, testfiles_path):
+        '''
+        :param testfiles_path: Local path where test files can be found. Mainly used for ``put()``
+        :type testfiles_path: string
+        '''
         self._testfiles_path = testfiles_path
         self._hadoop_home = os.environ['HADOOP_HOME']
         self._jobclient_jar = os.environ.get('HADOOP_JOBCLIENT_JAR')
@@ -34,28 +72,42 @@ class MiniCluster(object):
         self.hdfs_url = "hdfs://%s:%d" % (self.host, self.port)
 
     def terminate(self):
+        ''' Terminate the cluster
+
+        Since the minicluster is started as a subprocess, this method has to be called explicitely when
+        your program ends.
+        '''
         self.hdfs.terminate()
 
     def put(self, src, dst):
+        '''Upload a file to HDFS
+
+        This will take a file from the ``testfiles_path`` supplied in the constuctor.
+        '''
         src = "%s%s" % (self._testfiles_path, src)
         return self._runCmd([self._hadoop_cmd, 'fs', '-put', src, self._full_hdfs_path(dst)])
 
     def ls(self, src, extra_args=[]):
+        '''List files in a directory'''
         src = [self._full_hdfs_path(x) for x in src]
         output = self._runCmd([self._hadoop_cmd, 'fs', '-ls'] + extra_args + src)
         return self._transformLsOutput(output, self.hdfs_url)
 
     def mkdir(self, src, extra_args=[]):
+        '''Create a directory'''
         return self._runCmd([self._hadoop_cmd, 'fs', '-mkdir'] + extra_args + [self._full_hdfs_path(src)])
 
     def df(self, src):
+        '''Perform ``df`` on a path'''
         return self._runCmd([self._hadoop_cmd, 'fs', '-df', self._full_hdfs_path(src)])
 
     def du(self, src, extra_args=[]):
+        '''Perform ``du`` on a path'''
         src = [self._full_hdfs_path(x) for x in src]
         return self._transformDuOutput(self._runCmd([self._hadoop_cmd, 'fs', '-du'] + extra_args + src), self.hdfs_url)
 
     def count(self, src):
+        '''Perform ``count`` on a path'''
         src = [self._full_hdfs_path(x) for x in src]
         return self._transformCountOutput(self._runCmd([self._hadoop_cmd, 'fs', '-count'] + src), self.hdfs_url)
 
@@ -154,34 +206,3 @@ class MiniCluster(object):
                 s += "1"
         octal = "%d%d%d" % (int(s[0:3], 2), int(s[3:6], 2), int(s[6:9], 2))
         return int(octal, 8)
-
-
-class MiniClusterTestBase(unittest2.TestCase):
-
-    cluster = None
-
-    @classmethod
-    def setupClass(cls):
-        if not cls.cluster:
-            testfiles_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testfiles")
-            cls.cluster = MiniCluster(testfiles_path)
-            cls.cluster.put("/test1", "/test1")
-            cls.cluster.put("/test1", "/test2")
-            cls.cluster.put("/zerofile", "/")
-            cls.cluster.mkdir("/dir1")
-            cls.cluster.put("/zerofile", "/dir1")
-            cls.cluster.mkdir("/foo/bar/baz", ['-p'])
-            cls.cluster.put("/zerofile", "/foo/bar/baz/qux")
-            cls.cluster.mkdir("/bar/baz/foo", ['-p'])
-            cls.cluster.put("/zerofile", "/bar/baz/foo/qux")
-            cls.cluster.mkdir("/bar/foo/baz", ['-p'])
-            cls.cluster.put("/zerofile", "/bar/foo/baz/qux")
-
-    @classmethod
-    def tearDownClass(cls):
-        if cls.cluster:
-            cls.cluster.terminate()
-
-    def setUp(self):
-        self.cluster = self.__class__.cluster
-        self.client = Client(self.cluster.host, self.cluster.port)

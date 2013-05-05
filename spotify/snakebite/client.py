@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 
 class Client(object):
-    ''' Class that acts as a client to HDFS.
+    ''' A pure python HDFS client.
 
     **Example:**
 

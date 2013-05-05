@@ -14,7 +14,7 @@
 # the License.
 from spotify.snakebite.errors import FileNotFoundException
 from spotify.snakebite.errors import InvalidInputException
-from minicluster import MiniClusterTestBase
+from minicluster_testbase import MiniClusterTestBase
 from util import assertDu
 
 

@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 import re
-from minicluster import MiniClusterTestBase
+from minicluster_testbase import MiniClusterTestBase
 
 
 class DfTest(MiniClusterTestBase):

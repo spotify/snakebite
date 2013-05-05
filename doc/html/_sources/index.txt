@@ -1,66 +1,40 @@
-.. snakebite documentation master file, created by
-   sphinx-quickstart on Tue Apr 30 11:39:44 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Snakebite documentation
-=====================================
-Snakebite is a pure python HDFS client. It uses protobuf messages over Hadoop
-RPC to communicate with the namenode.
+=======================
+Snakebite is a python package that provides:
 
-Snakebite can be used as a library and comes with a command line interface (CLI). 
-The CLI mimicks the `hadoop` client as good as possible
+.. toctree::
+   :maxdepth: 2
 
-Client library
-==============
-.. automodule:: client
+   A pure python HDFS client library that uses protobuf messages over Hadoop RPC to communicate with the namenode. <client>
+   A command line interface (CLI) for HDFS that uses the pure python client library. <cli>
+   A hadoop minicluster wrapper. <minicluster>
 
-.. autoclass:: Client
-    :members:
-
-CLI client
+Background
 ==========
-::
+Since the 'normal' Hadoop HDFS client (``hadoop fs``) is written in Java and has
+a lot of dependencies on Hadoop jars, startup times are quite high (> 3 secs).
+This isn't ideal for integrating Hadoop commands in python projects.
 
-    Usage: snakebite [options] cmd [args]
+At Spotify we use the `luigi job scheduler <http://github.com/spotify/luigi>`_ 
+that relies on doing a lot of existence checks and moving data around in HDFS.
+And since calling ``hadoop`` from python is expensive, we decided to write a
+pure python HDFS client that only relies on protobuf. The current 
+:mod:`spotify.snakebite.client <client>` library uses protobuf messages and
+implements the Hadoop RPC protocol for talking to the NameNode.
 
-    Options:
-      -h, --help            show this help message and exit
-      -D, --debug           Show debug information
-      -j, --json            JSON output
-      -n NAMENODE, --namenode=NAMENODE
-                            namenode host (default: localhost)
-      -p PORT, --port=PORT  namenode RPC port (default: 54310)
-      -R, --recurse         recurse into subdirectories
-      -d, --directory       show only the path and no children / check if path is
-                            a dir
-      -H, --human           human readable output
-      -s, --summary         print summarized output
-      -z, --zero            check for zero length
-      -e, --exists          check if file exists
+During development, we needed to verify :mod:`spotify.snakebite.client <client>`
+behavior against the real client and for that we implemented a :mod:`minicluster`
+that wraps a Hadoop Java mini cluster. Obviously this :mod:`minicluster` can be
+used in different projects, so we made it a part of snakebite.
 
-    Commands:
-      chgrp <grp> [paths]            change group
-      chmod <mode> [paths]           change file mode (octal)
-      chown <owner:grp> [paths]      change owner
-      count [paths]                  display stats for paths
-      df                             display fs stats
-      du [paths]                     display disk usage statistics
-      ls [path]                      list a path
-      mkdir [paths]                  create directories
-      mkdirp [paths]                 create directories and their parents
-      mv [paths] dst                 move paths to destination
-      rm [paths]                     remove paths
-      rmdir [dirs]                   delete a directory
-      serverdefaults                 show server information
-      setrep <rep> [paths]           set replication factor
-      stat [paths]                   stat information
-      test path                      test a path
-      touchz [paths]                 creates a file of zero length
-      usage <cmd>                    show cmd usage
+And since it's nice to have a CLI that uses :mod:`spotify.snakebite.client <client>`
+we've implemented a :doc:`cli` as well.
 
 Testing
 =======
+.. note:: :mod:`spotify.snakebite.client <client>` hasn't been tested in the wild
+          a lot! **USE AT YOUR OWN RISK!**
+
 Tests can be run with ``nosetests``. Currently, only integration tests are
 provided and use ``minicluster.py`` to spawn an HDFS minicluster. 
 
@@ -116,7 +90,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 
-Some code was borrowed from https://code.google.com/p/protobuf-socket-rpc/ and
+Code in :mod:`channel`, :mod:`logger` and :mod:`service` was borrowed from https://code.google.com/p/protobuf-socket-rpc/ and
 carries it's respective license.
 
 Indices and tables
