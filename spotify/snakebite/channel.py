@@ -77,9 +77,16 @@ class RpcBufferedReader(object):
 
     def read(self, n):
         '''Reads n bytes from the buffer. This will overwrite the internal buffer.'''
-        self.buffer = self.socket.recv(n)
-        self.bytes_read += n
-        log.debug("Bytes read: %d, total: %d" % (n, self.bytes_read))
+        self.buffer = ""
+        while len(self.buffer) < n:
+            self.buffer += self.socket.recv(n)
+            self.bytes_read += len(self.buffer)
+
+        log.debug("Bytes read: %d, total: %d" % (len(self.buffer), self.bytes_read))
+
+        # Read more if we didn't read all requested bytes
+        if len(self.buffer) < n:
+            self.buffer += self.read(n - len(self.buffer))
         return self.buffer
 
     def rewind(self, pos):
