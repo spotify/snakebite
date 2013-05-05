@@ -54,6 +54,20 @@
             
   <div class="section" id="cli-client">
 <h1>CLI client<a class="headerlink" href="#cli-client" title="Permalink to this headline">¶</a></h1>
+<p>A command line interface for HDFS using <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">spotify.snakebite.client</span></tt></a>.</p>
+<p>The CLI client tries to read the config from ~/.snakebiterc and if that doesn&#8217;t
+exist, it will check $HADOOP_HOME/core-site.xml and create a ~/.snakebiterc from that.</p>
+<p>A config looks like</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s">&quot;namenode&quot;</span><span class="p">:</span> <span class="s">&quot;&lt;host/ip&gt;&quot;</span><span class="p">,</span>
+  <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="mi">54310</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Snakebite cli comes with bash completion inf /scripts.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-python"><pre>Usage: snakebite [options] cmd [args]
 
 Options:
@@ -99,6 +113,12 @@ Commands:
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CLI client</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="client.html"
                         title="previous chapter">Client library</a></p>

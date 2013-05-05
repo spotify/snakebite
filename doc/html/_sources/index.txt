@@ -3,11 +3,15 @@ Snakebite documentation
 Snakebite is a python package that provides:
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+   
+   client
+   cli
+   minicluster
 
-   A pure python HDFS client library that uses protobuf messages over Hadoop RPC to communicate with the namenode. <client>
-   A command line interface (CLI) for HDFS that uses the pure python client library. <cli>
-   A hadoop minicluster wrapper. <minicluster>
+* :doc:`A pure python HDFS client library that uses protobuf messages over Hadoop RPC to communicate with the namenode. <client>`
+* :doc:`A command line interface (CLI) for HDFS that uses the pure python client library. <cli>`
+* :doc:`A hadoop minicluster wrapper. <minicluster>`
 
 Background
 ==========
@@ -52,7 +56,6 @@ TODO
 * Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well
 * More tests. Currently only integration tests with a minicluster are available.
 * Tests for the CLI.
-* Add tab-completion
 * Move to argparse to have arguments per command
 * Return correct exit codes from cli client.
 * Use generators when receiving messages (if and wherever possible).

@@ -49,9 +49,13 @@ class Commands(object):
     methods = {}
 
 
-def command(args="", descr="", allowed_opts=""):
+def command(args="", descr="", allowed_opts="", visible=True):
     def wrap(f):
-        Commands.methods[f.func_name] = {"method": f, "args": args, "descr": descr, "allowed_opts": allowed_opts}
+        Commands.methods[f.func_name] = {"method": f,
+                                         "args": args,
+                                         "descr": descr,
+                                         "allowed_opts": allowed_opts,
+                                         "visible": visible}
     return wrap
 
 
@@ -93,7 +97,7 @@ class SnakebiteCli(object):
         usage = "usage: %prog [options] cmd [args]"
 
         epilog = "\nCommands:\n"
-        epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (k, v['args']), v['descr']) for k, v in Commands.methods.iteritems()]))
+        epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (k, v['args']), v['descr']) for k, v in Commands.methods.iteritems() if v['visible']]))
         epilog += "\n\n"
 
         parser = MyParser(usage=usage, epilog=epilog)
@@ -152,6 +156,10 @@ class SnakebiteCli(object):
             exitError(e)
         except FileException, e:
             exitError(e)
+
+    @command(visible=False)
+    def commands(self):
+        print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
 
     @command(args="[path]", descr="list a path", allowed_opts=["d", "R"])
     def ls(self):
