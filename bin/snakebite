@@ -71,32 +71,53 @@ class SnakebiteCli(object):
         and create a ~/.snakebiterc from that.
         '''
         config_file = os.path.join(os.path.expanduser('~'), '.snakebiterc')
+
+        try_paths = ['/etc/hadoop/conf/core-site.xml',
+                     '/usr/local/etc/hadoop/conf/core-site.xml',
+                     '/usr/local/hadoop/conf/core-site.xml']
+
         if os.path.exists(config_file):
             config = json.loads(open(os.path.join(os.path.expanduser('~'), '.snakebiterc')).read())
             self.opts.namenode = config['namenode']
             self.opts.port = config['port']
         elif os.environ.get('HADOOP_HOME'):
             hdfs_conf = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
-            if os.path.exists(hdfs_conf):
-                tree = ET.parse(hdfs_conf)
-                root = tree.getroot()
-                for p in root.findall("./property"):
-                    if p.findall('name')[0].text == 'fs.defaultFS':
-                        parse_result = urlparse(p.findall('value')[0].text)
+            self._read_hadoop_config(hdfs_conf, config_file)
+        else:
+            # Try to find other paths
+            for hdfs_conf in try_paths:
+                self._read_hadoop_config(hdfs_conf, config_file)
+                # Bail out on the first find
+                if self.opts.namenode and self.opts.port:
+                    continue
 
-                        # Set config
-                        self.opts.namenode = parse_result.hostname
-                        self.opts.port = parse_result.port
-
-                        # Write config to file
-                        f = open(config_file, "w")
-                        f.write(json.dumps({"namenode": self.opts.namenode, "port": self.opts.port}))
-                        f.close()
-        elif self.opts.namenode and self.opts.port:
+        if self.opts.namenode and self.opts.port:
             return
         else:
             print "No ~/.snakebiterc found, no HADOOP_HOME set and no -n and -p provided"
+            print "Tried to find core-site.xml in:"
+            for hdfs_conf in try_paths:
+                print " - %s" % hdfs_conf
+            print "\nYou can manually create ~/.snakebite with the following content:"
+            print "{'namenode': 'ip/hostname', 'port': 54310}"
             sys.exit(1)
+
+    def _read_hadoop_config(self, hdfs_conf, config_file):
+        if os.path.exists(hdfs_conf):
+            tree = ET.parse(hdfs_conf)
+            root = tree.getroot()
+            for p in root.findall("./property"):
+                if p.findall('name')[0].text == 'fs.defaultFS':
+                    parse_result = urlparse(p.findall('value')[0].text)
+
+                    # Set config
+                    self.opts.namenode = parse_result.hostname
+                    self.opts.port = parse_result.port
+
+                    # Write config to file
+                    f = open(config_file, "w")
+                    f.write(json.dumps({"namenode": self.opts.namenode, "port": self.opts.port}))
+                    f.close()
 
     def _parse_opts(self):
         usage = "usage: %prog [options] cmd [args]"
