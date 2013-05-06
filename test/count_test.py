@@ -37,7 +37,9 @@ class CountTest(MiniClusterTestBase):
                 self.assertEqual(client_node[key], expected_node[key])
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.count, ['/doesnotexist'])
+        result = self.client.count(['/doesnotexist'])
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_invalid_input(self):
-            self.assertRaises(InvalidInputException, self.client.count, '/stringpath')
+        result = self.client.count('/stringpath')
+        self.assertRaises(InvalidInputException, result.next)

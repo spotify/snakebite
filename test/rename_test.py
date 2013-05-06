@@ -19,21 +19,24 @@ from minicluster_testbase import MiniClusterTestBase
 
 class RenameTest(MiniClusterTestBase):
     def test_rename_file(self):
-        self.client.rename(['/zerofile'], '/zerofile2')
-        expected_output = self.client.ls(['/zerofile2'], include_toplevel=True)
+        print list(self.client.rename(['/zerofile'], '/zerofile2'))
+        expected_output = list(self.client.ls(['/zerofile2'], include_toplevel=True))
         self.assertEqual(len(expected_output), 1)
         self.assertEqual(expected_output[0]['path'], '/zerofile2')
-        self.assertRaises(FileNotFoundException, self.client.ls, ['/zerofile'])
+        result = self.client.ls(['/zerofile'])
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_rename_multi(self):
-        self.client.rename(['/test1', '/test2'], '/dir1')
+        list(self.client.rename(['/test1', '/test2'], '/dir1'))
         expected_output = self.client.ls(['/dir1'])
         paths = set([node["path"] for node in expected_output])
         for path in ['/dir1/test1', '/dir1/test2']:
             self.assertTrue(path in paths)
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.rename, ['/doesnotexist'], '/somewhereelse')
+        result = self.client.rename(['/doesnotexist'], '/somewhereelse')
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_invalid_input(self):
-            self.assertRaises(InvalidInputException, self.client.rename, '/stringpath', '777')
+        result = self.client.rename('/stringpath', '777')
+        self.assertRaises(InvalidInputException, result.next)

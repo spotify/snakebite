@@ -63,10 +63,18 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">)</span>
 </pre></div>
 </div>
+<p><strong>IMPORTANT!!</strong></p>
+<p>All methods return generators, which mean they need to be consumed to execute!
+If you don&#8217;t care about the results, just create en empty for loop:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last"><tt class="docutils literal"><span class="pre">paths</span></tt> parameters in methods are often passed as lists, since operations can work on multiple
-paths. The return values of methods are always lists of results.</p>
+paths. Methods return generators that yield dictionaries.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -93,11 +101,14 @@ when paths contain globs.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list</em>) &#8211; List of paths to chgrp</li>
 <li><strong>group</strong> &#8211; New group</li>
 <li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive chgrp</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -112,11 +123,14 @@ when paths contain globs.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list</em>) &#8211; List of paths to chmod</li>
 <li><strong>mode</strong> (<em>int</em>) &#8211; Octal mode (e.g. 0755)</li>
 <li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive chmod</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -135,11 +149,14 @@ when paths contain globs.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list</em>) &#8211; List of paths to chmod</li>
 <li><strong>owner</strong> (<em>string</em>) &#8211; New owner</li>
 <li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive chown</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -157,10 +174,12 @@ when paths contain globs.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) &#8211; List of paths to count</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">count</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">count</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">]))</span>
 <span class="go">[{&#39;spaceConsumed&#39;: 260185L, &#39;quota&#39;: 2147483647L, &#39;spaceQuota&#39;: 18446744073709551615L, &#39;length&#39;: 260185L, &#39;directoryCount&#39;: 9L, &#39;path&#39;: &#39;/&#39;, &#39;fileCount&#39;: 34L}]</span>
 </pre></div>
 </div>
@@ -174,10 +193,13 @@ when paths contain globs.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list</em>) &#8211; Paths to delete</li>
 <li><strong>recurse</strong> (<em>boolean</em>) &#8211; Recursive delete (use with care!)</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -195,8 +217,16 @@ deleted. Snakebite doesn&#8217;t.</p>
 <dt id="client.Client.df">
 <tt class="descname">df</tt><big>(</big><big>)</big><a class="headerlink" href="#client.Client.df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get FS information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+</tr>
+</tbody>
+</table>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">df</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">df</span><span class="p">())</span>
 <span class="go">[{&#39;used&#39;: 491520L, &#39;capacity&#39;: 120137519104L, &#39;under_replicated&#39;: 0L, &#39;missing_blocks&#39;: 0L, &#39;filesystem&#39;: &#39;hdfs://localhost:54310&#39;, &#39;remaining&#39;: 19669295104L, &#39;corrupt_blocks&#39;: 0L}]</span>
 </pre></div>
 </div>
@@ -217,19 +247,19 @@ deleted. Snakebite doesn&#8217;t.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
 </table>
 <p><strong>Examples:</strong></p>
 <p>Children:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">du</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">du</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">]))</span>
 <span class="go">[{&#39;path&#39;: &#39;/Makefile&#39;, &#39;length&#39;: 6783L}, {&#39;path&#39;: &#39;/build&#39;, &#39;length&#39;: 244778L}, {&#39;path&#39;: &#39;/index.asciidoc&#39;, &#39;length&#39;: 100L}, {&#39;path&#39;: &#39;/source&#39;, &#39;length&#39;: 8524L}]</span>
 </pre></div>
 </div>
 <p>Directory only:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">du</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">],</span> <span class="n">include_toplevel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">include_children</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">du</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">],</span> <span class="n">include_toplevel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">include_children</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
 <span class="go">[{&#39;path&#39;: &#39;/&#39;, &#39;length&#39;: 260185L}]</span>
 </pre></div>
 </div>
@@ -251,24 +281,24 @@ deleted. Snakebite doesn&#8217;t.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
 </table>
 <p><strong>Examples:</strong></p>
 <p>Directory listing</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/&quot;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/&quot;</span><span class="p">]))</span>
 <span class="go">[{&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;access_time&#39;: 1367317324982L, &#39;block_replication&#39;: 1, &#39;modification_time&#39;: 1367317325346L, &#39;length&#39;: 6783L, &#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/Makefile&#39;}, {&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 493, &#39;file_type&#39;: &#39;d&#39;, &#39;access_time&#39;: 0L, &#39;block_replication&#39;: 0, &#39;modification_time&#39;: 1367317325431L, &#39;length&#39;: 0L, &#39;blocksize&#39;: 0L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/build&#39;}, {&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;access_time&#39;: 1367317326510L, &#39;block_replication&#39;: 1, &#39;modification_time&#39;: 1367317326522L, &#39;length&#39;: 100L, &#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/index.asciidoc&#39;}, {&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 493, &#39;file_type&#39;: &#39;d&#39;, &#39;access_time&#39;: 0L, &#39;block_replication&#39;: 0, &#39;modification_time&#39;: 1367317326628L, &#39;length&#39;: 0L, &#39;blocksize&#39;: 0L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/source&#39;}]</span>
 </pre></div>
 </div>
 <p>File listing</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/Makefile&quot;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/Makefile&quot;</span><span class="p">]))</span>
 <span class="go">[{&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;access_time&#39;: 1367317324982L, &#39;block_replication&#39;: 1, &#39;modification_time&#39;: 1367317325346L, &#39;length&#39;: 6783L, &#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/Makefile&#39;}]</span>
 </pre></div>
 </div>
 <p>Get directory information</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/source&quot;</span><span class="p">],</span> <span class="n">include_toplevel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">include_children</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/source&quot;</span><span class="p">],</span> <span class="n">include_toplevel</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">include_children</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
 <span class="go">[{&#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 493, &#39;file_type&#39;: &#39;d&#39;, &#39;access_time&#39;: 0L, &#39;block_replication&#39;: 0, &#39;modification_time&#39;: 1367317326628L, &#39;length&#39;: 0L, &#39;blocksize&#39;: 0L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;path&#39;: &#39;/source&#39;}]</span>
 </pre></div>
 </div>
@@ -282,11 +312,14 @@ deleted. Snakebite doesn&#8217;t.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list of strings</em>) &#8211; Paths to create</li>
 <li><strong>create_parent</strong> (<em>boolean</em>) &#8211; Also create the parent directories</li>
 <li><strong>mode</strong> (<em>int</em>) &#8211; Mode the directory should be created with</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -301,10 +334,13 @@ deleted. Snakebite doesn&#8217;t.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list</em>) &#8211; Source paths</li>
 <li><strong>dst</strong> (<em>string</em>) &#8211; destination</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -321,6 +357,8 @@ deleted. Snakebite doesn&#8217;t.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>list</em>) &#8211; Paths to delete</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+</tr>
 </tbody>
 </table>
 </dd></dl>
@@ -329,9 +367,17 @@ deleted. Snakebite doesn&#8217;t.</p>
 <dt id="client.Client.serverdefaults">
 <tt class="descname">serverdefaults</tt><big>(</big><big>)</big><a class="headerlink" href="#client.Client.serverdefaults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get server defaults</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+</tr>
+</tbody>
+</table>
 <p><strong>Example:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">serverdefaults</span><span class="p">()</span>
-<span class="go">{&#39;writePacketSize&#39;: 65536, &#39;fileBufferSize&#39;: 4096, &#39;replication&#39;: 1, &#39;bytesPerChecksum&#39;: 512, &#39;trashInterval&#39;: 0L, &#39;blockSize&#39;: 134217728L, &#39;encryptDataTransfer&#39;: False, &#39;checksumType&#39;: 2}</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">serverdefaults</span><span class="p">())</span>
+<span class="go">[{&#39;writePacketSize&#39;: 65536, &#39;fileBufferSize&#39;: 4096, &#39;replication&#39;: 1, &#39;bytesPerChecksum&#39;: 512, &#39;trashInterval&#39;: 0L, &#39;blockSize&#39;: 134217728L, &#39;encryptDataTransfer&#39;: False, &#39;checksumType&#39;: 2}]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -344,11 +390,14 @@ deleted. Snakebite doesn&#8217;t.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list</em>) &#8211; Paths</li>
 <li><strong>replication</strong> &#8211; Replication factor</li>
 <li><strong>recurse</strong> (<em>boolean</em>) &#8211; Apply replication factor recursive</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -365,10 +414,12 @@ deleted. Snakebite doesn&#8217;t.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>string</em>) &#8211; Path</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Example:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">stat</span><span class="p">([</span><span class="s">&#39;/index.asciidoc&#39;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">stat</span><span class="p">([</span><span class="s">&#39;/index.asciidoc&#39;</span><span class="p">]))</span>
 <span class="go">[{&#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;length&#39;: 100L, &#39;access_time&#39;: 1367317326510L, &#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;path&#39;: &#39;/index.asciidoc&#39;, &#39;modification_time&#39;: 1367317326522L, &#39;block_replication&#39;: 1}]</span>
 </pre></div>
 </div>
@@ -382,12 +433,15 @@ deleted. Snakebite doesn&#8217;t.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>path</strong> (<em>string</em>) &#8211; Path to test</li>
 <li><strong>exists</strong> (<em>boolean</em>) &#8211; Check if the path exists</li>
 <li><strong>directory</strong> &#8211; Check if the path exists</li>
 <li><strong>zero_length</strong> (<em>boolean</em>) &#8211; Check if the path is zero-length</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>
@@ -406,11 +460,14 @@ deleted. Snakebite doesn&#8217;t.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>paths</strong> (<em>list</em>) &#8211; Paths</li>
 <li><strong>replication</strong> &#8211; Replication factor</li>
 <li><strong>blocksize</strong> (<em>int</em>) &#8211; Block size (in bytes) of the newly created file</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
 </td>
 </tr>
 </tbody>

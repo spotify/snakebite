@@ -20,32 +20,34 @@ from minicluster_testbase import MiniClusterTestBase
 class DeleteTest(MiniClusterTestBase):
     def test_delete_file(self):
         before_state = set([node['path'] for node in self.client.ls(['/'])])
-        self.client.delete(['/zerofile'])
+        list(self.client.delete(['/zerofile']))
         after_state = set([node['path'] for node in self.client.ls(['/'])])
         self.assertEqual(len(after_state), len(before_state) - 1)
         self.assertFalse('/zerofile' in after_state)
 
     def test_delete_multi(self):
         before_state = set([node['path'] for node in self.client.ls(['/'])])
-        self.client.delete(['/test1', '/test2'])
+        list(self.client.delete(['/test1', '/test2']))
         after_state = set([node['path'] for node in self.client.ls(['/'])])
         self.assertEqual(len(after_state), len(before_state) - 2)
         self.assertFalse('/test1' in after_state or '/test2' in after_state)
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.delete, ['/doesnotexist'])
+        result = self.client.delete(['/doesnotexist'])
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_invalid_input(self):
-        self.assertRaises(InvalidInputException, self.client.delete, '/stringpath')
+        result = self.client.delete('/stringpath')
+        self.assertRaises(InvalidInputException, result.next)
 
     def test_recurse(self):
-        self.client.delete(['/foo'], recurse=True)
+        list(self.client.delete(['/foo'], recurse=True))
         client_output = self.client.ls(['/'])
         paths = [node['path'] for node in client_output]
         self.assertFalse('/foo' in paths)
 
     def test_glob(self):
-        self.client.delete(['/ba*'], recurse=True)
+        list(self.client.delete(['/ba*'], recurse=True))
         client_output = self.client.ls(['/'])
         paths = [node['path'] for node in client_output]
         self.assertFalse('/bar' in paths)

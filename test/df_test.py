@@ -19,11 +19,9 @@ from minicluster_testbase import MiniClusterTestBase
 class DfTest(MiniClusterTestBase):
 
     def test_df(self):
-        client_output = self.client.df()[0]
+        client_output = list(self.client.df())[0]
         expected_output = self.cluster.df("/").split("\n")[1]
 
-        print client_output
-        print expected_output
         (filesystem, capacity, used, remaining, pct) = re.split("\s+", expected_output)
 
         self.assertEqual(filesystem, client_output["filesystem"])

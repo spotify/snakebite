@@ -16,6 +16,7 @@ import datetime
 import stat
 import json
 import binascii
+import os.path
 
 
 def _octal_to_perm(octal):
@@ -78,19 +79,39 @@ def format_column(col, node, human_readable):
         return value
 
 
-def format_listing(listing, json_output=False, human_readable=False):
+def format_listing(listing, json_output=False, human_readable=False, recursive=False):
     if json_output:
-        return json.dumps(listing)
+        for node in listing:
+            yield json.dumps(node)
+    else:
+        nodes = []
+        last_dir = None
+        try:
+            while True:
+                node = listing.next()
+                dir_name = os.path.dirname(node['path'])
+                if dir_name != last_dir:
+                    if last_dir:
+                        yield _create_dir_listing(nodes, human_readable, recursive)
+                    last_dir = dir_name
+                    nodes = []
+                nodes.append(node)
 
+        except StopIteration:
+            yield _create_dir_listing(nodes, human_readable, recursive)
+
+
+def _create_dir_listing(nodes, human_readable, recursive):
     ret = []
-    ret.append("Found %d items" % len(listing))
+    if not recursive:
+        ret.append("Found %d items" % len(nodes))
     columns = ['file_type', 'permission', 'block_replication', 'owner', 'group', 'length', 'modification_time', 'path']
 
-    max_len = max([len(str(node.get('length'))) for node in listing] + [10])
-    max_owner = max([len(str(node.get('owner'))) for node in listing] + [10])
-    max_group = max([len(str(node.get('group'))) for node in listing] + [10])
+    max_len = max([len(str(node.get('length'))) for node in nodes] + [10])
+    max_owner = max([len(str(node.get('owner'))) for node in nodes] + [10])
+    max_group = max([len(str(node.get('group'))) for node in nodes] + [10])
     templ = "%%s%%s %%3s %%-%ds %%-%ds %%%ds %%s %%s" % (max_owner, max_group, max_len)
-    for node in listing:
+    for node in nodes:
         cols = [str(format_column(col, node, human_readable)) for col in columns]
         ret.append(templ % tuple(cols))
 
@@ -99,87 +120,96 @@ def format_listing(listing, json_output=False, human_readable=False):
 
 def format_results(results, json_output=False):
     if json_output:
-        return json.dumps(results)
-
-    ret = []
-    max_len = max(len(r.get('path')) for r in results)
-    templ = "%%-%ds %%-6s %%s" % max_len
-    for r in results:
-        if r['result']:
-            result = "OK"
-        else:
-            result = "ERROR:"
-        if r.get('error'):
-            error = r['error']
-        else:
-            error = ""
-
-        ret.append(templ % (r.get('path'), result, error))
-
-    return "\n".join(ret)
+        for result in results:
+            yield json.dumps(result)
+    else:
+        for r in results:
+            if r['result']:
+                yield "OK: %s" % r.get('path')
+            else:
+                yield "ERROR: %s (reason: %s)" % (r.get('path'), r.get('error', ''))
 
 
 def format_counts(results, json_output=False):
     if json_output:
-        return json.dumps(results)
-
-    ret = []
-    for result in results:
-        ret.append("%12s %12s %18s %s" % (result.get('directoryCount'),
-                                            result.get('fileCount'),
-                                            result.get('spaceConsumed'),
-                                            result.get('path')))
-    return "\n".join(ret)
+        for result in results:
+            yield json.dumps(result)
+    else:
+        for result in results:
+            yield "%12s %12s %18s %s" % (result.get('directoryCount'),
+                                                result.get('fileCount'),
+                                                result.get('spaceConsumed'),
+                                                result.get('path'))
 
 
 def format_fs_stats(results, json_output=False, human_readable=False):
-    r = results[0]
     if json_output:
-        return json.dumps(r)
-
-    fs = r['filesystem']
-    size = r['capacity']
-    used = r['used']
-    avail = r['remaining']
-    if avail == 0:
-        pct_used = 0
-    else:
-        pct_used = str((used / avail) * 100)
-
-    if human_readable:
-        size = _sizeof_fmt(int(size))
-        used = _sizeof_fmt(int(used))
-        avail = _sizeof_fmt(int(avail))
-
-    tmpl = "%%-%ds  %%%ds  %%%ds  %%%ds  %%%ds%%%%" % (max(len(str(fs)), len('Filesystem')),
-                                                       max(len(str(size)), len('Size')),
-                                                       max(len(str(used)), len('Used')),
-                                                       max(len(str(avail)), len('Available')),
-                                                       max(len(str(pct_used)), len('Use%')))
-
-    header = tmpl % ('Filesystem', 'Size', 'Used', 'Available', 'Use')
-    data = tmpl % (fs, size, used, avail, pct_used)
-    return "%s\n%s" % (header, data)
-
-
-def format_du(results, json_output=False, human_readable=False):
-    ret = []
-    if json_output:
-            return json.dumps(results)
-    if human_readable:
         for result in results:
-            result['length'] = _sizeof_fmt(result['length'])
-    max_len = max([len(str(r['length'])) for r in results])
+            yield json.dumps(result)
+    else:
+        r = list(results)[0]
+        fs = r['filesystem']
+        size = r['capacity']
+        used = r['used']
+        avail = r['remaining']
+        if avail == 0:
+            pct_used = 0
+        else:
+            pct_used = str((used / avail) * 100)
+
+        if human_readable:
+            size = _sizeof_fmt(int(size))
+            used = _sizeof_fmt(int(used))
+            avail = _sizeof_fmt(int(avail))
+
+        tmpl = "%%-%ds  %%%ds  %%%ds  %%%ds  %%%ds%%%%" % (max(len(str(fs)), len('Filesystem')),
+                                                           max(len(str(size)), len('Size')),
+                                                           max(len(str(used)), len('Used')),
+                                                           max(len(str(avail)), len('Available')),
+                                                           max(len(str(pct_used)), len('Use%')))
+
+        header = tmpl % ('Filesystem', 'Size', 'Used', 'Available', 'Use')
+        data = tmpl % (fs, size, used, avail, pct_used)
+        yield "%s\n%s" % (header, data)
+
+
+def format_du(listing, json_output=False, human_readable=False):
+    if json_output:
+        for result in listing:
+            yield json.dumps(result)
+    else:
+        nodes = []
+        last_dir = None
+        try:
+            while True:
+                node = listing.next()
+                dir_name = os.path.dirname(node['path'])
+                if dir_name != last_dir:
+                    if last_dir:
+                        yield _create_count_listing(nodes, human_readable)
+                    last_dir = dir_name
+                    nodes = []
+                nodes.append(node)
+        except StopIteration:
+            yield _create_count_listing(nodes, human_readable)
+
+
+def _create_count_listing(nodes, human_readable):
+    ret = []
+    if human_readable:
+        for node in nodes:
+            node['length'] = _sizeof_fmt(node['length'])
+    max_len = max([len(str(r['length'])) for r in nodes])
     templ = "%%-%ds  %%s" % max_len
-    for result in results:
-        ret.append(templ % (result['length'], result['path']))
+    for node in nodes:
+        ret.append(templ % (node['length'], node['path']))
     return "\n".join(ret)
 
 
 def format_stat(results, json_output=False):
     ret = []
     if json_output:
-        return json.dumps(results)
+        return json.dumps(list(results))
     for result in results:
         ret.append(str(result))
     return "\n".join(ret)

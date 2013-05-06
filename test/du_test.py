@@ -37,7 +37,9 @@ class DfTest(MiniClusterTestBase):
         assertDu(expected_output, client_output, self.assertEqual, self.assertEqual)
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.du, ['/nonexistent'])
+        result = self.client.du(['/nonexistent'])
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_invalid_input(self):
-        self.assertRaises(InvalidInputException, self.client.du, '/stringpath')
+        result = self.client.du('/stringpath')
+        self.assertRaises(InvalidInputException, result.next)

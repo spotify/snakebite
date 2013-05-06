@@ -20,24 +20,26 @@ from snakebite.errors import InvalidInputException
 class ChgrpTest(MiniClusterTestBase):
 
     def test_onepath(self):
-        self.client.chgrp(['/dir1'], "onepathgroup")
-        client_output = self.client.ls(['/dir1'], include_toplevel=True, include_children=False)
+        list(self.client.chgrp(['/dir1'], "onepathgroup"))
+        client_output = list(self.client.ls(['/dir1'], include_toplevel=True, include_children=False))
         self.assertEqual(client_output[0]["group"], "onepathgroup")
 
     def test_multipath(self):
-        self.client.chgrp(['/dir1', '/zerofile'], "multipathgroup")
+        list(self.client.chgrp(['/dir1', '/zerofile'], "multipathgroup"))
         client_output = self.client.ls(['/dir1', '/zerofile'], include_toplevel=True, include_children=False)
         for node in client_output:
             self.assertEqual(node["group"], "multipathgroup")
 
     def test_recursive(self):
-        self.client.chgrp(['/'], 'recursivegroup', recurse=True)
+        list(self.client.chgrp(['/'], 'recursivegroup', recurse=True))
         expected_output = self.cluster.ls(["/"], ["-R"])
         for node in expected_output:
             self.assertEqual(node["group"], "recursivegroup")
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.chgrp, ['/nonexistent'], 'myOnwer', recurse=True)
+        result = self.client.chgrp(['/nonexistent'], 'myOnwer', recurse=True)
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_invalid_input(self):
-        self.assertRaises(InvalidInputException, self.client.chgrp, '/doesnotexist', 'myOnwer')
+        result = self.client.chgrp('/doesnotexist', 'myOnwer')
+        self.assertRaises(InvalidInputException, result.next)

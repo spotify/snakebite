@@ -20,38 +20,40 @@ from snakebite.errors import InvalidInputException
 class ChownTest(MiniClusterTestBase):
 
     def test_onepath(self):
-        self.client.chown(['/dir1'], "onepathowner")
-        client_output = self.client.ls(['/dir1'], include_toplevel=True, include_children=False)
+        list(self.client.chown(['/dir1'], "onepathowner"))
+        client_output = list(self.client.ls(['/dir1'], include_toplevel=True, include_children=False))
         self.assertEqual(client_output[0]["owner"], "onepathowner")
 
     def test_multipath(self):
-        self.client.chown(['/dir1', '/zerofile'], "multipathowner")
+        list(self.client.chown(['/dir1', '/zerofile'], "multipathowner"))
         client_output = self.client.ls(['/dir1', '/zerofile'], include_toplevel=True, include_children=False)
         for node in client_output:
             self.assertEqual(node["owner"], "multipathowner")
 
     def test_recursive(self):
-        self.client.chown(['/'], 'recursiveowner', recurse=True)
+        list(self.client.chown(['/'], 'recursiveowner', recurse=True))
         expected_output = self.cluster.ls(["/"], ["-R"])
         for node in expected_output:
             self.assertEqual(node["owner"], "recursiveowner")
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.chown, ['/nonexistent'], 'myGroup', recurse=True)
+        result = self.client.chown(['/nonexistent'], 'myGroup', recurse=True)
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_user_group(self):
-        self.client.chown(['/dir1'], "myUser:myGroup")
-        client_output = self.client.ls(['/dir1'], include_toplevel=True, include_children=False)
+        list(self.client.chown(['/dir1'], "myUser:myGroup"))
+        client_output = list(self.client.ls(['/dir1'], include_toplevel=True, include_children=False))
         self.assertEqual(client_output[0]["owner"], "myUser")
         self.assertEqual(client_output[0]["group"], "myGroup")
 
     def test_group(self):
-        client_output = self.client.ls(['/dir1'], include_toplevel=True, include_children=False)
+        client_output = list(self.client.ls(['/dir1'], include_toplevel=True, include_children=False))
         expected_owner = client_output[0]["owner"]
-        self.client.chown(['/dir1'], ":mySuperGroup")
-        client_output = self.client.ls(['/dir1'], include_toplevel=True, include_children=False)
+        list(self.client.chown(['/dir1'], ":mySuperGroup"))
+        client_output = list(self.client.ls(['/dir1'], include_toplevel=True, include_children=False))
         self.assertEqual(client_output[0]["owner"], expected_owner)
         self.assertEqual(client_output[0]["group"], "mySuperGroup")
 
     def test_invalid_input(self):
-            self.assertRaises(InvalidInputException, self.client.chown, '/stringpath', 'myGroup')
+        result = self.client.chown('/stringpath', 'myGroup')
+        self.assertRaises(InvalidInputException, result.next)

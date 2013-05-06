@@ -201,25 +201,30 @@ class SnakebiteCli(object):
                                   include_toplevel=include_toplevel,
                                   include_children=include_children)
 
-        print format_listing(listing, json_output=self.opts.json,
-                                     human_readable=self.opts.human)
+        for line in  format_listing(listing, json_output=self.opts.json,
+                                             human_readable=self.opts.human,
+                                             recursive=recurse):
+            print line
 
     @command(args="[paths]", descr="create directories")
     def mkdir(self):
         creations = self.client.mkdir(self.args)
-        print format_results(creations, json_output=self.opts.json)
+        for line in format_results(creations, json_output=self.opts.json):
+            print line
 
     @command(args="[paths]", descr="create directories and their parents")
     def mkdirp(self):
         creations = self.client.mkdir(self.args, create_parent=True)
-        print format_results(creations, json_output=self.opts.json)
+        for line in format_results(creations, json_output=self.opts.json):
+            print line
 
     @command(args="<owner:grp> [paths]", descr="change owner", allowed_opts=["R"])
     def chown(self):
         owner = self.args.pop(0)
         try:
             mods = self.client.chown(self.args, owner, recurse=self.opts.recurse)
-            print format_results(mods, json_output=self.opts.json)
+            for line in format_results(mods, json_output=self.opts.json):
+                print line
         except FileNotFoundException, e:
             exitError(e)
 
@@ -227,24 +232,28 @@ class SnakebiteCli(object):
     def chmod(self):
         mode = int(self.args.pop(0), 8)
         mods = self.client.chmod(self.args, mode, recurse=self.opts.recurse)
-        print format_results(mods, json_output=self.opts.json)
+        for line in format_results(mods, json_output=self.opts.json):
+            print line
 
     @command(args="<grp> [paths]", descr="change group", allowed_opts=["R"])
     def chgrp(self):
         grp = self.args.pop(0)
         mods = self.client.chgrp(self.args, grp, recurse=self.opts.recurse)
-        print format_results(mods, json_output=self.opts.json)
+        for line in format_results(mods, json_output=self.opts.json):
+            print line
 
     @command(args="[paths]", descr="display stats for paths")
     def count(self):
         counts = self.client.count(self.args)
-        print format_counts(counts, json_output=self.opts.json)
+        for line in format_counts(counts, json_output=self.opts.json):
+            print line
 
     @command(args="", descr="display fs stats")
     def df(self):
         result = self.client.df()
-        print format_fs_stats(result, json_output=self.opts.json,
-                                 human_readable=self.opts.human)
+        for line in format_fs_stats(result, json_output=self.opts.json,
+                                            human_readable=self.opts.human):
+            print line
 
     @command(args="[paths]", descr="display disk usage statistics", allowed_opts=["s"])
     def du(self):
@@ -255,40 +264,47 @@ class SnakebiteCli(object):
             include_children = True
             include_toplevel = False
         result = self.client.du(self.args, include_toplevel=include_toplevel, include_children=include_children)
-        print format_du(result, json_output=self.opts.json, human_readable=self.opts.human)
+        for line in format_du(result, json_output=self.opts.json, human_readable=self.opts.human):
+            print line
 
     @command(args="[paths] dst", descr="move paths to destination")
     def mv(self):
         paths = self.args[:-1]
         dst = self.args[-1]
         result = self.client.rename(paths, dst)
-        print format_results(result)
+        for line in format_results(result, json_output=self.opts.json):
+            print line
 
     @command(args="[paths]", descr="remove paths", allowed_opts=["R"])
     def rm(self):
         result = self.client.delete(self.args, recurse=self.opts.recurse)
-        print format_results(result)
+        for line in format_results(result, json_output=self.opts.json):
+            print line
 
     @command(args="[paths]", descr="creates a file of zero length")
     def touchz(self):
         result = self.client.touchz(self.args)
-        print format_results(result)
+        for line in format_results(result, json_output=self.opts.json):
+            print line
 
     @command(args="", descr="show server information")
     def serverdefaults(self):
         result = self.client.serverdefaults()
-        print result
+        for line in result:
+            print line
 
     @command(args="[dirs]", descr="delete a directory")
     def rmdir(self):
         result = self.client.rmdir(self.args)
-        print format_results(result)
+        for line in format_results(result, json_output=self.opts.json):
+            print line
 
     @command(args="<rep> [paths]", descr="set replication factor", allowed_opts=['R'])
     def setrep(self):
         rep_factor = int(self.args.pop(0))
         result = self.client.setrep(self.args, rep_factor, recurse=self.opts.recurse)
-        print format_results(result)
+        for line in format_results(result, json_output=self.opts.json):
+            print line
 
     @command(args="<cmd>", descr="show cmd usage")
     def usage(self):

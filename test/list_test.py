@@ -22,35 +22,35 @@ class ListTest(MiniClusterTestBase):
 
     def test_toplevel_root(self):
         expected_output = self.cluster.ls(['/'])
-        client_output = self.client.ls(['/'])
+        client_output = list(self.client.ls(['/']))
         assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
 
     def test_toplevel_dir(self):
-        client_output = self.client.ls(['/dir1'], include_toplevel=True, include_children=False)
+        client_output = list(self.client.ls(['/dir1'], include_toplevel=True, include_children=False))
         self.assertEqual(len(client_output), 1)
         self.assertEqual(client_output[0]['file_type'], 'd')
         self.assertEqual(client_output[0]['length'], 0)
 
     def test_zerofile(self):
-        client_output = self.client.ls(['/zerofile'], include_toplevel=True, include_children=False)
+        client_output = list(self.client.ls(['/zerofile'], include_toplevel=True, include_children=False))
         self.assertEqual(len(client_output), 1)
         self.assertEqual(client_output[0]['file_type'], 'f')
         self.assertEqual(client_output[0]['length'], 0)
 
     def test_file_even_if_toplevel_is_false(self):
-        client_output = self.client.ls(['/zerofile'])
+        client_output = list(self.client.ls(['/zerofile']))
         self.assertEqual(len(client_output), 1)
         self.assertEqual(client_output[0]['file_type'], 'f')
         self.assertEqual(client_output[0]['length'], 0)
 
     def test_root_incl_toplevel(self):
         expected_output = self.cluster.ls(['/'])
-        result = self.client.ls(['/'], include_toplevel=True, include_children=True)
-        self.assertEqual(len(result), len(expected_output) + 1)
+        client_output = list(self.client.ls(['/'], include_toplevel=True, include_children=True))
+        self.assertEqual(len(client_output), len(expected_output) + 1)
 
     def test_root_recursive(self):
         expected_output = self.cluster.ls(['/'], ['-R'])
-        client_output = self.client.ls(['/'], include_toplevel=False, recurse=True)
+        client_output = list(self.client.ls(['/'], include_toplevel=False, recurse=True))
         assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
 
     def test_multiple_files(self):
@@ -62,31 +62,33 @@ class ListTest(MiniClusterTestBase):
 
     def test_glob(self):
         expected_output = self.cluster.ls(['/b*'])
-        client_output = self.client.ls(['/b*'])
+        client_output = list(self.client.ls(['/b*']))
         self.assertTrue(len(client_output) > 1)
         self.assertTrue(len(expected_output) > 1)
         assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
 
         expected_output = self.cluster.ls(['/{foo,bar}'])
-        client_output = self.client.ls(['/{foo,bar}'])
+        client_output = list(self.client.ls(['/{foo,bar}']))
         self.assertTrue(len(client_output) > 1)
         self.assertTrue(len(expected_output) > 1)
         assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
 
         expected_output = self.cluster.ls(['/[fb]*/*/*/qux'])
-        client_output = self.client.ls(['/[fb]*/*/*/qux'])
+        client_output = list(self.client.ls(['/[fb]*/*/*/qux']))
         self.assertTrue(len(client_output) > 1)
         self.assertTrue(len(expected_output) > 1)
         assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
 
         expected_output = self.cluster.ls(['/{foo,bar}/*/*/qux'])
-        client_output = self.client.ls(['/{foo,bar}/*/*/qux'])
+        client_output = list(self.client.ls(['/{foo,bar}/*/*/qux']))
         self.assertTrue(len(client_output) > 1)
         self.assertTrue(len(expected_output) > 1)
         assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.ls, ['/doesnotexist'])
+        result = self.client.ls(['/doesnotexist'])
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_invalid_input(self):
-        self.assertRaises(InvalidInputException, self.client.ls, '/stringpath')
+        result = self.client.ls('/stringpath')
+        self.assertRaises(InvalidInputException, result.next)

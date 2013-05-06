@@ -39,9 +39,20 @@ class Client(object):
     >>> from snakebite.client import Client
     >>> client = Client("localhost", 54310)
 
+    **IMPORTANT!!**
+
+    All methods return generators, which mean they need to be consumed to execute!
+    If you don't care about the results, just create en empty for loop:
+
+    .. code-block:: python
+
+        result = client.ls(['/'])
+        for item in result:
+            pass
+
     .. note::
         ``paths`` parameters in methods are often passed as lists, since operations can work on multiple
-        paths. The return values of methods are always lists of results.
+        paths. Methods return generators that yield dictionaries.
 
     .. note::
         Parameters like ``include_children``, ``include_toplevel`` and ``recurse`` are not used
@@ -76,32 +87,33 @@ class Client(object):
         :type include_toplevel: boolean
         :param include_children: Include child nodes in the listing.
         :type include_children: boolean
-        :returns: list of dictionaries
+        :returns: a generator that yields dictionaries
 
         **Examples:**
 
         Directory listing
 
-        >>> client.ls(["/"])
+        >>> list(client.ls(["/"]))
         [{'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317324982L, 'block_replication': 1, 'modification_time': 1367317325346L, 'length': 6783L, 'blocksize': 134217728L, 'owner': u'wouter', 'path': '/Makefile'}, {'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1367317325431L, 'length': 0L, 'blocksize': 0L, 'owner': u'wouter', 'path': '/build'}, {'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317326510L, 'block_replication': 1, 'modification_time': 1367317326522L, 'length': 100L, 'blocksize': 134217728L, 'owner': u'wouter', 'path': '/index.asciidoc'}, {'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1367317326628L, 'length': 0L, 'blocksize': 0L, 'owner': u'wouter', 'path': '/source'}]
 
         File listing
 
-        >>> client.ls(["/Makefile"])
+        >>> list(client.ls(["/Makefile"]))
         [{'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'access_time': 1367317324982L, 'block_replication': 1, 'modification_time': 1367317325346L, 'length': 6783L, 'blocksize': 134217728L, 'owner': u'wouter', 'path': '/Makefile'}]
 
         Get directory information
 
-        >>> client.ls(["/source"], include_toplevel=True, include_children=False)
+        >>> list(client.ls(["/source"], include_toplevel=True, include_children=False))
         [{'group': u'supergroup', 'permission': 493, 'file_type': 'd', 'access_time': 0L, 'block_replication': 0, 'modification_time': 1367317326628L, 'length': 0L, 'blocksize': 0L, 'owner': u'wouter', 'path': '/source'}]
         '''
         if not type(paths) == type([]):
             raise InvalidInputException("Paths should be a list")
 
-        return self._find_items(paths, self._handle_ls,
+        for item in self._find_items(paths, self._handle_ls,
                                include_toplevel=include_toplevel,
                                include_children=include_children,
-                               recurse=recurse)
+                               recurse=recurse):
+            yield item
 
     LISTING_ATTRIBUTES = ['length', 'owner', 'group', 'block_replication',
                           'modification_time', 'access_time', 'blocksize']
@@ -128,6 +140,7 @@ class Client(object):
         :type mode: int
         :param recurse: Recursive chmod
         :type recurse: boolean
+        :returns: a generator that yields dictionaries
 
         .. note:: The top level directory is always included when `recurse=True`'''
         if not type(paths) == type([]):
@@ -138,8 +151,10 @@ class Client(object):
             raise InvalidInputException("chmod: no mode given")
 
         processor = lambda path, node, mode=mode: self._handle_chmod(path, node, mode)
-        return self._find_items(paths, processor, include_toplevel=True,
-                               include_children=False, recurse=recurse)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                                                       include_children=False,
+                                                       recurse=recurse):
+            yield item
 
     def _handle_chmod(self, path, node, mode):
         request = client_proto.SetPermissionRequestProto()
@@ -157,6 +172,7 @@ class Client(object):
         :type owner: string
         :param recurse: Recursive chown
         :type recurse: boolean
+        :returns: a generator that yields dictionaries
 
         This always include the toplevel when recursing.'''
         if not type(paths) == type([]):
@@ -167,8 +183,9 @@ class Client(object):
             raise InvalidInputException("chown: no owner given")
 
         processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
-        return self._find_items(paths, processor, include_toplevel=True,
-                               include_children=False, recurse=recurse)
+        for item in  self._find_items(paths, processor, include_toplevel=True,
+                               include_children=False, recurse=recurse):
+            yield item
 
     def _handle_chown(self, path, node, owner):
         if ":" in owner:
@@ -194,6 +211,7 @@ class Client(object):
         :type mode: string
         :param recurse: Recursive chgrp
         :type recurse: boolean
+        :returns: a generator that yields dictionaries
 
         '''
         if not type(paths) == type([]):
@@ -205,18 +223,20 @@ class Client(object):
 
         owner = ":%s" % group
         processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
-        return self._find_items(paths, processor, include_toplevel=True,
-                               include_children=False, recurse=recurse)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                               include_children=False, recurse=recurse):
+            yield item
 
     def count(self, paths):
         ''' Count files in a path
 
         :param paths: List of paths to count
         :type paths: list
+        :returns: a generator that yields dictionaries
 
         **Examples:**
 
-        >>> client.count(['/'])
+        >>> list(client.count(['/']))
         [{'spaceConsumed': 260185L, 'quota': 2147483647L, 'spaceQuota': 18446744073709551615L, 'length': 260185L, 'directoryCount': 9L, 'path': '/', 'fileCount': 34L}]
 
         '''
@@ -226,8 +246,9 @@ class Client(object):
             raise InvalidInputException("count: no path given")
 
         processor = lambda path, node: self._handle_count(path, node)
-        return self._find_items(paths, processor, include_toplevel=True,
-                               include_children=False, recurse=False)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                               include_children=False, recurse=False):
+            yield item
 
     COUNT_ATTRIBUTES = ['length', 'fileCount', 'directoryCount', 'quota', 'spaceConsumed', 'spaceQuota']
 
@@ -243,13 +264,16 @@ class Client(object):
     def df(self):
         ''' Get FS information
 
+        :returns: a generator that yields dictionaries
+
         **Examples:**
 
-        >>> client.df()
+        >>> list(client.df())
         [{'used': 491520L, 'capacity': 120137519104L, 'under_replicated': 0L, 'missing_blocks': 0L, 'filesystem': 'hdfs://localhost:54310', 'remaining': 19669295104L, 'corrupt_blocks': 0L}]
         '''
         processor = lambda path, node: self._handle_df(path, node)
-        return self._find_items(['/'], processor, include_toplevel=True, include_children=False, recurse=False)
+        for item in self._find_items(['/'], processor, include_toplevel=True, include_children=False, recurse=False):
+            yield item
 
     def _handle_df(self, path, node):
         request = client_proto.GetFsStatusRequestProto()
@@ -269,18 +293,18 @@ class Client(object):
         :type include_toplevel: boolean
         :param include_children: Include child nodes in the result.
         :type include_children: boolean
-        :returns: list of dictionaries
+        :returns: a generator that yields dictionaries
 
         **Examples:**
 
         Children:
 
-        >>> client.du(['/'])
+        >>> list(client.du(['/']))
         [{'path': '/Makefile', 'length': 6783L}, {'path': '/build', 'length': 244778L}, {'path': '/index.asciidoc', 'length': 100L}, {'path': '/source', 'length': 8524L}]
 
         Directory only:
 
-        >>> client.du(['/'], include_toplevel=True, include_children=False)
+        >>> list(client.du(['/'], include_toplevel=True, include_children=False))
         [{'path': '/', 'length': 260185L}]
 
         '''
@@ -290,8 +314,9 @@ class Client(object):
             raise InvalidInputException("du: no path given")
 
         processor = lambda path, node: self._handle_du(path, node)
-        return self._find_items(paths, processor, include_toplevel=include_toplevel,
-                               include_children=include_children, recurse=False)
+        for item in self._find_items(paths, processor, include_toplevel=include_toplevel,
+                               include_children=include_children, recurse=False):
+            yield item
 
     def _handle_du(self, path, node):
         request = client_proto.GetContentSummaryRequestProto()
@@ -306,6 +331,7 @@ class Client(object):
         :type paths: list
         :param dst: destination
         :type dst: string
+        :returns: a generator that yields dictionaries
         '''
         if not type(paths) == type([]):
             raise InvalidInputException("Paths should be a list")
@@ -315,7 +341,8 @@ class Client(object):
             raise InvalidInputException("rename: no destination given")
 
         processor = lambda path, node, dst=dst: self._handle_rename(path, node, dst)
-        return self._find_items(paths, processor, include_toplevel=True)
+        for item in self._find_items(paths, processor, include_toplevel=True):
+            yield item
 
     def _handle_rename(self, path, node, dst):
         request = client_proto.RenameRequestProto()
@@ -331,6 +358,7 @@ class Client(object):
         :type paths: list
         :param recurse: Recursive delete (use with care!)
         :type recurse: boolean
+        :returns: a generator that yields dictionaries
 
         .. note:: Recursive deletion uses the NameNode recursive deletion functionality
                  instead of letting the client recurse. Hadoops client recurses
@@ -343,7 +371,8 @@ class Client(object):
             raise InvalidInputException("delete: no path given")
 
         processor = lambda path, node, recurse=recurse: self._handle_delete(path, node, recurse)
-        return self._find_items(paths, processor, include_toplevel=True)
+        for item in self._find_items(paths, processor, include_toplevel=True):
+            yield item
 
     def _handle_delete(self, path, node, recurse):
         if (self._is_dir(node) and not recurse):
@@ -364,6 +393,7 @@ class Client(object):
 
         :param paths: Paths to delete
         :type paths: list
+        :returns: a generator that yields dictionaries
 
         .. note: directories have to be empty.
         '''
@@ -373,7 +403,8 @@ class Client(object):
             raise InvalidInputException("rmdir: no path given")
 
         processor = lambda path, node: self._handle_rmdir(path, node)
-        return self._find_items(paths, processor, include_toplevel=True)
+        for item in self._find_items(paths, processor, include_toplevel=True):
+            yield item
 
     def _handle_rmdir(self, path, node):
         if not self._is_dir(node):
@@ -395,6 +426,7 @@ class Client(object):
         :type recurse: int
         :param blocksize: Block size (in bytes) of the newly created file
         :type blocksize: int
+        :returns: a generator that yields dictionaries
         '''
 
         if not type(paths) == type([]):
@@ -413,7 +445,8 @@ class Client(object):
             blocksize = defaults['blockSize']
 
         processor = lambda path, node, replication=replication, blocksize=blocksize: self._handle_touchz(path, node, replication, blocksize)
-        return self._find_items(paths, processor, include_toplevel=True, check_nonexistence=True)
+        for item in self._find_items(paths, processor, include_toplevel=True, check_nonexistence=True):
+            yield item
 
     def _handle_touchz(self, path, node, replication, blocksize):
         # Item already exists
@@ -442,6 +475,7 @@ class Client(object):
         :type recurse: int
         :param recurse: Apply replication factor recursive
         :type recurse: boolean
+        :returns: a generator that yields dictionaries
         '''
         if not type(paths) == type([]):
             raise InvalidInputException("Paths should be a list")
@@ -451,8 +485,9 @@ class Client(object):
             raise InvalidInputException("setrep: no replication given")
 
         processor = lambda path, node, replication=replication: self._handle_setrep(path, node, replication)
-        return self._find_items(paths, processor, include_toplevel=True,
-                               include_children=False, recurse=recurse)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                               include_children=False, recurse=recurse):
+            yield item
 
     def _handle_setrep(self, path, node, replication):
         if not self._is_dir(node):
@@ -493,10 +528,11 @@ class Client(object):
 
         :param paths: Path
         :type paths: string
+        :returns: a generator that yields dictionaries
 
         **Example:**
 
-        >>> client.stat(['/index.asciidoc'])
+        >>> list(client.stat(['/index.asciidoc']))
         [{'blocksize': 134217728L, 'owner': u'wouter', 'length': 100L, 'access_time': 1367317326510L, 'group': u'supergroup', 'permission': 420, 'file_type': 'f', 'path': '/index.asciidoc', 'modification_time': 1367317326522L, 'block_replication': 1}]
         '''
         if not type(paths) == type([]):
@@ -505,7 +541,8 @@ class Client(object):
             raise InvalidInputException("stat: no path given")
 
         processor = lambda path, node: self._handle_stat(path, node)
-        return self._find_items(paths, processor, include_toplevel=True)
+        for item in self._find_items(paths, processor, include_toplevel=True):
+            yield item
 
     def _handle_stat(self, path, node):
         return {"path": path,
@@ -530,6 +567,7 @@ class Client(object):
         :type exists: boolean
         :param zero_length: Check if the path is zero-length
         :type zero_length: boolean
+        :returns: a generator that yields dictionaries
 
         .. note:: directory and zero lenght are AND'd.
         '''
@@ -540,10 +578,11 @@ class Client(object):
 
         processor = lambda path, node, exists=exists, directory=directory, zero_length=zero_length: self._handle_test(path, node, exists, directory, zero_length)
         try:
-            return self._find_items([path], processor, include_toplevel=True)[0]
+            for item in self._find_items([path], processor, include_toplevel=True):
+                yield item
         except FileNotFoundException, e:
             if exists:
-                return False
+                yield False
             else:
                 raise e
 
@@ -559,13 +598,13 @@ class Client(object):
         :type create_parent: boolean
         :param mode: Mode the directory should be created with
         :type mode: int
+        :returns: a generator that yields dictionaries
         '''
         if not type(paths) == type([]):
             raise InvalidInputException("Paths should be a list")
         if not paths:
             raise InvalidInputException("mkdirs: no path given")
 
-        creations = []
         for path in paths:
             orig_path = path
             if not path.startswith("/"):
@@ -579,24 +618,25 @@ class Client(object):
                     request.masked.perm = mode
                     request.createParent = create_parent
                     response = self.service.mkdirs(request)
-                    creations.append({"path": orig_path, "result": response.result})
+                    yield {"path": orig_path, "result": response.result}
                 except RequestError, e:
-                    creations.append({"path": orig_path, "result": False, "error": str(e)})
+                    yield {"path": orig_path, "result": False, "error": str(e)}
             else:
-                creations.append({"path": path, "result": False, "error": "mkdir: `%s': File exists" % orig_path})
-        return creations
+                yield {"path": path, "result": False, "error": "mkdir: `%s': File exists" % orig_path}
 
     def serverdefaults(self):
         '''Get server defaults
 
+        :returns: a generator that yields dictionaries
+
         **Example:**
 
-        >>> client.serverdefaults()
-        {'writePacketSize': 65536, 'fileBufferSize': 4096, 'replication': 1, 'bytesPerChecksum': 512, 'trashInterval': 0L, 'blockSize': 134217728L, 'encryptDataTransfer': False, 'checksumType': 2}
+        >>> list(client.serverdefaults())
+        [{'writePacketSize': 65536, 'fileBufferSize': 4096, 'replication': 1, 'bytesPerChecksum': 512, 'trashInterval': 0L, 'blockSize': 134217728L, 'encryptDataTransfer': False, 'checksumType': 2}]
         '''
         request = client_proto.GetServerDefaultsRequestProto()
         response = self.service.getServerDefaults(request).serverDefaults
-        return {'blockSize': response.blockSize, 'bytesPerChecksum': response.bytesPerChecksum,
+        yield {'blockSize': response.blockSize, 'bytesPerChecksum': response.bytesPerChecksum,
                 'writePacketSize': response.writePacketSize, 'replication': response.replication,
                 'fileBufferSize': response.fileBufferSize, 'encryptDataTransfer': response.encryptDataTransfer,
                 'trashInterval': response.trashInterval, 'checksumType': response.checksumType}
@@ -636,7 +676,7 @@ class Client(object):
         :param recurse:
             Recurse into children if they are directories.
         '''
-        collection = []
+        #collection = []
 
         if not paths:
             paths = [os.path.join("/user", pwd.getpwuid(os.getuid())[0])]
@@ -652,40 +692,39 @@ class Client(object):
 
             if glob.has_magic(path):
                 log.debug("Dealing with globs in %s" % path)
-                collection += self._glob_find(path, processor, include_toplevel)
+                for item in self._glob_find(path, processor, include_toplevel):
+                    yield item
             else:
                 fileinfo = self._get_file_info(path)
                 if not fileinfo and not check_nonexistence:
                     raise FileNotFoundException("`%s': No such file or directory" % path)
                 elif not fileinfo and check_nonexistence:
-                    collection.append(processor(path, None))
-                    return collection
+                    yield processor(path, None)
 
                 if include_toplevel or not self._is_dir(fileinfo.fs):
                     # Construct the full path before processing
                     full_path = self._get_full_path(path, fileinfo.fs)
                     log.debug("Added %s to to result set" % full_path)
                     entry = processor(full_path, fileinfo.fs)
-                    collection.append(entry)
+                    yield entry
 
                 if self._is_dir(fileinfo.fs) and (include_children or recurse):
                     listing = self._get_dir_listing(path)
                     for node in listing.dirList.partialListing:
                         full_path = self._get_full_path(path, node)
                         entry = processor(full_path, node)
-                        collection.append(entry)
+                        yield entry
 
                         # Recurse into directories
                         if recurse and self._is_dir(node):
                             # Construct the full path before processing
                             full_path = os.path.join(path, node.path)
-                            collection += self._find_items([full_path],
+                            for item in self._find_items([full_path],
                                                           processor,
                                                           include_toplevel=False,
                                                           include_children=False,
-                                                          recurse=recurse)
-
-        return collection
+                                                          recurse=recurse):
+                                yield item
 
     def _get_dir_listing(self, path):
         request = client_proto.GetListingRequestProto()
@@ -701,7 +740,6 @@ class Client(object):
         we don't add the found children to the result, but traverse into paths
         that did have a match.
         '''
-        collection = []
         # Split path elements and check where the first occurence of magic is
         path_elements = path.split("/")
         for i, element in enumerate(path_elements):
@@ -739,26 +777,22 @@ class Client(object):
                     # If we have a match, but need to go deeper, we recurse
                     if rest and glob.has_magic(rest):
                         traverse_path = "/".join([full_path, rest])
-                        collection += self._glob_find(traverse_path, processor, include_toplevel)
+                        for item in self._glob_find(traverse_path, processor, include_toplevel):
+                            yield item
                     else:
                         # If the matching node is a directory, we list the directory
                         # This is what the hadoop client does at least.
                         if self._is_dir(node):
                             if include_toplevel:
-                                entry = processor(full_path, node)
-                                collection.append(entry)
+                                yield processor(full_path, node)
                             fp = self._get_full_path(check_path, node)
                             dir_list = self._get_dir_listing(fp)
                             if dir_list:  # It might happen that the directory above has been removed
                                 for n in dir_list.dirList.partialListing:
                                     full_child_path = self._get_full_path(fp, n)
-                                    entry = processor(full_child_path, n)
-                                    collection.append(entry)
+                                    yield processor(full_child_path, n)
                         else:
-                            entry = processor(full_path, node)
-                            collection.append(entry)
-
-        return collection
+                            yield processor(full_path, node)
 
     def _is_dir(self, entry):
         return self.FILETYPES.get(entry.fileType) == "d"

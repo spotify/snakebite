@@ -20,12 +20,12 @@ from snakebite.errors import InvalidInputException
 class ChmodTest(MiniClusterTestBase):
 
     def test_onepath(self):
-        self.client.chmod(['/dir1'], 0777)
-        client_output = self.client.ls(['/dir1'], include_toplevel=True, include_children=False)
+        list(self.client.chmod(['/dir1'], 0777))
+        client_output = list(self.client.ls(['/dir1'], include_toplevel=True, include_children=False))
         self.assertEqual(client_output[0]["permission"], 511)
 
     def test_multipath(self):
-        self.client.chmod(['/dir1', '/zerofile'], 0700)
+        list(self.client.chmod(['/dir1', '/zerofile'], 0700))
         client_output = self.client.ls(['/dir1', '/zerofile'], include_toplevel=True, include_children=False)
         for node in client_output:
             if node["file_type"] == "d":
@@ -34,7 +34,7 @@ class ChmodTest(MiniClusterTestBase):
                 self.assertEqual(node["permission"], 384)
 
     def test_recursive(self):
-        self.client.chmod(['/'], 0770, recurse=True)
+        list(self.client.chmod(['/'], 0770, recurse=True))
         expected_output = self.cluster.ls(["/"], ["-R"])
         for node in expected_output:
             if node["file_type"] == "d":
@@ -43,7 +43,9 @@ class ChmodTest(MiniClusterTestBase):
                 self.assertEqual(node["permission"], 432)
 
     def test_unknown_file(self):
-        self.assertRaises(FileNotFoundException, self.client.chmod, ['/nonexistent'], 0777, recurse=True)
+        result = self.client.chmod(['/nonexistent'], 0777, recurse=True)
+        self.assertRaises(FileNotFoundException, result.next)
 
     def test_invalid_input(self):
-            self.assertRaises(InvalidInputException, self.client.chmod, '/stringpath', 777)
+        result = self.client.chmod('/stringpath', 777)
+        self.assertRaises(InvalidInputException, result.next)
