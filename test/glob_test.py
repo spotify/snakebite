@@ -20,5 +20,5 @@ class GlobTest(unittest2.TestCase):
     def test_path_expansion(self):
         paths = ['/foo/bar', '/foo/{bar,baz}', '/foo/{bar,baz}/{quz,quux}', '/foo/{bar,baz}/{quz,quux}/{aap}']
         expected = ['/foo/bar', '/foo/bar', '/foo/baz', '/foo/bar/quz', '/foo/bar/quux', '/foo/baz/quz', '/foo/baz/quux', '/foo/bar/quz/aap', '/foo/bar/quux/aap', '/foo/baz/quz/aap', '/foo/baz/quux/aap']
-        new_paths = glob.expandPaths(paths)
+        new_paths = glob.expand_paths(paths)
         self.assertEqual(new_paths, expected)

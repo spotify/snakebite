@@ -124,7 +124,7 @@ class SocketRpcChannel(service.RpcChannel):
         self.sock = None
         self.call_id = 0
 
-    def validateRequest(self, request):
+    def validate_request(self, request):
         '''Validate the client request against the protocol file.'''
 
         # Check the request is correctly initialized
@@ -132,7 +132,7 @@ class SocketRpcChannel(service.RpcChannel):
             print dir(request)
             raise Exception("Client request (%s) is missing mandatory fields" % type(request))
 
-    def openSocket(self, host, port, context):
+    def open_socket(self, host, port, context):
         '''Open a socket connection to a given host and port and writes the Hadoop header
         The Hadoop RPC protocol looks like this when creating a connection:
 
@@ -167,10 +167,10 @@ class SocketRpcChannel(service.RpcChannel):
         self.sock.send(struct.pack('!I', len(context)))        # length of connection context (32bit int)
         self.sock.send(context)                                # connection context
 
-    def createRpcRequest(self, method, request):
+    def create_rpc_request(self, method, request):
         '''Wraps the user's request in an HadoopRpcRequestProto message and serializes it delimited.'''
         s_request = request.SerializeToString()
-        self.logProtobufMessage("Protobuf message", request)
+        self.log_protobuf_message("Protobuf message", request)
         log.debug("Protobuf message bytes (%d): %s" % (len(s_request), format_bytes(s_request)))
         rpcRequest = hadoop_rpc.HadoopRpcRequestProto()
         rpcRequest.methodName = method.name
@@ -180,10 +180,10 @@ class SocketRpcChannel(service.RpcChannel):
 
         # Serialize delimited
         s_rpcRequest = rpcRequest.SerializeToString()
-        self.logProtobufMessage("RpcRequest (len: %d)" % len(s_rpcRequest), rpcRequest)
+        self.log_protobuf_message("RpcRequest (len: %d)" % len(s_rpcRequest), rpcRequest)
         return encoder._VarintBytes(len(s_rpcRequest)) + s_rpcRequest
 
-    def createRpcHeader(self):
+    def create_rpc_header(self):
         '''Creates and serializes a delimited RpcPayloadHeaderProto message.'''
         rpcheader = rpcheaderproto.RpcPayloadHeaderProto()
         rpcheader.rpcKind = 2  # rpcheaderproto.RpcKindProto.Value('RPC_PROTOCOL_BUFFER')
@@ -193,19 +193,19 @@ class SocketRpcChannel(service.RpcChannel):
 
         # Serialize delimited
         s_rpcHeader = rpcheader.SerializeToString()
-        self.logProtobufMessage("RpcPayloadHeader (len: %d)" % (len(s_rpcHeader)), rpcheader)
+        self.log_protobuf_message("RpcPayloadHeader (len: %d)" % (len(s_rpcHeader)), rpcheader)
         return encoder._VarintBytes(len(s_rpcHeader)) + s_rpcHeader
 
-    def createConnectionContext(self):
+    def create_connection_context(self):
         '''Creates and seriazlies a IpcConnectionContextProto (not delimited)'''
         context = connectionContext.IpcConnectionContextProto()
         context.userInfo.effectiveUser = pwd.getpwuid(os.getuid())[0]
         context.protocol = "org.apache.hadoop.hdfs.protocol.ClientProtocol"
         s_context = context.SerializeToString()
-        self.logProtobufMessage("RequestContext (len: %d)" % len(s_context), context)
+        self.log_protobuf_message("RequestContext (len: %d)" % len(s_context), context)
         return s_context
 
-    def sendRpcMessage(self, rpcHeader, rpcRequest):
+    def send_rpc_message(self, rpcHeader, rpcRequest):
         '''Sends a Hadoop RPC request to the NameNode.
 
         The IpcConnectionContextProto, RpcPayloadHeaderProto and HadoopRpcRequestProto
@@ -231,10 +231,10 @@ class SocketRpcChannel(service.RpcChannel):
         self.sock.send(rpcHeader)                                  # payload header
         self.sock.send(rpcRequest)                                 # rpc request
 
-    def logProtobufMessage(self, header, message):
+    def log_protobuf_message(self, header, message):
         log.debug("%s:\n\n\033[92m%s\033[0m" % (header, message))
 
-    def recvRpcMessage(self):
+    def recv_rpc_message(self):
         '''Handle reading an RPC reply from the server. This is done by wrapping the
         socket in a RcpBufferedReader that allows for rewinding of the buffer stream.
         '''
@@ -242,7 +242,7 @@ class SocketRpcChannel(service.RpcChannel):
         byte_stream = RpcBufferedReader(self.sock)
         return byte_stream
 
-    def getDelimitedMessageBytes(self, byte_stream):
+    def get_delimited_nessage_bytes(self, byte_stream):
         ''' Parse a delimited protobuf message. This is done by first getting a protobuf varint from
         the stream that represents the length of the message, then reading that amount of
         from the message and then parse it.
@@ -260,7 +260,7 @@ class SocketRpcChannel(service.RpcChannel):
         log.debug("Delimited message bytes (%d): %s" % (len(message_bytes), format_bytes(message_bytes)))
         return message_bytes
 
-    def getLength(self, byte_stream):
+    def get_length(self, byte_stream):
         ''' In Hadoop protobuf RPC, some parts of the stream are delimited with protobuf varint,
         while others are delimited with 4 byte integers. This reads 4 bytes from the byte stream
         and retruns the length of the delimited part that follows, by unpacking the 4 bytes
@@ -271,7 +271,7 @@ class SocketRpcChannel(service.RpcChannel):
         log.debug("4 bytes delimited part length: %d" % length)
         return length
 
-    def parseResponse(self, byte_stream, response_class):
+    def parse_response(self, byte_stream, response_class):
         '''Parses a Hadoop RPC response.
 
         The RpcResponseHeaderProto contains a status field that marks SUCCESS or ERROR.
@@ -306,15 +306,15 @@ class SocketRpcChannel(service.RpcChannel):
         log.debug("Payload class: %s" % response_class)
 
         log.debug("---- Parsing header ----")
-        header_bytes = self.getDelimitedMessageBytes(byte_stream)
+        header_bytes = self.get_delimited_nessage_bytes(byte_stream)
         header = rpcheaderproto.RpcResponseHeaderProto()
         header.ParseFromString(header_bytes)
-        self.logProtobufMessage("Response header", header)
+        self.log_protobuf_message("Response header", header)
 
         if header.status == 0:  # rpcheaderproto.RpcStatusProto.Value('SUCCESS')
             log.debug("---- Parsing response ----")
             response = response_class()
-            response_length = self.getLength(byte_stream)
+            response_length = self.get_length(byte_stream)
 
             if response_length == 0:
                 return
@@ -323,11 +323,11 @@ class SocketRpcChannel(service.RpcChannel):
             log.debug("Response bytes (%d): %s" % (len(response_bytes), format_bytes(response_bytes)))
 
             response.ParseFromString(response_bytes)
-            self.logProtobufMessage("Response", response)
+            self.log_protobuf_message("Response", response)
             return response
 
         elif header.status == 1:  # rpcheaderproto.RpcStatusProto.Value('ERROR')
-            length = self.getLength(byte_stream)
+            length = self.get_length(byte_stream)
             log.debug("Class name length: %d" % (length))
             if length == -1:
                 class_name = None
@@ -335,7 +335,7 @@ class SocketRpcChannel(service.RpcChannel):
                 class_name = byte_stream.read(length)
                 log.debug("Class name (%d): %s" % (len(class_name), class_name))
 
-            length = self.getLength(byte_stream)
+            length = self.get_length(byte_stream)
             log.debug("Stack trace length: %d" % (length))
             if length == -1:
                 stack_trace = None
@@ -348,7 +348,7 @@ class SocketRpcChannel(service.RpcChannel):
 
             raise RequestError(stack_trace_msg)
 
-    def closeSocket(self):
+    def close_socket(self):
         '''Closes the socket and resets the channel.'''
         log.debug("Closing socket")
         if self.sock:
@@ -360,27 +360,28 @@ class SocketRpcChannel(service.RpcChannel):
             self.sock = None
 
     def CallMethod(self, method, controller, request, response_class, done):
-        '''Call the RPC method.
+        '''Call the RPC method. The naming doesn't confirm PEP8, since it's
+        a method called by protobuf
         '''
         try:
-            self.validateRequest(request)
+            self.validate_request(request)
 
             if not self.sock:
-                context = self.createConnectionContext()
-                self.openSocket(self.host, self.port, context)
+                context = self.create_connection_context()
+                self.open_socket(self.host, self.port, context)
 
             # Create serialized rpcHeader, context and rpcRequest
-            rpcHeader = self.createRpcHeader()
-            rpcRequest = self.createRpcRequest(method, request)
+            rpcHeader = self.create_rpc_header()
+            rpcRequest = self.create_rpc_request(method, request)
 
-            self.sendRpcMessage(rpcHeader, rpcRequest)
+            self.send_rpc_message(rpcHeader, rpcRequest)
 
-            byte_stream = self.recvRpcMessage()
-            return self.parseResponse(byte_stream, response_class)
+            byte_stream = self.recv_rpc_message()
+            return self.parse_response(byte_stream, response_class)
         except RequestError, e:  # Raise a request error, but don't close the socket
             raise e
         except Exception, e:  # All other errors close the socket
-            self.closeSocket()
+            self.close_socket()
             raise e
 
 

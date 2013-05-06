@@ -18,7 +18,7 @@ import json
 import binascii
 
 
-def _octalToPerm(octal):
+def _octal_to_perm(octal):
     perms = list("-" * 9)
     if octal & stat.S_IRUSR:
         perms[0] = "r"
@@ -51,7 +51,7 @@ def _sizeof_fmt(num):
         num /= 1024.0
 
 
-def formatColumn(col, node, human_readable):
+def format_column(col, node, human_readable):
     value = node.get(col)
 
     if col == "file_type":
@@ -60,7 +60,7 @@ def formatColumn(col, node, human_readable):
         else:
             return value
     elif col == "permission":
-        return _octalToPerm(value)
+        return _octal_to_perm(value)
     elif col == "modification_time":
         timestamp = datetime.datetime.fromtimestamp(value / 1000)
         return timestamp.strftime('%Y-%m-%d %H:%M')
@@ -78,7 +78,7 @@ def formatColumn(col, node, human_readable):
         return value
 
 
-def formatListing(listing, json_output=False, human_readable=False):
+def format_listing(listing, json_output=False, human_readable=False):
     if json_output:
         return json.dumps(listing)
 
@@ -91,13 +91,13 @@ def formatListing(listing, json_output=False, human_readable=False):
     max_group = max([len(str(node.get('group'))) for node in listing] + [10])
     templ = "%%s%%s %%3s %%-%ds %%-%ds %%%ds %%s %%s" % (max_owner, max_group, max_len)
     for node in listing:
-        cols = [str(formatColumn(col, node, human_readable)) for col in columns]
+        cols = [str(format_column(col, node, human_readable)) for col in columns]
         ret.append(templ % tuple(cols))
 
     return "\n".join(ret)
 
 
-def formatResults(results, json_output=False):
+def format_results(results, json_output=False):
     if json_output:
         return json.dumps(results)
 
@@ -119,7 +119,7 @@ def formatResults(results, json_output=False):
     return "\n".join(ret)
 
 
-def formatCounts(results, json_output=False):
+def format_counts(results, json_output=False):
     if json_output:
         return json.dumps(results)
 
@@ -132,7 +132,7 @@ def formatCounts(results, json_output=False):
     return "\n".join(ret)
 
 
-def formatFsStats(results, json_output=False, human_readable=False):
+def format_fs_stats(results, json_output=False, human_readable=False):
     r = results[0]
     if json_output:
         return json.dumps(r)
@@ -162,7 +162,7 @@ def formatFsStats(results, json_output=False, human_readable=False):
     return "%s\n%s" % (header, data)
 
 
-def formatDu(results, json_output=False, human_readable=False):
+def format_du(results, json_output=False, human_readable=False):
     ret = []
     if json_output:
             return json.dumps(results)
@@ -176,13 +176,14 @@ def formatDu(results, json_output=False, human_readable=False):
     return "\n".join(ret)
 
 
-def formatStat(results, json_output=False):
+def format_stat(results, json_output=False):
     ret = []
     if json_output:
         return json.dumps(results)
     for result in results:
         ret.append(str(result))
     return "\n".join(ret)
+
 
 def format_bytes(bytes):
     ascii = binascii.b2a_hex(bytes)

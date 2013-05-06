@@ -17,7 +17,7 @@ import re
 import itertools
 
 
-def expandPaths(paths):
+def expand_paths(paths):
     ''' Expand paths like /foo/{bar,baz} becomes /foo/bar, /foo/bar'''
     result = []
     exp = re.compile("{(.*?)}")

@@ -66,9 +66,9 @@ class MiniCluster(object):
         self._hadoop_home = os.environ['HADOOP_HOME']
         self._jobclient_jar = os.environ.get('HADOOP_JOBCLIENT_JAR')
         self._hadoop_cmd = "%s/bin/hadoop" % self._hadoop_home
-        self._startMiniCluster()
+        self._start_mini_cluster()
         self.host = "localhost"
-        self.port = self._getNameNodePort()
+        self.port = self._get_namenode_port()
         self.hdfs_url = "hdfs://%s:%d" % (self.host, self.port)
 
     def terminate(self):
@@ -91,7 +91,7 @@ class MiniCluster(object):
         '''List files in a directory'''
         src = [self._full_hdfs_path(x) for x in src]
         output = self._runCmd([self._hadoop_cmd, 'fs', '-ls'] + extra_args + src)
-        return self._transformLsOutput(output, self.hdfs_url)
+        return self._transform_ls_output(output, self.hdfs_url)
 
     def mkdir(self, src, extra_args=[]):
         '''Create a directory'''
@@ -104,12 +104,12 @@ class MiniCluster(object):
     def du(self, src, extra_args=[]):
         '''Perform ``du`` on a path'''
         src = [self._full_hdfs_path(x) for x in src]
-        return self._transformDuOutput(self._runCmd([self._hadoop_cmd, 'fs', '-du'] + extra_args + src), self.hdfs_url)
+        return self._transform_du_output(self._runCmd([self._hadoop_cmd, 'fs', '-du'] + extra_args + src), self.hdfs_url)
 
     def count(self, src):
         '''Perform ``count`` on a path'''
         src = [self._full_hdfs_path(x) for x in src]
-        return self._transformCountOutput(self._runCmd([self._hadoop_cmd, 'fs', '-count'] + src), self.hdfs_url)
+        return self._transform_count_output(self._runCmd([self._hadoop_cmd, 'fs', '-count'] + src), self.hdfs_url)
 
     def _runCmd(self, cmd):
         print cmd
@@ -119,17 +119,17 @@ class MiniCluster(object):
     def _full_hdfs_path(self, src):
         return "%s%s" % (self.hdfs_url, src)
 
-    def _findMiniClusterJar(self, path):
+    def _find_mini_cluster_jar(self, path):
         for dirpath, dirnames, filenames in os.walk(path):
             for files in filenames:
                 if re.match(".*hadoop-mapreduce-client-jobclient.+-tests.jar", files):
                     return os.path.join(dirpath, files)
 
-    def _startMiniCluster(self):
+    def _start_mini_cluster(self):
         if self._jobclient_jar:
             hadoop_jar = self._jobclient_jar
         else:
-            hadoop_jar = self._findMiniClusterJar(self._hadoop_home)
+            hadoop_jar = self._find_mini_cluster_jar(self._hadoop_home)
         if not hadoop_jar:
             raise Exception("No hadoop jobclient test jar found")
         self.hdfs = subprocess.Popen([self._hadoop_cmd,
@@ -139,7 +139,7 @@ class MiniCluster(object):
                                       bufsize=0,
                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    def _getNameNodePort(self):
+    def _get_namenode_port(self):
         port_found = False
         while self.hdfs.poll() is None and not port_found:
             rlist, wlist, xlist = select.select([self.hdfs.stderr, self.hdfs.stdout], [], [])
@@ -150,7 +150,7 @@ class MiniCluster(object):
                 if m:
                     return int(m.group(1))
 
-    def _transformLsOutput(self, i, base_path):
+    def _transform_ls_output(self, i, base_path):
         result = []
         for line in i.split("\n"):
             if not line or line.startswith("Found"):
@@ -170,11 +170,11 @@ class MiniCluster(object):
             dt = "%s %s" % (date, time)
             node['modification_time'] = long(datetime.datetime.strptime(dt, '%Y-%m-%d %H:%M').strftime('%s'))
             node['path'] = path.replace(base_path, '')
-            node['file_type'] = self._getFileType(perms[0])
+            node['file_type'] = self._get_file_type(perms[0])
             result.append(node)
         return result
 
-    def _transformDuOutput(self, i, base_path):
+    def _transform_du_output(self, i, base_path):
         result = []
         for line in i.split("\n"):
             if line:
@@ -182,7 +182,7 @@ class MiniCluster(object):
                 result.append({"path": path.replace(base_path, ""), "length": long(length)})
         return result
 
-    def _transformCountOutput(self, i, base_path):
+    def _transform_count_output(self, i, base_path):
         result = []
         for line in i.split("\n"):
             if line:
@@ -191,7 +191,7 @@ class MiniCluster(object):
                                "directoryCount": long(dir_count), "fileCount": long(file_count)})
         return result
 
-    def _getFileType(self, i):
+    def _get_file_type(self, i):
         if i == "-":
             return "f"
         else:

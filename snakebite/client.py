@@ -98,7 +98,7 @@ class Client(object):
         if not type(paths) == type([]):
             raise InvalidInputException("Paths should be a list")
 
-        return self._findItems(paths, self._handleLs,
+        return self._find_items(paths, self._handle_ls,
                                include_toplevel=include_toplevel,
                                include_children=include_children,
                                recurse=recurse)
@@ -106,7 +106,7 @@ class Client(object):
     LISTING_ATTRIBUTES = ['length', 'owner', 'group', 'block_replication',
                           'modification_time', 'access_time', 'blocksize']
 
-    def _handleLs(self, path, node):
+    def _handle_ls(self, path, node):
         ''' Handle every node received for an ls request'''
         entry = {}
 
@@ -137,11 +137,11 @@ class Client(object):
         if not mode:
             raise InvalidInputException("chmod: no mode given")
 
-        processor = lambda path, node, mode=mode: self._handleChmod(path, node, mode)
-        return self._findItems(paths, processor, include_toplevel=True,
+        processor = lambda path, node, mode=mode: self._handle_chmod(path, node, mode)
+        return self._find_items(paths, processor, include_toplevel=True,
                                include_children=False, recurse=recurse)
 
-    def _handleChmod(self, path, node, mode):
+    def _handle_chmod(self, path, node, mode):
         request = client_proto.SetPermissionRequestProto()
         request.src = path
         request.permission.perm = mode
@@ -166,11 +166,11 @@ class Client(object):
         if not paths:
             raise InvalidInputException("chown: no owner given")
 
-        processor = lambda path, node, owner=owner: self._handleChown(path, node, owner)
-        return self._findItems(paths, processor, include_toplevel=True,
+        processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
+        return self._find_items(paths, processor, include_toplevel=True,
                                include_children=False, recurse=recurse)
 
-    def _handleChown(self, path, node, owner):
+    def _handle_chown(self, path, node, owner):
         if ":" in owner:
             (owner, group) = owner.split(":")
         else:
@@ -204,8 +204,8 @@ class Client(object):
             raise InvalidInputException("chgrp: no group given")
 
         owner = ":%s" % group
-        processor = lambda path, node, owner=owner: self._handleChown(path, node, owner)
-        return self._findItems(paths, processor, include_toplevel=True,
+        processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
+        return self._find_items(paths, processor, include_toplevel=True,
                                include_children=False, recurse=recurse)
 
     def count(self, paths):
@@ -225,13 +225,13 @@ class Client(object):
         if not paths:
             raise InvalidInputException("count: no path given")
 
-        processor = lambda path, node: self._handleCount(path, node)
-        return self._findItems(paths, processor, include_toplevel=True,
+        processor = lambda path, node: self._handle_count(path, node)
+        return self._find_items(paths, processor, include_toplevel=True,
                                include_children=False, recurse=False)
 
     COUNT_ATTRIBUTES = ['length', 'fileCount', 'directoryCount', 'quota', 'spaceConsumed', 'spaceQuota']
 
-    def _handleCount(self, path, node):
+    def _handle_count(self, path, node):
         request = client_proto.GetContentSummaryRequestProto()
         request.path = path
         response = self.service.getContentSummary(request)
@@ -248,10 +248,10 @@ class Client(object):
         >>> client.df()
         [{'used': 491520L, 'capacity': 120137519104L, 'under_replicated': 0L, 'missing_blocks': 0L, 'filesystem': 'hdfs://localhost:54310', 'remaining': 19669295104L, 'corrupt_blocks': 0L}]
         '''
-        processor = lambda path, node: self._handleDf(path, node)
-        return self._findItems(['/'], processor, include_toplevel=True, include_children=False, recurse=False)
+        processor = lambda path, node: self._handle_df(path, node)
+        return self._find_items(['/'], processor, include_toplevel=True, include_children=False, recurse=False)
 
-    def _handleDf(self, path, node):
+    def _handle_df(self, path, node):
         request = client_proto.GetFsStatusRequestProto()
         response = self.service.getFsStats(request)
         entry = {"filesystem": "hdfs://%s:%d" % (self.host, self.port)}
@@ -289,11 +289,11 @@ class Client(object):
         if not paths:
             raise InvalidInputException("du: no path given")
 
-        processor = lambda path, node: self._handleDu(path, node)
-        return self._findItems(paths, processor, include_toplevel=include_toplevel,
+        processor = lambda path, node: self._handle_du(path, node)
+        return self._find_items(paths, processor, include_toplevel=include_toplevel,
                                include_children=include_children, recurse=False)
 
-    def _handleDu(self, path, node):
+    def _handle_du(self, path, node):
         request = client_proto.GetContentSummaryRequestProto()
         request.path = path
         response = self.service.getContentSummary(request)
@@ -314,10 +314,10 @@ class Client(object):
         if not dst:
             raise InvalidInputException("rename: no destination given")
 
-        processor = lambda path, node, dst=dst: self._handleRename(path, node, dst)
-        return self._findItems(paths, processor, include_toplevel=True)
+        processor = lambda path, node, dst=dst: self._handle_rename(path, node, dst)
+        return self._find_items(paths, processor, include_toplevel=True)
 
-    def _handleRename(self, path, node, dst):
+    def _handle_rename(self, path, node, dst):
         request = client_proto.RenameRequestProto()
         request.src = path
         request.dst = dst
@@ -342,11 +342,11 @@ class Client(object):
         if not paths:
             raise InvalidInputException("delete: no path given")
 
-        processor = lambda path, node, recurse=recurse: self._handleDelete(path, node, recurse)
-        return self._findItems(paths, processor, include_toplevel=True)
+        processor = lambda path, node, recurse=recurse: self._handle_delete(path, node, recurse)
+        return self._find_items(paths, processor, include_toplevel=True)
 
-    def _handleDelete(self, path, node, recurse):
-        if (self._isDir(node) and not recurse):
+    def _handle_delete(self, path, node, recurse):
+        if (self._is_dir(node) and not recurse):
             raise DirectoryException("rm: `%s': Is a directory" % path)
 
         # None might be passed in for recurse
@@ -372,11 +372,11 @@ class Client(object):
         if not paths:
             raise InvalidInputException("rmdir: no path given")
 
-        processor = lambda path, node: self._handleRmdir(path, node)
-        return self._findItems(paths, processor, include_toplevel=True)
+        processor = lambda path, node: self._handle_rmdir(path, node)
+        return self._find_items(paths, processor, include_toplevel=True)
 
-    def _handleRmdir(self, path, node):
-        if not self._isDir(node):
+    def _handle_rmdir(self, path, node):
+        if not self._is_dir(node):
             raise DirectoryException("rmdir: `%s': Is not a directory" % path)
 
         # Check if the directory is empty
@@ -384,7 +384,7 @@ class Client(object):
         if len(files) > 0:
             raise DirectoryException("rmdir: `%s': Directory is not empty" % path)
 
-        return self._handleDelete(path, node, recurse=True)
+        return self._handle_delete(path, node, recurse=True)
 
     def touchz(self, paths, replication=None, blocksize=None):
         ''' Create a zero length file or updates the timestamp on a zero length file
@@ -412,25 +412,25 @@ class Client(object):
         if not blocksize:
             blocksize = defaults['blockSize']
 
-        processor = lambda path, node, replication=replication, blocksize=blocksize: self._handleTouchz(path, node, replication, blocksize)
-        return self._findItems(paths, processor, include_toplevel=True, check_nonexistence=True)
+        processor = lambda path, node, replication=replication, blocksize=blocksize: self._handle_touchz(path, node, replication, blocksize)
+        return self._find_items(paths, processor, include_toplevel=True, check_nonexistence=True)
 
-    def _handleTouchz(self, path, node, replication, blocksize):
+    def _handle_touchz(self, path, node, replication, blocksize):
         # Item already exists
         if node:
             if node.length != 0:
                 raise FileException("touchz: `%s': Not a zero-length file" % path)
-            if self._isDir(node):
+            if self._is_dir(node):
                 raise DirectoryException("touchz: `%s': Is a directory" % path)
 
-            response = self._createFile(path, replication, blocksize, overwrite=True)
+            response = self._create_file(path, replication, blocksize, overwrite=True)
         else:
             # Check if the parent directory exists
-            parent = self._getFileInfo(os.path.dirname(path))
+            parent = self._get_file_info(os.path.dirname(path))
             if not parent:
                 raise DirectoryException("touchz: `%s': No such file or directory" % path)
             else:
-                response = self._createFile(path, replication, blocksize, overwrite=False)
+                response = self._create_file(path, replication, blocksize, overwrite=False)
         return {"path": path, "result": response.result}
 
     def setrep(self, paths, replication, recurse=False):
@@ -450,19 +450,19 @@ class Client(object):
         if not replication:
             raise InvalidInputException("setrep: no replication given")
 
-        processor = lambda path, node, replication=replication: self._handleSetrep(path, node, replication)
-        return self._findItems(paths, processor, include_toplevel=True,
+        processor = lambda path, node, replication=replication: self._handle_setrep(path, node, replication)
+        return self._find_items(paths, processor, include_toplevel=True,
                                include_children=False, recurse=recurse)
 
-    def _handleSetrep(self, path, node, replication):
-        if not self._isDir(node):
+    def _handle_setrep(self, path, node, replication):
+        if not self._is_dir(node):
             request = client_proto.SetReplicationRequestProto()
             request.src = path
             request.replication = replication
             response = self.service.setReplication(request)
             return {"result": response.result, "path": path}
 
-    def _createFile(self, path, replication, blocksize, overwrite):
+    def _create_file(self, path, replication, blocksize, overwrite):
         if overwrite:
             createFlag = 0x02
         else:
@@ -504,10 +504,10 @@ class Client(object):
         if not paths:
             raise InvalidInputException("stat: no path given")
 
-        processor = lambda path, node: self._handleStat(path, node)
-        return self._findItems(paths, processor, include_toplevel=True)
+        processor = lambda path, node: self._handle_stat(path, node)
+        return self._find_items(paths, processor, include_toplevel=True)
 
-    def _handleStat(self, path, node):
+    def _handle_stat(self, path, node):
         return {"path": path,
                 "file_type": self.FILETYPES[node.fileType],
                 "length": node.length,
@@ -538,16 +538,16 @@ class Client(object):
         if not path:
             raise InvalidInputException("test: no path given")
 
-        processor = lambda path, node, exists=exists, directory=directory, zero_length=zero_length: self._handleTest(path, node, exists, directory, zero_length)
+        processor = lambda path, node, exists=exists, directory=directory, zero_length=zero_length: self._handle_test(path, node, exists, directory, zero_length)
         try:
-            return self._findItems([path], processor, include_toplevel=True)[0]
+            return self._find_items([path], processor, include_toplevel=True)[0]
         except FileNotFoundException, e:
             if exists:
                 return False
             else:
                 raise e
 
-    def _handleTest(self, path, node, exists, directory, zero_length):
+    def _handle_test(self, path, node, exists, directory, zero_length):
         return self._is_directory(directory, node) and self._is_zero_length(zero_length, node)
 
     def mkdir(self, paths, create_parent=False, mode=0755):
@@ -569,9 +569,9 @@ class Client(object):
         for path in paths:
             orig_path = path
             if not path.startswith("/"):
-                path = self._joinUserPath(path)
+                path = self._join_user_path(path)
 
-            fileinfo = self._getFileInfo(path)
+            fileinfo = self._get_file_info(path)
             if not fileinfo:
                 try:
                     request = client_proto.MkdirsRequestProto()
@@ -604,20 +604,20 @@ class Client(object):
     def _is_directory(self, should_check, node):
         if not should_check:
             return True
-        return self._isDir(node)
+        return self._is_dir(node)
 
     def _is_zero_length(self, should_check, node):
         if not should_check:
             return True
         return node.length == 0
 
-    def _getFullPath(self, path, node):
+    def _get_full_path(self, path, node):
         if node.path:
             return os.path.join(path, node.path)
         else:
             return path
 
-    def _findItems(self, paths, processor, include_toplevel=False, include_children=False, recurse=False, check_nonexistence=False):
+    def _find_items(self, paths, processor, include_toplevel=False, include_children=False, recurse=False, check_nonexistence=False):
         ''' Request file info from the NameNode and call the processor on the node(s) returned
 
         :param paths:
@@ -642,44 +642,44 @@ class Client(object):
             paths = [os.path.join("/user", pwd.getpwuid(os.getuid())[0])]
 
         # Expand paths if necessary (/foo/{bar,baz} --> ['/foo/bar', '/foo/baz'])
-        paths = glob.expandPaths(paths)
+        paths = glob.expand_paths(paths)
 
         for path in paths:
             if not path.startswith("/"):
-                path = self._joinUserPath(path)
+                path = self._join_user_path(path)
 
             log.debug("Trying to find path %s" % path)
 
             if glob.has_magic(path):
                 log.debug("Dealing with globs in %s" % path)
-                collection += self._globFind(path, processor, include_toplevel)
+                collection += self._glob_find(path, processor, include_toplevel)
             else:
-                fileinfo = self._getFileInfo(path)
+                fileinfo = self._get_file_info(path)
                 if not fileinfo and not check_nonexistence:
                     raise FileNotFoundException("`%s': No such file or directory" % path)
                 elif not fileinfo and check_nonexistence:
                     collection.append(processor(path, None))
                     return collection
 
-                if include_toplevel or not self._isDir(fileinfo.fs):
+                if include_toplevel or not self._is_dir(fileinfo.fs):
                     # Construct the full path before processing
-                    full_path = self._getFullPath(path, fileinfo.fs)
+                    full_path = self._get_full_path(path, fileinfo.fs)
                     log.debug("Added %s to to result set" % full_path)
                     entry = processor(full_path, fileinfo.fs)
                     collection.append(entry)
 
-                if self._isDir(fileinfo.fs) and (include_children or recurse):
-                    listing = self._getDirListing(path)
+                if self._is_dir(fileinfo.fs) and (include_children or recurse):
+                    listing = self._get_dir_listing(path)
                     for node in listing.dirList.partialListing:
-                        full_path = self._getFullPath(path, node)
+                        full_path = self._get_full_path(path, node)
                         entry = processor(full_path, node)
                         collection.append(entry)
 
                         # Recurse into directories
-                        if recurse and self._isDir(node):
+                        if recurse and self._is_dir(node):
                             # Construct the full path before processing
                             full_path = os.path.join(path, node.path)
-                            collection += self._findItems([full_path],
+                            collection += self._find_items([full_path],
                                                           processor,
                                                           include_toplevel=False,
                                                           include_children=False,
@@ -687,14 +687,14 @@ class Client(object):
 
         return collection
 
-    def _getDirListing(self, path):
+    def _get_dir_listing(self, path):
         request = client_proto.GetListingRequestProto()
         request.src = path
         request.startAfter = ''
         request.needLocation = False
         return self.service.getListing(request)
 
-    def _globFind(self, path, processor, include_toplevel):
+    def _glob_find(self, path, processor, include_toplevel):
         '''Handle globs in paths.
         This is done by listing the directory before a glob and checking which
         node matches the initial glob. If there are more globs in the path,
@@ -729,29 +729,29 @@ class Client(object):
             rest = "/".join(rest_elements)
 
         # Check if the path exists and that it's a directory (which it should..)
-        fileinfo = self._getFileInfo(check_path)
-        if fileinfo and self._isDir(fileinfo.fs):
+        fileinfo = self._get_file_info(check_path)
+        if fileinfo and self._is_dir(fileinfo.fs):
             # List all child nodes and match them agains the glob
-            listing = self._getDirListing(check_path)
+            listing = self._get_dir_listing(check_path)
             for node in listing.dirList.partialListing:
-                full_path = self._getFullPath(check_path, node)
+                full_path = self._get_full_path(check_path, node)
                 if fnmatch.fnmatch(full_path, match_path):
                     # If we have a match, but need to go deeper, we recurse
                     if rest and glob.has_magic(rest):
                         traverse_path = "/".join([full_path, rest])
-                        collection += self._globFind(traverse_path, processor, include_toplevel)
+                        collection += self._glob_find(traverse_path, processor, include_toplevel)
                     else:
                         # If the matching node is a directory, we list the directory
                         # This is what the hadoop client does at least.
-                        if self._isDir(node):
+                        if self._is_dir(node):
                             if include_toplevel:
                                 entry = processor(full_path, node)
                                 collection.append(entry)
-                            fp = self._getFullPath(check_path, node)
-                            dir_list = self._getDirListing(fp)
+                            fp = self._get_full_path(check_path, node)
+                            dir_list = self._get_dir_listing(fp)
                             if dir_list:  # It might happen that the directory above has been removed
                                 for n in dir_list.dirList.partialListing:
-                                    full_child_path = self._getFullPath(fp, n)
+                                    full_child_path = self._get_full_path(fp, n)
                                     entry = processor(full_child_path, n)
                                     collection.append(entry)
                         else:
@@ -760,14 +760,14 @@ class Client(object):
 
         return collection
 
-    def _isDir(self, entry):
+    def _is_dir(self, entry):
         return self.FILETYPES.get(entry.fileType) == "d"
 
-    def _getFileInfo(self, path):
+    def _get_file_info(self, path):
         request = client_proto.GetFileInfoRequestProto()
         request.src = path
 
         return self.service.getFileInfo(request)
 
-    def _joinUserPath(self, path):
+    def _join_user_path(self, path):
         return os.path.join("/user", pwd.getpwuid(os.getuid())[0], path)
