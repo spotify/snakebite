@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 from minicluster_testbase import MiniClusterTestBase
-from spotify.snakebite.errors import FileNotFoundException
-from spotify.snakebite.errors import InvalidInputException
+from snakebite.errors import FileNotFoundException
+from snakebite.errors import InvalidInputException
 
 
 class ChmodTest(MiniClusterTestBase):

@@ -21,16 +21,16 @@ import json
 import xml.etree.ElementTree as ET
 from urlparse import urlparse
 
-from spotify.snakebite.client import Client
-from spotify.snakebite.errors import FileNotFoundException
-from spotify.snakebite.errors import DirectoryException
-from spotify.snakebite.errors import FileException
-from spotify.snakebite.formatter import formatListing
-from spotify.snakebite.formatter import formatResults
-from spotify.snakebite.formatter import formatCounts
-from spotify.snakebite.formatter import formatFsStats
-from spotify.snakebite.formatter import formatStat
-from spotify.snakebite.formatter import formatDu
+from snakebite.client import Client
+from snakebite.errors import FileNotFoundException
+from snakebite.errors import DirectoryException
+from snakebite.errors import FileException
+from snakebite.formatter import formatListing
+from snakebite.formatter import formatResults
+from snakebite.formatter import formatCounts
+from snakebite.formatter import formatFsStats
+from snakebite.formatter import formatStat
+from snakebite.formatter import formatDu
 
 log = logging.getLogger(__name__)
 

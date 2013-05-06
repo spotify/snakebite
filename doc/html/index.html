@@ -68,20 +68,20 @@ This isn&#8217;t ideal for integrating Hadoop commands in python projects.</p>
 that relies on doing a lot of existence checks and moving data around in HDFS.
 And since calling <tt class="docutils literal"><span class="pre">hadoop</span></tt> from python is expensive, we decided to write a
 pure python HDFS client that only relies on protobuf. The current
-<a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">spotify.snakebite.client</span></tt></a> library uses protobuf messages and
+<a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a> library uses protobuf messages and
 implements the Hadoop RPC protocol for talking to the NameNode.</p>
-<p>During development, we needed to verify <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">spotify.snakebite.client</span></tt></a>
+<p>During development, we needed to verify <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a>
 behavior against the real client and for that we implemented a <a class="reference internal" href="minicluster.html#module-minicluster" title="minicluster"><tt class="xref py py-mod docutils literal"><span class="pre">minicluster</span></tt></a>
 that wraps a Hadoop Java mini cluster. Obviously this <a class="reference internal" href="minicluster.html#module-minicluster" title="minicluster"><tt class="xref py py-mod docutils literal"><span class="pre">minicluster</span></tt></a> can be
 used in different projects, so we made it a part of snakebite.</p>
-<p>And since it&#8217;s nice to have a CLI that uses <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">spotify.snakebite.client</span></tt></a>
+<p>And since it&#8217;s nice to have a CLI that uses <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a>
 we&#8217;ve implemented a <a class="reference internal" href="cli.html"><em>CLI client</em></a> as well.</p>
 </div>
 <div class="section" id="testing">
 <h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last"><a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">spotify.snakebite.client</span></tt></a> hasn&#8217;t been tested in the wild
+<p class="last"><a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a> hasn&#8217;t been tested in the wild
 a lot! <strong>USE AT YOUR OWN RISK!</strong></p>
 </div>
 <p>Tests can be run with <tt class="docutils literal"><span class="pre">nosetests</span></tt>. Currently, only integration tests are

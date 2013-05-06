@@ -23,6 +23,6 @@ setup(name='snakebite',
       author=u'Wouter de Bie',
       author_email='wouter@spotify.com',
       description='Pure Python HDFS client',
-      packages=['spotify.snakebite', 'spotify.snakebite.protobuf'],
+      packages=['snakebite', 'snakebite.protobuf'],
       scripts=['bin/snakebite'],
       datafiles=[('/etc/bash_completion.d', ['scripts/snakebite-completion.bash'])])

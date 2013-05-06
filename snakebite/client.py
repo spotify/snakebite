@@ -13,14 +13,14 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import spotify.snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
-import spotify.snakebite.glob as glob
-from spotify.snakebite.errors import RequestError
-from spotify.snakebite.service import RpcService
-from spotify.snakebite.errors import FileNotFoundException
-from spotify.snakebite.errors import DirectoryException
-from spotify.snakebite.errors import FileException
-from spotify.snakebite.errors import InvalidInputException
+import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
+import snakebite.glob as glob
+from snakebite.errors import RequestError
+from snakebite.service import RpcService
+from snakebite.errors import FileNotFoundException
+from snakebite.errors import DirectoryException
+from snakebite.errors import FileException
+from snakebite.errors import InvalidInputException
 
 import logging
 import os
@@ -36,7 +36,7 @@ class Client(object):
 
     **Example:**
 
-    >>> from spotify.snakebite.client import Client
+    >>> from snakebite.client import Client
     >>> client = Client("localhost", 54310)
 
     .. note::

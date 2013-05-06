@@ -1,6 +1,6 @@
 CLI client
 ==========
-A command line interface for HDFS using :mod:`spotify.snakebite.client <client>`.
+A command line interface for HDFS using :mod:`snakebite.client <client>`.
 
 The CLI client tries to read the config from ~/.snakebiterc and if that doesn't
 exist, it will check $HADOOP_HOME/core-site.xml and create a ~/.snakebiterc from that.

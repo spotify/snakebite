@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-from spotify.snakebite.channel import SocketRpcChannel
-from spotify.snakebite.channel import SocketRpcController
+from snakebite.channel import SocketRpcChannel
+from snakebite.channel import SocketRpcController
 
 
 class RpcService(object):

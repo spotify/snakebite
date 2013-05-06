@@ -34,16 +34,16 @@ class MiniCluster(object):
 
     All methods return a list of maps that are snakebite compatible.
 
-    Example without :mod:`spotify.snakebite.client <client>`
+    Example without :mod:`snakebite.client <client>`
 
-    >>> from spotify.snakebite.minicluster import MiniCluster
+    >>> from snakebite.minicluster import MiniCluster
     >>> cluster = Minicluster("/path/to/test/files")
     >>> ls_output = cluster.ls(["/"])
 
-    Example with :mod:`spotify.snakebite.client <client>`
+    Example with :mod:`snakebite.client <client>`
 
-    >>> from spotify.snakebite.minicluster import MiniCluster
-    >>> from spotify.snakebite.client import Client
+    >>> from snakebite.minicluster import MiniCluster
+    >>> from snakebite.client import Client
     >>> cluster = Minicluster("/path/to/test/files")
     >>> client = Client('localhost', cluster.port)
     >>> ls_output = client.ls(["/"])

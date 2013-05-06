@@ -23,20 +23,20 @@ At Spotify we use the `luigi job scheduler <http://github.com/spotify/luigi>`_
 that relies on doing a lot of existence checks and moving data around in HDFS.
 And since calling ``hadoop`` from python is expensive, we decided to write a
 pure python HDFS client that only relies on protobuf. The current 
-:mod:`spotify.snakebite.client <client>` library uses protobuf messages and
+:mod:`snakebite.client <client>` library uses protobuf messages and
 implements the Hadoop RPC protocol for talking to the NameNode.
 
-During development, we needed to verify :mod:`spotify.snakebite.client <client>`
+During development, we needed to verify :mod:`snakebite.client <client>`
 behavior against the real client and for that we implemented a :mod:`minicluster`
 that wraps a Hadoop Java mini cluster. Obviously this :mod:`minicluster` can be
 used in different projects, so we made it a part of snakebite.
 
-And since it's nice to have a CLI that uses :mod:`spotify.snakebite.client <client>`
+And since it's nice to have a CLI that uses :mod:`snakebite.client <client>`
 we've implemented a :doc:`cli` as well.
 
 Testing
 =======
-.. note:: :mod:`spotify.snakebite.client <client>` hasn't been tested in the wild
+.. note:: :mod:`snakebite.client <client>` hasn't been tested in the wild
           a lot! **USE AT YOUR OWN RISK!**
 
 Tests can be run with ``nosetests``. Currently, only integration tests are

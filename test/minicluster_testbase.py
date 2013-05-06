@@ -1,7 +1,7 @@
 import unittest2
 import os
-from spotify.snakebite.minicluster import MiniCluster
-from spotify.snakebite.client import Client
+from snakebite.minicluster import MiniCluster
+from snakebite.client import Client
 
 
 class MiniClusterTestBase(unittest2.TestCase):

@@ -48,12 +48,12 @@ import google.protobuf.service as service
 #from error import RpcError
 
 # Protobuf imports
-import spotify.snakebite.protobuf.RpcPayloadHeader_pb2 as rpcheaderproto
-import spotify.snakebite.protobuf.IpcConnectionContext_pb2 as connectionContext
-import spotify.snakebite.protobuf.hadoop_rpc_pb2 as hadoop_rpc
+import snakebite.protobuf.RpcPayloadHeader_pb2 as rpcheaderproto
+import snakebite.protobuf.IpcConnectionContext_pb2 as connectionContext
+import snakebite.protobuf.hadoop_rpc_pb2 as hadoop_rpc
 
-from spotify.snakebite.formatter import format_bytes
-from spotify.snakebite.errors import RequestError
+from snakebite.formatter import format_bytes
+from snakebite.errors import RequestError
 
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
