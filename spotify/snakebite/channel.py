@@ -41,6 +41,7 @@ May 2012
 # Standard library imports
 import socket
 import os
+import pwd
 
 # Third party imports
 import google.protobuf.service as service
@@ -198,7 +199,7 @@ class SocketRpcChannel(service.RpcChannel):
     def createConnectionContext(self):
         '''Creates and seriazlies a IpcConnectionContextProto (not delimited)'''
         context = connectionContext.IpcConnectionContextProto()
-        context.userInfo.effectiveUser = os.getlogin()
+        context.userInfo.effectiveUser = pwd.getpwuid(os.getuid())[0]
         context.protocol = "org.apache.hadoop.hdfs.protocol.ClientProtocol"
         s_context = context.SerializeToString()
         self.logProtobufMessage("RequestContext (len: %d)" % len(s_context), context)

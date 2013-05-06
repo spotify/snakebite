@@ -25,6 +25,7 @@ from spotify.snakebite.errors import InvalidInputException
 import logging
 import os
 import os.path
+import pwd
 import fnmatch
 
 log = logging.getLogger(__name__)
@@ -638,7 +639,7 @@ class Client(object):
         collection = []
 
         if not paths:
-            paths = [os.path.join("/user", os.getlogin())]
+            paths = [os.path.join("/user", pwd.getpwuid(os.getuid())[0])]
 
         # Expand paths if necessary (/foo/{bar,baz} --> ['/foo/bar', '/foo/baz'])
         paths = glob.expandPaths(paths)
@@ -769,4 +770,4 @@ class Client(object):
         return self.service.getFileInfo(request)
 
     def _joinUserPath(self, path):
-        return os.path.join("/user", os.getlogin(), path)
+        return os.path.join("/user", pwd.getpwuid(os.getuid())[0], path)
