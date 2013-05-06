@@ -185,7 +185,7 @@ class SnakebiteCli(object):
     def commands(self):
         print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
 
-    @command(args="[path]", descr="list a path", allowed_opts=["d", "R"])
+    @command(args="[path]", descr="list a path", allowed_opts=["d", "R", "s"])
     def ls(self):
         # Mimicking hadoop client behaviour
         if self.opts.directory:
@@ -203,7 +203,8 @@ class SnakebiteCli(object):
 
         for line in  format_listing(listing, json_output=self.opts.json,
                                              human_readable=self.opts.human,
-                                             recursive=recurse):
+                                             recursive=recurse,
+                                             summary=self.opts.summary):
             print line
 
     @command(args="[paths]", descr="create directories")

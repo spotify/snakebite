@@ -14,7 +14,7 @@ _snakebite()
         fi
 
         last_root=$(echo $cur | grep -o "^/\([^/]*/\)*")
-        opts=$(snakebite $prev $last_root |grep -v Found | awk '{dir = (substr($1,0,1) == "d"); if(dir){print $8 "/"} else { print $8}}')
+        opts=$(snakebite ls -s $last_root)
 
         if [[ ${cur} == * ]] ; then
             COMPREPLY=($(compgen -W "${opts}" -- ${cur}))

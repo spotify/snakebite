@@ -79,7 +79,7 @@ def format_column(col, node, human_readable):
         return value
 
 
-def format_listing(listing, json_output=False, human_readable=False, recursive=False):
+def format_listing(listing, json_output=False, human_readable=False, recursive=False, summary=False):
     if json_output:
         for node in listing:
             yield json.dumps(node)
@@ -92,28 +92,36 @@ def format_listing(listing, json_output=False, human_readable=False, recursive=F
                 dir_name = os.path.dirname(node['path'])
                 if dir_name != last_dir:
                     if last_dir:
-                        yield _create_dir_listing(nodes, human_readable, recursive)
+                        yield _create_dir_listing(nodes, human_readable, recursive, summary)
                     last_dir = dir_name
                     nodes = []
                 nodes.append(node)
 
         except StopIteration:
-            yield _create_dir_listing(nodes, human_readable, recursive)
+            yield _create_dir_listing(nodes, human_readable, recursive, summary)
 
 
-def _create_dir_listing(nodes, human_readable, recursive):
+def _create_dir_listing(nodes, human_readable, recursive, summary):
     ret = []
-    if not recursive:
+    if not recursive and not summary:
         ret.append("Found %d items" % len(nodes))
-    columns = ['file_type', 'permission', 'block_replication', 'owner', 'group', 'length', 'modification_time', 'path']
 
-    max_len = max([len(str(node.get('length'))) for node in nodes] + [10])
-    max_owner = max([len(str(node.get('owner'))) for node in nodes] + [10])
-    max_group = max([len(str(node.get('group'))) for node in nodes] + [10])
-    templ = "%%s%%s %%3s %%-%ds %%-%ds %%%ds %%s %%s" % (max_owner, max_group, max_len)
-    for node in nodes:
-        cols = [str(format_column(col, node, human_readable)) for col in columns]
-        ret.append(templ % tuple(cols))
+    if summary:
+        for node in nodes:
+            path = node['path']
+            if node['file_type'] == "d":
+                path += "/"
+            ret.append(path)
+    else:
+        columns = ['file_type', 'permission', 'block_replication', 'owner', 'group', 'length', 'modification_time', 'path']
+
+        max_len = max([len(str(node.get('length'))) for node in nodes] + [10])
+        max_owner = max([len(str(node.get('owner'))) for node in nodes] + [10])
+        max_group = max([len(str(node.get('group'))) for node in nodes] + [10])
+        templ = "%%s%%s %%3s %%-%ds %%-%ds %%%ds %%s %%s" % (max_owner, max_group, max_len)
+        for node in nodes:
+            cols = [str(format_column(col, node, human_readable)) for col in columns]
+            ret.append(templ % tuple(cols))
 
     return "\n".join(ret)
 
