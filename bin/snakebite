@@ -63,7 +63,7 @@ class SnakebiteCli(object):
     def __init__(self):
         (self.cmd, self.opts, self.args) = self._parseOpts()
         self._readConfig()
-        self._setupClient(self.opts.namenode, self.opts.port)
+        self._setupClient(self.opts.namenode, int(self.opts.port))
         self._setupLogging()
 
     def _readConfig(self):
@@ -75,7 +75,7 @@ class SnakebiteCli(object):
             config = json.loads(open(os.path.join(os.path.expanduser('~'), '.snakebiterc')).read())
             self.opts.namenode = config['namenode']
             self.opts.port = config['port']
-        else:
+        elif os.environ.get('HADOOP_HOME'):
             hdfs_conf = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
             if os.path.exists(hdfs_conf):
                 tree = ET.parse(hdfs_conf)
@@ -92,6 +92,11 @@ class SnakebiteCli(object):
                         f = open(config_file, "w")
                         f.write(json.dumps({"namenode": self.opts.namenode, "port": self.opts.port}))
                         f.close()
+        elif self.opts.namenode and self.opts.port:
+            return
+        else:
+            print "No ~/.snakebiterc found, no HADOOP_HOME set and no -n and -p provided"
+            sys.exit(1)
 
     def _parseOpts(self):
         usage = "usage: %prog [options] cmd [args]"
@@ -106,10 +111,8 @@ class SnakebiteCli(object):
         parser.add_option('-D', '--debug', help='Show debug information',
             action='store_true')
         parser.add_option('-j', '--json', help='JSON output', action='store_true')
-        parser.add_option('-n', '--namenode', help='namenode host (default: %default)',
-            default='localhost')
-        parser.add_option('-p', '--port', help='namenode RPC port (default: %default)',
-            default=54310)
+        parser.add_option('-n', '--namenode', help='namenode host')
+        parser.add_option('-p', '--port', help='namenode RPC port')
 
         parser.add_option('-R', '--recurse', help='recurse into subdirectories',
             action='store_true')
