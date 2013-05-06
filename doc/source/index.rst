@@ -59,7 +59,7 @@ TODO
 * Move to argparse to have arguments per command
 * Return correct exit codes from cli client.
 * Use generators when receiving messages (if and wherever possible).
-
+* The python packaging (pip stuff) probably needs some more love.
 * Improve methods:
     * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f and -skipTrash)
 
