@@ -38,24 +38,19 @@ class Client(object):
 
     >>> from snakebite.client import Client
     >>> client = Client("localhost", 54310)
+    >>> for x in client.ls(['/']):
+    ...     print x
 
-    **IMPORTANT!!**
+    .. warning::
 
-    All methods return generators, which mean they need to be consumed to execute!
-    If you don't care about the results, just create en empty for loop:
-
-    .. code-block:: python
-
-        result = client.ls(['/'])
-        for item in result:
-            pass
+        All methods return generators, which mean they need to be consumed to execute!
 
     .. note::
         ``paths`` parameters in methods are often passed as lists, since operations can work on multiple
-        paths. Methods return generators that yield dictionaries.
+        paths.
 
     .. note::
-        Parameters like ``include_children``, ``include_toplevel`` and ``recurse`` are not used
+        Parameters like ``include_children`` and ``recurse`` are not used
         when paths contain globs.
     '''
     FILETYPES = {

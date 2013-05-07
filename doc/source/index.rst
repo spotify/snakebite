@@ -36,7 +36,7 @@ we've implemented a :doc:`cli` as well.
 
 Testing
 =======
-.. note:: :mod:`snakebite.client <client>` hasn't been tested in the wild
+.. warning:: :mod:`snakebite.client <client>` hasn't been tested in the wild
           a lot! **USE AT YOUR OWN RISK!**
 
 Tests can be run with ``nosetests``. Currently, only integration tests are
