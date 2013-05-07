@@ -290,9 +290,7 @@ class SnakebiteCli(object):
 
     @command(args="", descr="show server information")
     def serverdefaults(self):
-        result = self.client.serverdefaults()
-        for line in result:
-            print line
+        print self.client.serverdefaults()
 
     @command(args="[dirs]", descr="delete a directory")
     def rmdir(self):

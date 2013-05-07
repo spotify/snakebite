@@ -340,6 +340,8 @@ class Client(object):
             yield item
 
     def _handle_rename(self, path, node, dst):
+        if not dst.startswith("/"):
+            dst = self._join_user_path(dst)
         request = client_proto.RenameRequestProto()
         request.src = path
         request.dst = dst
@@ -431,7 +433,7 @@ class Client(object):
 
         # Let's get the blocksize and replication from the server defaults
         # provided by the namenode if they are not specified
-        if not replication or blocksize:
+        if not replication or not blocksize:
             defaults = self.serverdefaults()
 
         if not replication:
@@ -440,7 +442,7 @@ class Client(object):
             blocksize = defaults['blockSize']
 
         processor = lambda path, node, replication=replication, blocksize=blocksize: self._handle_touchz(path, node, replication, blocksize)
-        for item in self._find_items(paths, processor, include_toplevel=True, check_nonexistence=True):
+        for item in self._find_items(paths, processor, include_toplevel=True, check_nonexistence=True, include_children=False):
             yield item
 
     def _handle_touchz(self, path, node, replication, blocksize):
@@ -622,16 +624,16 @@ class Client(object):
     def serverdefaults(self):
         '''Get server defaults
 
-        :returns: a generator that yields dictionaries
+        :returns: dictionary
 
         **Example:**
 
-        >>> list(client.serverdefaults())
+        >>> client.serverdefaults()
         [{'writePacketSize': 65536, 'fileBufferSize': 4096, 'replication': 1, 'bytesPerChecksum': 512, 'trashInterval': 0L, 'blockSize': 134217728L, 'encryptDataTransfer': False, 'checksumType': 2}]
         '''
         request = client_proto.GetServerDefaultsRequestProto()
         response = self.service.getServerDefaults(request).serverDefaults
-        yield {'blockSize': response.blockSize, 'bytesPerChecksum': response.bytesPerChecksum,
+        return {'blockSize': response.blockSize, 'bytesPerChecksum': response.bytesPerChecksum,
                 'writePacketSize': response.writePacketSize, 'replication': response.replication,
                 'fileBufferSize': response.fileBufferSize, 'encryptDataTransfer': response.encryptDataTransfer,
                 'trashInterval': response.trashInterval, 'checksumType': response.checksumType}
@@ -695,8 +697,9 @@ class Client(object):
                     raise FileNotFoundException("`%s': No such file or directory" % path)
                 elif not fileinfo and check_nonexistence:
                     yield processor(path, None)
+                    return
 
-                if include_toplevel or not self._is_dir(fileinfo.fs):
+                if (include_toplevel and fileinfo) or not self._is_dir(fileinfo.fs):
                     # Construct the full path before processing
                     full_path = self._get_full_path(path, fileinfo.fs)
                     log.debug("Added %s to to result set" % full_path)
