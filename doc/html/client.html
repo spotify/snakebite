@@ -67,7 +67,8 @@
 </div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">All methods return generators, which mean they need to be consumed to execute!</p>
+<p class="last">Many methods return generators, which mean they need to be consumed to execute! Documentation will explicitly
+specify which methods return generators.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -219,13 +220,13 @@ deleted. Snakebite doesn&#8217;t.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a dictionary</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Examples:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">df</span><span class="p">())</span>
-<span class="go">[{&#39;used&#39;: 491520L, &#39;capacity&#39;: 120137519104L, &#39;under_replicated&#39;: 0L, &#39;missing_blocks&#39;: 0L, &#39;filesystem&#39;: &#39;hdfs://localhost:54310&#39;, &#39;remaining&#39;: 19669295104L, &#39;corrupt_blocks&#39;: 0L}]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">df</span><span class="p">()</span>
+<span class="go">{&#39;used&#39;: 491520L, &#39;capacity&#39;: 120137519104L, &#39;under_replicated&#39;: 0L, &#39;missing_blocks&#39;: 0L, &#39;filesystem&#39;: &#39;hdfs://localhost:54310&#39;, &#39;remaining&#39;: 19669295104L, &#39;corrupt_blocks&#39;: 0L}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -369,12 +370,12 @@ deleted. Snakebite doesn&#8217;t.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Example:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">serverdefaults</span><span class="p">())</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">serverdefaults</span><span class="p">()</span>
 <span class="go">[{&#39;writePacketSize&#39;: 65536, &#39;fileBufferSize&#39;: 4096, &#39;replication&#39;: 1, &#39;bytesPerChecksum&#39;: 512, &#39;trashInterval&#39;: 0L, &#39;blockSize&#39;: 134217728L, &#39;encryptDataTransfer&#39;: False, &#39;checksumType&#39;: 2}]</span>
 </pre></div>
 </div>
@@ -412,13 +413,13 @@ deleted. Snakebite doesn&#8217;t.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>paths</strong> (<em>string</em>) &#8211; Path</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a generator that yields dictionaries</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a dictionary</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Example:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">stat</span><span class="p">([</span><span class="s">&#39;/index.asciidoc&#39;</span><span class="p">]))</span>
-<span class="go">[{&#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;length&#39;: 100L, &#39;access_time&#39;: 1367317326510L, &#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;path&#39;: &#39;/index.asciidoc&#39;, &#39;modification_time&#39;: 1367317326522L, &#39;block_replication&#39;: 1}]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span><span class="o">.</span><span class="n">stat</span><span class="p">([</span><span class="s">&#39;/index.asciidoc&#39;</span><span class="p">])</span>
+<span class="go">{&#39;blocksize&#39;: 134217728L, &#39;owner&#39;: u&#39;wouter&#39;, &#39;length&#39;: 100L, &#39;access_time&#39;: 1367317326510L, &#39;group&#39;: u&#39;supergroup&#39;, &#39;permission&#39;: 420, &#39;file_type&#39;: &#39;f&#39;, &#39;path&#39;: &#39;/index.asciidoc&#39;, &#39;modification_time&#39;: 1367317326522L, &#39;block_replication&#39;: 1}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -439,7 +440,7 @@ deleted. Snakebite doesn&#8217;t.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields dictionaries</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a boolean</p>
 </td>
 </tr>
 </tbody>
