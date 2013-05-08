@@ -150,16 +150,14 @@ def format_counts(results, json_output=False):
                                                 result.get('path'))
 
 
-def format_fs_stats(results, json_output=False, human_readable=False):
+def format_fs_stats(result, json_output=False, human_readable=False):
     if json_output:
-        for result in results:
-            yield json.dumps(result)
+        yield json.dumps(result)
     else:
-        r = list(results)[0]
-        fs = r['filesystem']
-        size = r['capacity']
-        used = r['used']
-        avail = r['remaining']
+        fs = result['filesystem']
+        size = result['capacity']
+        used = result['used']
+        avail = result['remaining']
         if avail == 0:
             pct_used = 0
         else:
@@ -186,33 +184,38 @@ def format_du(listing, json_output=False, human_readable=False):
         for result in listing:
             yield json.dumps(result)
     else:
-        nodes = []
-        last_dir = None
-        try:
-            while True:
-                node = listing.next()
-                dir_name = os.path.dirname(node['path'])
-                if dir_name != last_dir:
-                    if last_dir:
-                        yield _create_count_listing(nodes, human_readable)
-                    last_dir = dir_name
-                    nodes = []
-                nodes.append(node)
-        except StopIteration:
-            yield _create_count_listing(nodes, human_readable)
+        for result in listing:
+            if human_readable:
+                result['lenght'] =  _sizeof_fmt(result['length'])
+            yield "%s %s" % (result['length'], result['path'])
 
-
-def _create_count_listing(nodes, human_readable):
-    ret = []
-    if human_readable:
-        for node in nodes:
-            node['length'] = _sizeof_fmt(node['length'])
-    max_len = max([len(str(r['length'])) for r in nodes])
-    templ = "%%-%ds  %%s" % max_len
-    for node in nodes:
-        ret.append(templ % (node['length'], node['path']))
-    return "\n".join(ret)
-
+#        nodes = []
+#        last_dir = None
+#        try:
+#            while True:
+#                node = listing.next()
+#                dir_name = os.path.dirname(node['path'])
+#                if dir_name != last_dir:
+#                    if last_dir:
+#                        yield _create_count_listing(nodes, human_readable)
+#                    last_dir = dir_name
+#                    nodes = []
+#                nodes.append(node)
+#        except StopIteration:
+#            yield _create_count_listing(nodes, human_readable)
+#
+#
+#def _create_count_listing(nodes, human_readable):
+#    ret = []
+#    if human_readable:
+#        for node in nodes:
+#            node['length'] = _sizeof_fmt(node['length'])
+#    max_len = max([len(str(r['length'])) for r in nodes])
+#    templ = "%%-%ds  %%s" % max_len
+#    for node in nodes:
+#        ret.append(templ % (node['length'], node['path']))
+#    return "\n".join(ret)
+#
 
 def format_stat(results, json_output=False):
     ret = []

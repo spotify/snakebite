@@ -407,7 +407,7 @@ class Client(object):
 
         # Check if the directory is empty
         files = self.ls([path])
-        if len(files) > 0:
+        if len(list(files)) > 0:
             raise DirectoryException("rmdir: `%s': Directory is not empty" % path)
 
         return self._handle_delete(path, node, recurse=True)
@@ -599,7 +599,6 @@ class Client(object):
             raise InvalidInputException("mkdirs: no path given")
 
         for path in paths:
-            orig_path = path
             if not path.startswith("/"):
                 path = self._join_user_path(path)
 
@@ -611,11 +610,11 @@ class Client(object):
                     request.masked.perm = mode
                     request.createParent = create_parent
                     response = self.service.mkdirs(request)
-                    yield {"path": orig_path, "result": response.result}
+                    yield {"path": path, "result": response.result}
                 except RequestError, e:
-                    yield {"path": orig_path, "result": False, "error": str(e)}
+                    yield {"path": path, "result": False, "error": str(e)}
             else:
-                yield {"path": path, "result": False, "error": "mkdir: `%s': File exists" % orig_path}
+                yield {"path": path, "result": False, "error": "mkdir: `%s': File exists" % path}
 
     def serverdefaults(self):
         '''Get server defaults

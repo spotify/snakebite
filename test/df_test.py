@@ -19,7 +19,7 @@ from minicluster_testbase import MiniClusterTestBase
 class DfTest(MiniClusterTestBase):
 
     def test_df(self):
-        client_output = list(self.client.df())[0]
+        client_output = self.client.df()
         expected_output = self.cluster.df("/").split("\n")[1]
 
         (filesystem, capacity, used, remaining, pct) = re.split("\s+", expected_output)
