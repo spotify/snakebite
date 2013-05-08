@@ -62,7 +62,7 @@ TODO
 * Improve methods:
     * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f and -skipTrash)
 
-* Implement more methods:
+* Implement more methods (those need interaction with DataNodes):
     * [-expunge]
     * [-cat [-ignoreCrc] <src> ...]
     * [-copyFromLocal <localsrc> ... <dst>]
