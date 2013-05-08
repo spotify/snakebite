@@ -109,7 +109,8 @@ class Client(object):
                                      include_toplevel=include_toplevel,
                                      include_children=include_children,
                                      recurse=recurse):
-            yield item
+            if item:
+                yield item
 
     LISTING_ATTRIBUTES = ['length', 'owner', 'group', 'block_replication',
                           'modification_time', 'access_time', 'blocksize']
@@ -149,7 +150,8 @@ class Client(object):
         processor = lambda path, node, mode=mode: self._handle_chmod(path, node, mode)
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
-            yield item
+            if item:
+                yield item
 
     def _handle_chmod(self, path, node, mode):
         request = client_proto.SetPermissionRequestProto()
@@ -180,7 +182,8 @@ class Client(object):
         processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
-            yield item
+            if item:
+                yield item
 
     def _handle_chown(self, path, node, owner):
         if ":" in owner:
@@ -220,7 +223,8 @@ class Client(object):
         processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
-            yield item
+            if item:
+                yield item
 
     def count(self, paths):
         ''' Count files in a path
@@ -242,7 +246,8 @@ class Client(object):
 
         for item in self._find_items(paths, self._handle_count, include_toplevel=True,
                                      include_children=False, recurse=False):
-            yield item
+            if item:
+                yield item
 
     COUNT_ATTRIBUTES = ['length', 'fileCount', 'directoryCount', 'quota', 'spaceConsumed', 'spaceQuota']
 
@@ -309,13 +314,20 @@ class Client(object):
         processor = lambda path, node: self._handle_du(path, node)
         for item in self._find_items(paths, processor, include_toplevel=include_toplevel,
                                      include_children=include_children, recurse=False):
-            yield item
+            if item:
+                yield item
 
     def _handle_du(self, path, node):
-        request = client_proto.GetContentSummaryRequestProto()
-        request.path = path
-        response = self.service.getContentSummary(request)
-        return {"path": path, "length": response.summary.length}
+        if self._is_dir(node):
+            request = client_proto.GetContentSummaryRequestProto()
+            request.path = path
+            try:
+                response = self.service.getContentSummary(request)
+                return {"path": path, "length": response.summary.length}
+            except RequestError, e:
+                print e
+        else:
+            return {"path": path, "length": node.length}
 
     def rename(self, paths, dst):
         ''' Rename (move) path(s) to a destination
@@ -335,7 +347,8 @@ class Client(object):
 
         processor = lambda path, node, dst=dst: self._handle_rename(path, node, dst)
         for item in self._find_items(paths, processor, include_toplevel=True):
-            yield item
+            if item:
+                yield item
 
     def _handle_rename(self, path, node, dst):
         if not dst.startswith("/"):
@@ -367,7 +380,8 @@ class Client(object):
 
         processor = lambda path, node, recurse=recurse: self._handle_delete(path, node, recurse)
         for item in self._find_items(paths, processor, include_toplevel=True):
-            yield item
+            if item:
+                yield item
 
     def _handle_delete(self, path, node, recurse):
         if (self._is_dir(node) and not recurse):
@@ -399,7 +413,8 @@ class Client(object):
 
         processor = lambda path, node: self._handle_rmdir(path, node)
         for item in self._find_items(paths, processor, include_toplevel=True):
-            yield item
+            if item:
+                yield item
 
     def _handle_rmdir(self, path, node):
         if not self._is_dir(node):
@@ -441,7 +456,8 @@ class Client(object):
 
         processor = lambda path, node, replication=replication, blocksize=blocksize: self._handle_touchz(path, node, replication, blocksize)
         for item in self._find_items(paths, processor, include_toplevel=True, check_nonexistence=True, include_children=False):
-            yield item
+            if item:
+                yield item
 
     def _handle_touchz(self, path, node, replication, blocksize):
         # Item already exists
@@ -482,7 +498,8 @@ class Client(object):
         processor = lambda path, node, replication=replication: self._handle_setrep(path, node, replication)
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
-            yield item
+            if item:
+                yield item
 
     def _handle_setrep(self, path, node, replication):
         if not self._is_dir(node):
@@ -563,7 +580,7 @@ class Client(object):
         :type zero_length: boolean
         :returns: a boolean
 
-        .. note:: directory and zero lenght are AND'd.
+        .. note:: directory and zero length are AND'd.
         '''
         if not isinstance(path, str):
             raise InvalidInputException("Path should be a string")
