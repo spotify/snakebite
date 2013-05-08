@@ -1,1 +1,230 @@
-First commit
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Snakebite documentation &mdash; snakebite 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="snakebite 1.0 documentation" href="#" />
+    <link rel="next" title="Client library" href="client.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="client.html" title="Client library"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">snakebite 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="snakebite-documentation">
+<h1>Snakebite documentation<a class="headerlink" href="#snakebite-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Snakebite is a python package that provides:</p>
+<div class="toctree-wrapper compound">
+</div>
+<ul class="simple">
+<li><a class="reference internal" href="client.html"><em>A pure python HDFS client library that uses protobuf messages over Hadoop RPC to communicate with the namenode.</em></a></li>
+<li><a class="reference internal" href="cli.html"><em>A command line interface (CLI) for HDFS that uses the pure python client library.</em></a></li>
+<li><a class="reference internal" href="minicluster.html"><em>A hadoop minicluster wrapper.</em></a></li>
+</ul>
+</div>
+<div class="section" id="background">
+<h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+<p>Since the &#8216;normal&#8217; Hadoop HDFS client (<tt class="docutils literal"><span class="pre">hadoop</span> <span class="pre">fs</span></tt>) is written in Java and has
+a lot of dependencies on Hadoop jars, startup times are quite high (&gt; 3 secs).
+This isn&#8217;t ideal for integrating Hadoop commands in python projects.</p>
+<p>At Spotify we use the <a class="reference external" href="http://github.com/spotify/luigi">luigi job scheduler</a>
+that relies on doing a lot of existence checks and moving data around in HDFS.
+And since calling <tt class="docutils literal"><span class="pre">hadoop</span></tt> from python is expensive, we decided to write a
+pure python HDFS client that only relies on protobuf. The current
+<a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a> library uses protobuf messages and
+implements the Hadoop RPC protocol for talking to the NameNode.</p>
+<p>During development, we needed to verify <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a>
+behavior against the real client and for that we implemented a <a class="reference internal" href="minicluster.html#module-minicluster" title="minicluster"><tt class="xref py py-mod docutils literal"><span class="pre">minicluster</span></tt></a>
+that wraps a Hadoop Java mini cluster. Obviously this <a class="reference internal" href="minicluster.html#module-minicluster" title="minicluster"><tt class="xref py py-mod docutils literal"><span class="pre">minicluster</span></tt></a> can be
+used in different projects, so we made it a part of snakebite.</p>
+<p>And since it&#8217;s nice to have a CLI that uses <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a>
+we&#8217;ve implemented a <a class="reference internal" href="cli.html"><em>CLI client</em></a> as well.</p>
+</div>
+<div class="section" id="testing">
+<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a> hasn&#8217;t been tested in the wild
+a lot! <strong>USE AT YOUR OWN RISK!</strong></p>
+</div>
+<p>Tests can be run with <tt class="docutils literal"><span class="pre">nosetests</span></tt>. Currently, only integration tests are
+provided and use <tt class="docutils literal"><span class="pre">minicluster.py</span></tt> to spawn an HDFS minicluster.</p>
+<p>When running the tests, make sure that the <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt> environment variable is set.
+The minicluster uses the <tt class="docutils literal"><span class="pre">hadoop-mapreduce-client-jobclient.&lt;version&gt;-tests.jar</span></tt> and
+assumes this is located in <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt>. The job client test jar can also be specified
+by using the <tt class="docutils literal"><span class="pre">HADOOP_JOBCLIENT_JAR</span></tt> environment variable.</p>
+<p>Also, make sure the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable is set.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A hadoop installation is only required for testing.</p>
+</div>
+</div>
+<div class="section" id="todo">
+<h1>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p class="first">Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well</p>
+</li>
+<li><p class="first">More tests. Currently only integration tests with a minicluster are available.</p>
+</li>
+<li><p class="first">Tests for the CLI.</p>
+</li>
+<li><p class="first">Move to argparse to have arguments per command</p>
+</li>
+<li><p class="first">Return correct exit codes from cli client.</p>
+</li>
+<li><p class="first">The python packaging (pip stuff) probably needs some more love.</p>
+</li>
+<li><dl class="first docutils">
+<dt>Improve methods:</dt>
+<dd><ul class="first last simple">
+<li>[-rm [-f] [-r|-R] [-skipTrash] &lt;src&gt; ...] (implement -f and -skipTrash)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Implement more methods:</dt>
+<dd><ul class="first last simple">
+<li>[-expunge]</li>
+<li>[-cat [-ignoreCrc] &lt;src&gt; ...]</li>
+<li>[-copyFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</li>
+<li>[-copyToLocal [-ignoreCrc] [-crc] &lt;src&gt; ... &lt;localdst&gt;]</li>
+<li>[-cp &lt;src&gt; ... &lt;dst&gt;]</li>
+<li>[-get [-ignoreCrc] [-crc] &lt;src&gt; ... &lt;localdst&gt;]</li>
+<li>[-getmerge [-nl] &lt;src&gt; &lt;localdst&gt;]</li>
+<li>[-moveFromLocal &lt;localsrc&gt; ... &lt;dst&gt;]</li>
+<li>[-moveToLocal &lt;src&gt; &lt;localdst&gt;]</li>
+<li>[-put &lt;localsrc&gt; ... &lt;dst&gt;]</li>
+<li>[-tail [-f] &lt;file&gt;]</li>
+<li>[-text [-ignoreCrc] &lt;src&gt; ...]</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="license">
+<h1>LICENSE<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<p>Copyright (c) 2013 Spotify AB</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at</p>
+<p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.</p>
+<p>Code in <tt class="xref py py-mod docutils literal"><span class="pre">channel</span></tt>, <tt class="xref py py-mod docutils literal"><span class="pre">logger</span></tt> and <tt class="xref py py-mod docutils literal"><span class="pre">service</span></tt> was borrowed from <a class="reference external" href="https://code.google.com/p/protobuf-socket-rpc/">https://code.google.com/p/protobuf-socket-rpc/</a> and
+carries it&#8217;s respective license.</p>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Snakebite documentation</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#background">Background</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#todo">TODO</a></li>
+<li><a class="reference internal" href="#license">LICENSE</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="client.html"
+                        title="next chapter">Client library</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="client.html" title="Client library"
+             >next</a> |</li>
+        <li><a href="#">snakebite 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Spotify AB.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
