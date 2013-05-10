@@ -185,9 +185,19 @@ class SnakebiteCli(object):
     def commands(self):
         print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
 
+    @command(visible=False)
+    def complete(self):
+        self.opts.summary = True
+        for line in self._listing():
+            print line.replace(" ", "\\\\ ")
+
     @command(args="[path]", descr="list a path", allowed_opts=["d", "R", "s"])
     def ls(self):
-        # Mimicking hadoop client behaviour
+        for line in self._listing():
+            print line
+
+    def _listing(self):
+                # Mimicking hadoop client behaviour
         if self.opts.directory:
             include_children = False
             recurse = False
@@ -205,7 +215,7 @@ class SnakebiteCli(object):
                                              human_readable=self.opts.human,
                                              recursive=recurse,
                                              summary=self.opts.summary):
-            print line
+            yield line
 
     @command(args="[paths]", descr="create directories")
     def mkdir(self):
