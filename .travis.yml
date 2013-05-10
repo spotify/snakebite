@@ -1,18 +1,14 @@
 language: python
 python:
-# - "2.7"
+  - "2.7"
   - "2.6"
 jdk:
   - oraclejdk6
 before_install:
   - sudo sed -e "s/^127.0.0.1.*/127.0.0.1 localhost $(hostname)/" --in-place /etc/hosts
-  - cat /etc/hosts
   - wget http://archive.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.2.1.tar.gz
   - tar zxf hadoop-2.0.0-cdh4.2.1.tar.gz -C /tmp
   - sudo apt-get update -qq
-  - cat /etc/hosts
-#  - sudo echo "127.0.0.1 localhost "
-#  - sudo apt-get install -qq protobuf
 install: 
   - pip install protobuf --use-mirrors
   - pip install unittest2 --use-mirrors

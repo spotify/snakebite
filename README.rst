@@ -11,4 +11,8 @@ Snakebite has been tested against Cloudera CDH4.1.3 (hadoop 2.0.0)
 
 For more information and documentation can be found at http://spotify.github.io/snakebite/
 
+Travis CI status: 
+
+.. image:: https://api.travis-ci.org/spotify/snakebite.png
+
 Copyright 2013 Spotify AB
