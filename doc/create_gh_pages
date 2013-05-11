@@ -6,7 +6,7 @@ NEW_COMMIT_MESSAGE=$(git log ${CURRENT_BRANCH} -1 --pretty=short --abbrev-commit
 pushd ..
 git checkout gh-pages
 rm -rf build _sources _static
-git checkout ${CURRENT_BRANCHc} ${GH_PAGES_SOURCES}
+git checkout ${CURRENT_BRANCH} ${GH_PAGES_SOURCES}
 git reset HEAD
 popd
 make html
