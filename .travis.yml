@@ -15,3 +15,6 @@ install:
 script: nosetests
 env:
   - HADOOP_HOME=/tmp/hadoop-2.0.0-cdh4.2.1
+branches:
+  except:
+  - gh-pages
