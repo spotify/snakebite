@@ -8,10 +8,12 @@ Snakebite is a python package that provides:
    client
    cli
    minicluster
+   hadoop_rpc
 
 * :doc:`A pure python HDFS client library that uses protobuf messages over Hadoop RPC to communicate with the namenode. <client>`
 * :doc:`A command line interface (CLI) for HDFS that uses the pure python client library. <cli>`
 * :doc:`A hadoop minicluster wrapper. <minicluster>`
+* :doc:`Hadoop RPC specification. <hadoop_rpc>`
 
 Background
 ==========
