@@ -2,8 +2,12 @@ CLI client
 ==========
 A command line interface for HDFS using :mod:`snakebite.client <client>`.
 
-The CLI client tries to read the config from ~/.snakebiterc and if that doesn't
-exist, it will check $HADOOP_HOME/core-site.xml and create a ~/.snakebiterc from that.
+The CLI client first tries parse the path and in case it's in the form
+'hdfs://<namenode>:<port>/<path> it will use that configuration.
+Otherwise it will use -n and -p command line arguments.
+If the previous aren't set it tries to read the config from ~/.snakebiterc and
+if that doesn't exist, it will check $HADOOP_HOME/core-site.xml and create a
+~/.snakebiterc from that.
 
 A config looks like
 
