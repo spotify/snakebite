@@ -67,6 +67,19 @@ class SnakebiteCli(object):
         self._setup_logging()
 
     def _read_config(self):
+        ''' Check if the last argument contains hdfs://'''
+        if 'hdfs://' in self.args[-1]:
+            parse_result = urlparse(self.args[-1])
+
+            # Set config
+            self.opts.namenode = parse_result.hostname
+            self.opts.port = parse_result.port
+            self.args[-1] = parse_result.path
+            return
+
+        if self.opts.namenode and self.opts.port:
+            return
+
         ''' Try to read the config from ~/.snakebiterc and if that doesn't exist, check $HADOOP_HOME/core-site.xml
         and create a ~/.snakebiterc from that.
         '''
