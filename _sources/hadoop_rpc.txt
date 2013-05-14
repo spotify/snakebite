@@ -2,7 +2,7 @@ Hadoop RPC protocol description
 ===============================
 
 Snakebite currently implements the following protocol in
-:class:`snakebite.channel.SocketRpcChannel` to communicate with the NameNode.
+:py:data:`snakebite.channel.SocketRpcChannel` to communicate with the NameNode.
 
 =============
 Connection
@@ -10,21 +10,21 @@ Connection
 The Hadoop RPC protocol works as described below. On connection, headers are
 sent to setup a session. After that, multiple requests can be sent within the session.
 
-+----------------------------------+----------------+--------------------------------------+
-| Function                         | Type           | Default                              |
-+==================================+================+======================================+
-| Header                           | :class:`bytes` | "hrpc"                               |
-+----------------------------------+----------------+--------------------------------------+
-| Version                          | :class:`uint8` | 7                                    |
-+----------------------------------+----------------+--------------------------------------+
-| Auth method                      | :class:`uint8` | 80 (Auth method :class:`SIMPLE`)     |
-+----------------------------------+----------------+--------------------------------------+
-| Serialization type               | :class:`uint8` | 0 (:class:`protobuf`)                |
-+----------------------------------+----------------+--------------------------------------+
-| IpcConnectionContextProto length | :class:`uint32`|                                      |
-+----------------------------------+----------------+--------------------------------------+
-| IpcConnectionContextProto        | :class:`bytes` |                                      |
-+----------------------------------+----------------+--------------------------------------+
++----------------------------------+------------------+----------------------------------------+
+| Function                         | Type             | Default                                |
++==================================+==================+========================================+
+| Header                           | :py:data:`bytes` | "hrpc"                                 |
++----------------------------------+------------------+----------------------------------------+
+| Version                          | :py:data:`uint8` | 7                                      |
++----------------------------------+------------------+----------------------------------------+
+| Auth method                      | :py:data:`uint8` | 80 (Auth method :py:data:`SIMPLE`)     |
++----------------------------------+------------------+----------------------------------------+
+| Serialization type               | :py:data:`uint8` | 0 (:py:data:`protobuf`)                |
++----------------------------------+------------------+----------------------------------------+
+| IpcConnectionContextProto length | :py:data:`uint32`|                                        |
++----------------------------------+------------------+----------------------------------------+
+| IpcConnectionContextProto        | :py:data:`bytes` |                                        |
++----------------------------------+------------------+----------------------------------------+
 
 ==================
 Sending messages
@@ -35,31 +35,31 @@ When sending a message, the following is sent to the sever:
 +----------------------------------+-----------------------------------------+
 | Function                         | Type                                    |
 +==================================+=========================================+
-| Length of the next two parts     | :class:`uint32`                         |
+| Length of the next two parts     | :py:data:`uint32`                       |
 +----------------------------------+-----------------------------------------+
-| RpcPayloadHeaderProto length     | :class:`varint`                         |
+| RpcPayloadHeaderProto length     | :py:data:`varint`                       |
 +----------------------------------+-----------------------------------------+
-| RpcPayloadHeaderProto            | :class:`protobuf serialized message`    |
+| RpcPayloadHeaderProto            | :py:data:`protobuf serialized message`  |
 +----------------------------------+-----------------------------------------+
-| HadoopRpcRequestProto length     | :class:`varint`                         |
+| HadoopRpcRequestProto length     | :py:data:`varint`                       |
 +----------------------------------+-----------------------------------------+
-| HadoopRpcRequestProto            | :class:`protobuf serialized message`    |
+| HadoopRpcRequestProto            | :py:data:`protobuf serialized message`  |
 +----------------------------------+-----------------------------------------+
 
-:class:`varint` is a `Protocol Buffer variable int <https://developers.google.com/protocol-buffers/docs/encoding#varints>`_. 
+:py:data:`varint` is a `Protocol Buffer variable int <https://developers.google.com/protocol-buffers/docs/encoding#varints>`_. 
 
 .. note::
-    The Java protobuf implementation uses :class:`writeToDelimited` to prepend
+    The Java protobuf implementation uses :py:data:`writeToDelimited` to prepend
     the message with their lenght, but the python implementation doesn't implement
     such a method (yet).
 
-Next to an :class:`rpcKind` (snakebites default is :class:`RPC_PROTOCOL_BUFFER`),
-an :class:`rpcOp` (snakebites default is :class:`RPC_FINAL_PAYLOAD`), the
-:class:`RpcPayloadHeaderProto` message defines a :class:`callId` that is added
+Next to an :py:data:`rpcKind` (snakebites default is :py:data:`RPC_PROTOCOL_BUFFER`),
+an :py:data:`rpcOp` (snakebites default is :py:data:`RPC_FINAL_PAYLOAD`), the
+:py:data:`RpcPayloadHeaderProto` message defines a :py:data:`callId` that is added
 in the RPC response (described below).
 
-The :class:`HadoopRpcRequestProto` contains a :class:`methodName` field that defines
-what server method is called and a has a property :class:`request` that contains the
+The :py:data:`HadoopRpcRequestProto` contains a :py:data:`methodName` field that defines
+what server method is called and a has a property :py:data:`request` that contains the
 serialized actual request message.
 
 ====================
@@ -68,39 +68,39 @@ Receiving messages
 
 After a message is sent, the response can be read in the following way:
 
-+----------------------------------------------+-----------------+
-| Function                                     | Type            |
-+==============================================+=================+
-| Length of the RpcResponseHeaderProto         | :class:`varint` |
-+----------------------------------------------+-----------------+
-| RpcResponseHeaderProto                       | :class:`bytes`  |
-+----------------------------------------------+-----------------+
-| Length of the RPC response                   | :class:`uint32` |
-+----------------------------------------------+-----------------+
-| Serialized RPC response                      | :class:`bytes`  |
-+----------------------------------------------+-----------------+
++----------------------------------------------+-------------------+
+| Function                                     | Type              |
++==============================================+===================+
+| Length of the RpcResponseHeaderProto         | :py:data:`varint` |
++----------------------------------------------+-------------------+
+| RpcResponseHeaderProto                       | :py:data:`bytes`  |
++----------------------------------------------+-------------------+
+| Length of the RPC response                   | :py:data:`uint32` |
++----------------------------------------------+-------------------+
+| Serialized RPC response                      | :py:data:`bytes`  |
++----------------------------------------------+-------------------+
 
-The :class:`RpcResponseHeaderProto` contains the :class:`callId` of the request
-and a status field. The status can be :class:`SUCCESS`, :class:`ERROR` or 
-:class:`FAILURE`. In case :class:`SUCCESS` the rest of response is a complete
+The :py:data:`RpcResponseHeaderProto` contains the :py:data:`callId` of the request
+and a status field. The status can be :py:data:`SUCCESS`, :py:data:`ERROR` or 
+:py:data:`FAILURE`. In case :py:data:`SUCCESS` the rest of response is a complete
 protobuf response.
 
-In case of :class:`ERROR`, the response looks like follows:
+In case of :py:data:`ERROR`, the response looks like follows:
 
-+----------------------------------------+-----------------------+
-| Function                               | Type                  |
-+========================================+=======================+
-| Length of the RpcResponseHeaderProto   | :class:`varint`       |
-+----------------------------------------+-----------------------+
-| RpcResponseHeaderProto                 | :class:`bytes`        |
-+----------------------------------------+-----------------------+
-| Length of the RPC response             | :class:`uint32`       |
-+----------------------------------------+-----------------------+
-| Length of the Exeption class name      | :class:`uint32`       |
-+----------------------------------------+-----------------------+
-| Exception class name                   | :class:`utf-8 string` |
-+----------------------------------------+-----------------------+
-| Length of the stack trace              | :class:`uint32`       |
-+----------------------------------------+-----------------------+
-| Stack trace                            | :class:`utf-8 string` |
-+----------------------------------------+-----------------------+
++----------------------------------------+-------------------------+
+| Function                               | Type                    |
++========================================+=========================+
+| Length of the RpcResponseHeaderProto   | :py:data:`varint`       |
++----------------------------------------+-------------------------+
+| RpcResponseHeaderProto                 | :py:data:`bytes`        |
++----------------------------------------+-------------------------+
+| Length of the RPC response             | :py:data:`uint32`       |
++----------------------------------------+-------------------------+
+| Length of the Exeption class name      | :py:data:`uint32`       |
++----------------------------------------+-------------------------+
+| Exception class name                   | :py:data:`utf-8 string` |
++----------------------------------------+-------------------------+
+| Length of the stack trace              | :py:data:`uint32`       |
++----------------------------------------+-------------------------+
+| Stack trace                            | :py:data:`utf-8 string` |
++----------------------------------------+-------------------------+

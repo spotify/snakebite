@@ -51,15 +51,15 @@
   <div class="section" id="hadoop-rpc-protocol-description">
 <h1>Hadoop RPC protocol description<a class="headerlink" href="#hadoop-rpc-protocol-description" title="Permalink to this headline">¶</a></h1>
 <p>Snakebite currently implements the following protocol in
-<tt class="xref py py-class docutils literal"><span class="pre">snakebite.channel.SocketRpcChannel</span></tt> to communicate with the NameNode.</p>
+<tt class="xref py py-data docutils literal"><span class="pre">snakebite.channel.SocketRpcChannel</span></tt> to communicate with the NameNode.</p>
 <div class="section" id="connection">
 <h2>Connection<a class="headerlink" href="#connection" title="Permalink to this headline">¶</a></h2>
 <p>The Hadoop RPC protocol works as described below. On connection, headers are
 sent to setup a session. After that, multiple requests can be sent within the session.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="39%" />
-<col width="18%" />
+<col width="37%" />
+<col width="20%" />
 <col width="43%" />
 </colgroup>
 <thead valign="bottom">
@@ -70,27 +70,27 @@ sent to setup a session. After that, multiple requests can be sent within the se
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Header</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">bytes</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">bytes</span></tt></td>
 <td>&#8220;hrpc&#8221;</td>
 </tr>
 <tr class="row-odd"><td>Version</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint8</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint8</span></tt></td>
 <td>7</td>
 </tr>
 <tr class="row-even"><td>Auth method</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint8</span></tt></td>
-<td>80 (Auth method <tt class="xref py py-class docutils literal"><span class="pre">SIMPLE</span></tt>)</td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint8</span></tt></td>
+<td>80 (Auth method <tt class="xref py py-data docutils literal"><span class="pre">SIMPLE</span></tt>)</td>
 </tr>
 <tr class="row-odd"><td>Serialization type</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint8</span></tt></td>
-<td>0 (<tt class="xref py py-class docutils literal"><span class="pre">protobuf</span></tt>)</td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint8</span></tt></td>
+<td>0 (<tt class="xref py py-data docutils literal"><span class="pre">protobuf</span></tt>)</td>
 </tr>
 <tr class="row-even"><td>IpcConnectionContextProto length</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint32</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint32</span></tt></td>
 <td>&nbsp;</td>
 </tr>
 <tr class="row-odd"><td>IpcConnectionContextProto</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">bytes</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">bytes</span></tt></td>
 <td>&nbsp;</td>
 </tr>
 </tbody>
@@ -111,35 +111,35 @@ sent to setup a session. After that, multiple requests can be sent within the se
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Length of the next two parts</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint32</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint32</span></tt></td>
 </tr>
 <tr class="row-odd"><td>RpcPayloadHeaderProto length</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">varint</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">varint</span></tt></td>
 </tr>
 <tr class="row-even"><td>RpcPayloadHeaderProto</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">protobuf</span> <span class="pre">serialized</span> <span class="pre">message</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">protobuf</span> <span class="pre">serialized</span> <span class="pre">message</span></tt></td>
 </tr>
 <tr class="row-odd"><td>HadoopRpcRequestProto length</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">varint</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">varint</span></tt></td>
 </tr>
 <tr class="row-even"><td>HadoopRpcRequestProto</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">protobuf</span> <span class="pre">serialized</span> <span class="pre">message</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">protobuf</span> <span class="pre">serialized</span> <span class="pre">message</span></tt></td>
 </tr>
 </tbody>
 </table>
-<p><tt class="xref py py-class docutils literal"><span class="pre">varint</span></tt> is a <a class="reference external" href="https://developers.google.com/protocol-buffers/docs/encoding#varints">Protocol Buffer variable int</a>.</p>
+<p><tt class="xref py py-data docutils literal"><span class="pre">varint</span></tt> is a <a class="reference external" href="https://developers.google.com/protocol-buffers/docs/encoding#varints">Protocol Buffer variable int</a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The Java protobuf implementation uses <tt class="xref py py-class docutils literal"><span class="pre">writeToDelimited</span></tt> to prepend
+<p class="last">The Java protobuf implementation uses <tt class="xref py py-data docutils literal"><span class="pre">writeToDelimited</span></tt> to prepend
 the message with their lenght, but the python implementation doesn&#8217;t implement
 such a method (yet).</p>
 </div>
-<p>Next to an <tt class="xref py py-class docutils literal"><span class="pre">rpcKind</span></tt> (snakebites default is <tt class="xref py py-class docutils literal"><span class="pre">RPC_PROTOCOL_BUFFER</span></tt>),
-an <tt class="xref py py-class docutils literal"><span class="pre">rpcOp</span></tt> (snakebites default is <tt class="xref py py-class docutils literal"><span class="pre">RPC_FINAL_PAYLOAD</span></tt>), the
-<tt class="xref py py-class docutils literal"><span class="pre">RpcPayloadHeaderProto</span></tt> message defines a <tt class="xref py py-class docutils literal"><span class="pre">callId</span></tt> that is added
+<p>Next to an <tt class="xref py py-data docutils literal"><span class="pre">rpcKind</span></tt> (snakebites default is <tt class="xref py py-data docutils literal"><span class="pre">RPC_PROTOCOL_BUFFER</span></tt>),
+an <tt class="xref py py-data docutils literal"><span class="pre">rpcOp</span></tt> (snakebites default is <tt class="xref py py-data docutils literal"><span class="pre">RPC_FINAL_PAYLOAD</span></tt>), the
+<tt class="xref py py-data docutils literal"><span class="pre">RpcPayloadHeaderProto</span></tt> message defines a <tt class="xref py py-data docutils literal"><span class="pre">callId</span></tt> that is added
 in the RPC response (described below).</p>
-<p>The <tt class="xref py py-class docutils literal"><span class="pre">HadoopRpcRequestProto</span></tt> contains a <tt class="xref py py-class docutils literal"><span class="pre">methodName</span></tt> field that defines
-what server method is called and a has a property <tt class="xref py py-class docutils literal"><span class="pre">request</span></tt> that contains the
+<p>The <tt class="xref py py-data docutils literal"><span class="pre">HadoopRpcRequestProto</span></tt> contains a <tt class="xref py py-data docutils literal"><span class="pre">methodName</span></tt> field that defines
+what server method is called and a has a property <tt class="xref py py-data docutils literal"><span class="pre">request</span></tt> that contains the
 serialized actual request message.</p>
 </div>
 <div class="section" id="receiving-messages">
@@ -147,8 +147,8 @@ serialized actual request message.</p>
 <p>After a message is sent, the response can be read in the following way:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="73%" />
-<col width="27%" />
+<col width="71%" />
+<col width="29%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Function</th>
@@ -157,28 +157,28 @@ serialized actual request message.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Length of the RpcResponseHeaderProto</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">varint</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">varint</span></tt></td>
 </tr>
 <tr class="row-odd"><td>RpcResponseHeaderProto</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">bytes</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">bytes</span></tt></td>
 </tr>
 <tr class="row-even"><td>Length of the RPC response</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint32</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint32</span></tt></td>
 </tr>
 <tr class="row-odd"><td>Serialized RPC response</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">bytes</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">bytes</span></tt></td>
 </tr>
 </tbody>
 </table>
-<p>The <tt class="xref py py-class docutils literal"><span class="pre">RpcResponseHeaderProto</span></tt> contains the <tt class="xref py py-class docutils literal"><span class="pre">callId</span></tt> of the request
-and a status field. The status can be <tt class="xref py py-class docutils literal"><span class="pre">SUCCESS</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">ERROR</span></tt> or
-<tt class="xref py py-class docutils literal"><span class="pre">FAILURE</span></tt>. In case <tt class="xref py py-class docutils literal"><span class="pre">SUCCESS</span></tt> the rest of response is a complete
+<p>The <tt class="xref py py-data docutils literal"><span class="pre">RpcResponseHeaderProto</span></tt> contains the <tt class="xref py py-data docutils literal"><span class="pre">callId</span></tt> of the request
+and a status field. The status can be <tt class="xref py py-data docutils literal"><span class="pre">SUCCESS</span></tt>, <tt class="xref py py-data docutils literal"><span class="pre">ERROR</span></tt> or
+<tt class="xref py py-data docutils literal"><span class="pre">FAILURE</span></tt>. In case <tt class="xref py py-data docutils literal"><span class="pre">SUCCESS</span></tt> the rest of response is a complete
 protobuf response.</p>
-<p>In case of <tt class="xref py py-class docutils literal"><span class="pre">ERROR</span></tt>, the response looks like follows:</p>
+<p>In case of <tt class="xref py py-data docutils literal"><span class="pre">ERROR</span></tt>, the response looks like follows:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="63%" />
-<col width="37%" />
+<col width="62%" />
+<col width="38%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Function</th>
@@ -187,25 +187,25 @@ protobuf response.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Length of the RpcResponseHeaderProto</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">varint</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">varint</span></tt></td>
 </tr>
 <tr class="row-odd"><td>RpcResponseHeaderProto</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">bytes</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">bytes</span></tt></td>
 </tr>
 <tr class="row-even"><td>Length of the RPC response</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint32</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint32</span></tt></td>
 </tr>
 <tr class="row-odd"><td>Length of the Exeption class name</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint32</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint32</span></tt></td>
 </tr>
 <tr class="row-even"><td>Exception class name</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">utf-8</span> <span class="pre">string</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">utf-8</span> <span class="pre">string</span></tt></td>
 </tr>
 <tr class="row-odd"><td>Length of the stack trace</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">uint32</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">uint32</span></tt></td>
 </tr>
 <tr class="row-even"><td>Stack trace</td>
-<td><tt class="xref py py-class docutils literal"><span class="pre">utf-8</span> <span class="pre">string</span></tt></td>
+<td><tt class="xref py py-data docutils literal"><span class="pre">utf-8</span> <span class="pre">string</span></tt></td>
 </tr>
 </tbody>
 </table>
