@@ -30,6 +30,6 @@ setup(
         ('', ['LICENSE'])
     ],
     install_requires=[
-        'python-protobuf>2.4.1',
+        'protobuf>2.4.1',
     ]
 )
