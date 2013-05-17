@@ -13,16 +13,23 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-try:
-    from setuptools import setup
-except:
-    from distutils.core import setup
 
-setup(name='snakebite',
-      version='1.0',
-      author=u'Wouter de Bie',
-      author_email='wouter@spotify.com',
-      description='Pure Python HDFS client',
-      packages=['snakebite', 'snakebite.protobuf'],
-      scripts=['bin/snakebite'],
-      datafiles=[('/etc/bash_completion.d', ['scripts/snakebite-completion.bash'])])
+from distutils.core import setup
+
+setup(
+    name='snakebite',
+    version='1.0.0',
+    author=u'Wouter de Bie',
+    author_email='wouter@spotify.com',
+    description='Pure Python HDFS client',
+    packages=['snakebite', 'snakebite.protobuf'],
+    scripts=['bin/snakebite'],
+    license='Apache License 2.0',
+    data_files=[
+        ('etc/bash_completion.d', ['scripts/snakebite-completion.bash']),
+        ('', ['LICENSE'])
+    ],
+    install_requires=[
+        'python-protobuf>2.4.1',
+    ]
+)
