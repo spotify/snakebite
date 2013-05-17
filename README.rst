@@ -9,6 +9,10 @@ Snakebite requires python2 (python3 is not supported yet) and python-protobuf 2.
 
 Snakebite has been tested against Cloudera CDH4.1.3 (hadoop 2.0.0)
 
+The quickest way to install snakebite is to run:
+
+  pip install snakebite
+
 For more information and documentation can be found at http://spotify.github.io/snakebite/
 
 Travis CI status: 
