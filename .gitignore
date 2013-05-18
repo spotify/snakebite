@@ -6,3 +6,5 @@
 */build
 build/
 snakebite.egg-info/
+MANIFEST
+dist/
