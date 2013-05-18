@@ -24,6 +24,7 @@ class MiniClusterTestBase(unittest2.TestCase):
             cls.cluster.put("/zerofile", "/bar/baz/foo/qux")
             cls.cluster.mkdir("/bar/foo/baz", ['-p'])
             cls.cluster.put("/zerofile", "/bar/foo/baz/qux")
+            cls.cluster.put("/log", "/")
 
     @classmethod
     def tearDownClass(cls):

@@ -68,7 +68,7 @@ class SnakebiteCli(object):
 
     def _read_config(self):
         ''' Check if the last argument contains hdfs://'''
-        if 'hdfs://' in self.args[-1]:
+        if self.args and 'hdfs://' in self.args[-1]:
             parse_result = urlparse(self.args[-1])
 
             # Set config

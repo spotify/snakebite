@@ -789,6 +789,17 @@ class Client(object):
                         traverse_path = "/".join([full_path, rest])
                         for item in self._glob_find(traverse_path, processor, include_toplevel):
                             yield item
+                    elif rest:
+                        # we have more rest, but it's not magic, which is either a file or a directory
+                        final_path = full_path + rest
+                        fi = self._get_file_info(final_path)
+                        if fi and self._is_dir(fi.fs):
+                            dir_list = self._get_dir_listing(final_path)
+                            for n in dir_list.dirList.partialListing:
+                                full_child_path = self._get_full_path(final_path, n)
+                                yield processor(full_child_path, n)
+                        elif fi:
+                            yield processor(final_path, fi.fs)
                     else:
                         # If the matching node is a directory, we list the directory
                         # This is what the hadoop client does at least.
