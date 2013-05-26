@@ -719,9 +719,9 @@ class Client(object):
                     yield entry
 
                 if self._is_dir(fileinfo.fs) and (include_children or recurse):
-                    listing = self._get_dir_listing(path)
-                    for node in listing.dirList.partialListing:
+                    for node in self._get_dir_listing(path):
                         full_path = self._get_full_path(path, node)
+                        last_entry_path = node.path
                         entry = processor(full_path, node)
                         yield entry
 
@@ -736,12 +736,20 @@ class Client(object):
                                                          recurse=recurse):
                                 yield item
 
-    def _get_dir_listing(self, path):
+    def _get_dir_listing(self, path, start_after=''):
         request = client_proto.GetListingRequestProto()
         request.src = path
-        request.startAfter = ''
+        request.startAfter = start_after
         request.needLocation = False
-        return self.service.getListing(request)
+        listing = self.service.getListing(request)
+        if not listing:
+            return
+        for node in listing.dirList.partialListing:
+            start_after = node.path
+            yield node
+        if listing.dirList.remainingEntries > 0:
+            for node in self._get_dir_listing(path, start_after):
+                yield node
 
     def _glob_find(self, path, processor, include_toplevel):
         '''Handle globs in paths.
@@ -780,8 +788,7 @@ class Client(object):
         fileinfo = self._get_file_info(check_path)
         if fileinfo and self._is_dir(fileinfo.fs):
             # List all child nodes and match them agains the glob
-            listing = self._get_dir_listing(check_path)
-            for node in listing.dirList.partialListing:
+            for node in self._get_dir_listing(check_path):
                 full_path = self._get_full_path(check_path, node)
                 if fnmatch.fnmatch(full_path, match_path):
                     # If we have a match, but need to go deeper, we recurse
@@ -794,8 +801,7 @@ class Client(object):
                         final_path = full_path + rest
                         fi = self._get_file_info(final_path)
                         if fi and self._is_dir(fi.fs):
-                            dir_list = self._get_dir_listing(final_path)
-                            for n in dir_list.dirList.partialListing:
+                            for n in self._get_dir_listing(final_path):
                                 full_child_path = self._get_full_path(final_path, n)
                                 yield processor(full_child_path, n)
                         elif fi:
@@ -809,7 +815,7 @@ class Client(object):
                             fp = self._get_full_path(check_path, node)
                             dir_list = self._get_dir_listing(fp)
                             if dir_list:  # It might happen that the directory above has been removed
-                                for n in dir_list.dirList.partialListing:
+                                for n in dir_list:
                                     full_child_path = self._get_full_path(fp, n)
                                     yield processor(full_child_path, n)
                         else:
