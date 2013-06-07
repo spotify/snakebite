@@ -758,6 +758,11 @@ class Client(object):
         we don't add the found children to the result, but traverse into paths
         that did have a match.
         '''
+
+        # Remove the last / from the path, since hadoop doesn't understand it
+        if path.endswith("/"):
+            path = path[:-1]
+
         # Split path elements and check where the first occurence of magic is
         path_elements = path.split("/")
         for i, element in enumerate(path_elements):
@@ -780,10 +785,9 @@ class Client(object):
         # we prepend it with "/", since "/".join(['x']) doesn't return "/x"
         rest_elements = path_elements[first_magic + 1:]
         if len(rest_elements) == 1:
-            rest = "/" + rest_elements[0]
+            rest = rest_elements[0]
         else:
             rest = "/".join(rest_elements)
-
         # Check if the path exists and that it's a directory (which it should..)
         fileinfo = self._get_file_info(check_path)
         if fileinfo and self._is_dir(fileinfo.fs):
@@ -798,7 +802,7 @@ class Client(object):
                             yield item
                     elif rest:
                         # we have more rest, but it's not magic, which is either a file or a directory
-                        final_path = full_path + rest
+                        final_path = os.path.join(full_path, rest)
                         fi = self._get_file_info(final_path)
                         if fi and self._is_dir(fi.fs):
                             for n in self._get_dir_listing(final_path):

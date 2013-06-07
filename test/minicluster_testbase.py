@@ -1,5 +1,6 @@
 import unittest2
 import os
+import time
 from snakebite.minicluster import MiniCluster
 from snakebite.client import Client
 
@@ -34,3 +35,11 @@ class MiniClusterTestBase(unittest2.TestCase):
     def setUp(self):
         self.cluster = self.__class__.cluster
         self.client = Client(self.cluster.host, self.cluster.port)
+
+if __name__ == '__main__':
+    try:
+        MiniClusterTestBase.setupClass()
+        while True:
+            time.sleep(5)
+    finally:
+        MiniClusterTestBase.cluster.terminate()
