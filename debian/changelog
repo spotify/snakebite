@@ -1,3 +1,9 @@
+snakebite (1.0.3) unstable; urgency=low
+
+  * Fixes globbing issue
+
+ -- Wouter de Bie <wouter@spotify.com>  Sun, 7 Jun 2013 08:29:10 +0000
+
 snakebite (1.0.2) unstable; urgency=low
 
   * Fixes directory listings > 1000 nodes
