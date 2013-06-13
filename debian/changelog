@@ -1,3 +1,9 @@
+snakebite (1.0.4) unstable; urgency=low
+
+  * Update setup.py
+
+ -- Wouter de Bie <wouter@spotify.com>  Thu, 13 Jun 2013 08:29:10 +0000
+
 snakebite (1.0.3) unstable; urgency=low
 
   * Fixes globbing issue

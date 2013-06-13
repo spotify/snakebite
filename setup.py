@@ -18,13 +18,23 @@ from distutils.core import setup
 
 setup(
     name='snakebite',
-    version='1.0.3',
+    version='1.0.4',
     author=u'Wouter de Bie',
     author_email='wouter@spotify.com',
     description='Pure Python HDFS client',
+    url='http://github.com/spotify/snakebite',
     packages=['snakebite', 'snakebite.protobuf'],
     scripts=['bin/snakebite'],
     license='Apache License 2.0',
+    keywords='hadoop protobuf hdfs'.split(),
+    classifiers=[
+        'Topic :: Utilities',
+        'Programming Language :: Python',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: MacOS',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Environment :: Other Environment'
+    ],
     data_files=[
         ('etc/bash_completion.d', ['scripts/snakebite-completion.bash']),
         ('', ['LICENSE'])
