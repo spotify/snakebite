@@ -1,4 +1,3 @@
-=========
 Snakebite
 =========
 Snakebite is a python library that provides a pure python HDFS client and a wrapper around Hadoops minicluster. 
@@ -9,13 +8,18 @@ Snakebite requires python2 (python3 is not supported yet) and python-protobuf 2.
 
 Snakebite has been tested mainly against Cloudera CDH4.1.3 (hadoop 2.0.0) in production. Tests pass on HortonWorks HDP 2.0.3.22-alpha
 
+Installing
+**********
 The quickest way to install snakebite is to run:
 
   pip install snakebite
 
+Documentation
+*************
 For more information and documentation can be found at http://spotify.github.io/snakebite/
 
-Travis CI status: 
+Travis CI status
+****************
 
 .. image:: https://api.travis-ci.org/spotify/snakebite.png
 

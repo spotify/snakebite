@@ -33,8 +33,9 @@ class MiniClusterTestBase(unittest2.TestCase):
             cls.cluster.terminate()
 
     def setUp(self):
+        version = os.environ.get("HADOOP_PROTOCOL_VER", 7)
         self.cluster = self.__class__.cluster
-        self.client = Client(self.cluster.host, self.cluster.port)
+        self.client = Client(self.cluster.host, self.cluster.port, int(version))
 
 if __name__ == '__main__':
     try:

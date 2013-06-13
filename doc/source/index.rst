@@ -39,7 +39,7 @@ we've implemented a :doc:`cli` as well.
 Testing
 =======
 .. warning:: :mod:`snakebite.client <client>` hasn't been tested in the wild
-          a lot! **USE AT YOUR OWN RISK!**
+   a lot! **USE AT YOUR OWN RISK!**
 
 Tests can be run with ``nosetests``. Currently, only integration tests are
 provided and use ``minicluster.py`` to spawn an HDFS minicluster. 
@@ -50,6 +50,11 @@ assumes this is located in ``HADOOP_HOME``. The job client test jar can also be 
 by using the ``HADOOP_JOBCLIENT_JAR`` environment variable.
 
 Also, make sure the ``JAVA_HOME`` environment variable is set.
+
+.. note:: Different Hadoop distributions use different protocol versions. Snakebite
+   and the tests default to version 7 (CDH 4.1.3), but if you want to test with
+   different protocol versions (HDP 2.0 uses version 8), set the ``HADOOP_PROTOCOL_VER``
+   environment variable to the apropriate version number.
 
 .. note:: A hadoop installation is only required for testing.
 
