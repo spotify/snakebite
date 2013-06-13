@@ -76,8 +76,18 @@ class RpcBufferedReader(object):
         self.buffer = ""
         self.pos = -1  # position of last byte read
 
+    def read(self, n):
+        '''Reads n bytes into the internal buffer'''
+        bytes_wanted = n - self.buffer_length + self.pos + 1
+        if bytes_wanted > 0:
+            self._buffer_bytes(bytes_wanted)
+
+        end_pos = self.pos + n
+        ret = self.buffer[self.pos + 1:end_pos + 1]
+        self.pos = end_pos
+        return ret
+
     def _buffer_bytes(self, n):
-        log.debug("Trying to buffer %d bytes" % n)
         bytes_read = self.socket.recv(n)
         self.buffer += bytes_read
         if len(bytes_read) < n:
@@ -86,22 +96,6 @@ class RpcBufferedReader(object):
         log.debug("Bytes read: %d, total: %d" % (n, self.buffer_length))
         return n
 
-    def read(self, n):
-        '''Reads n bytes from the buffer. This will overwrite the internal buffer.'''
-        log.debug("read(%d), pos: %d, buffer: %s" % (n, self.pos, format_bytes(self.buffer)))
-
-        bytes_wanted = n - self.buffer_length + self.pos + 1
-        if bytes_wanted > 0:
-            self._buffer_bytes(bytes_wanted)
-
-        next_pos = self.pos + 1  # position of the next byte
-        log.debug("Buffer: %s", format_bytes(self.buffer))
-        end_pos = next_pos + n - 1
-        ret = self.buffer[next_pos:end_pos + 1]
-        self.pos = end_pos
-        log.debug("Returning buffer[%d:%d], new pos: %d, ret: %s" % (next_pos, end_pos, self.pos, format_bytes(ret)))
-        return ret
-
     def rewind(self, places):
         '''Rewinds the current buffer to a position. Needed for reading varints,
         because we might read bytes that belong to the stream after the varint.
@@ -109,11 +103,6 @@ class RpcBufferedReader(object):
         log.debug("Rewinding pos %d with %d places" % (self.pos, places))
         self.pos -= places
         log.debug("Reset buffer to pos %d" % self.pos)
-
-    def peek(self, n):
-        bytes = self.read(n)
-        self.rewind(n)
-        return bytes
 
     @property
     def buffer_length(self):
@@ -140,7 +129,6 @@ class SocketRpcChannel(service.RpcChannel):
 
         # Check the request is correctly initialized
         if not request.IsInitialized():
-            print dir(request)
             raise Exception("Client request (%s) is missing mandatory fields" % type(request))
 
     def open_socket(self, host, port, context):

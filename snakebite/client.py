@@ -53,6 +53,10 @@ class Client(object):
     .. note::
         Parameters like ``include_children`` and ``recurse`` are not used
         when paths contain globs.
+
+    .. note::
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 7, but this can be set by passing
+        in the ``hadoop_version`` parameter to the constructor.
     '''
     FILETYPES = {
         1: "d",
@@ -66,6 +70,8 @@ class Client(object):
         :type host: string
         :param port: RPC Port of the NameNode
         :type port: int
+        :param hadoop_version: What hadoop protocol version should be used (default: 7)
+        :type hadoop_version: int
         '''
         self.host = host
         self.port = port
