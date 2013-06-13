@@ -60,7 +60,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, hadoop_version=7):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -70,7 +70,7 @@ class Client(object):
         self.host = host
         self.port = port
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
-        self.service = RpcService(self.service_stub_class, self.port, self.host)
+        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version)
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
         ''' Issues 'ls' command and returns a list of maps that contain fileinfo

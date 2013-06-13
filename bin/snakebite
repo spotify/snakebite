@@ -25,6 +25,7 @@ from snakebite.client import Client
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
+from snakebite.errors import RequestError
 from snakebite.formatter import format_listing
 from snakebite.formatter import format_results
 from snakebite.formatter import format_counts
@@ -36,7 +37,14 @@ log = logging.getLogger(__name__)
 
 
 def exitError(error):
-    print str(error)
+    if isinstance(error, FileNotFoundException) or \
+       isinstance(error, DirectoryException) or \
+       isinstance(error, FileException):
+        print str(error)
+    elif isinstance(error, RequestError):
+        print "Request error: %s" % str(error)
+    else:
+        raise error
     sys.exit(-1)
 
 
@@ -63,7 +71,7 @@ class SnakebiteCli(object):
     def __init__(self):
         (self.cmd, self.opts, self.args) = self._parse_opts()
         self._read_config()
-        self._setup_client(self.opts.namenode, int(self.opts.port))
+        self._setup_client(self.opts.namenode, int(self.opts.port), int(self.opts.version))
         self._setup_logging()
 
     def _read_config(self):
@@ -93,6 +101,7 @@ class SnakebiteCli(object):
             config = json.loads(open(os.path.join(os.path.expanduser('~'), '.snakebiterc')).read())
             self.opts.namenode = config['namenode']
             self.opts.port = config['port']
+            self.opts.version = config.get('version', 7)
         elif os.environ.get('HADOOP_HOME'):
             hdfs_conf = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
             self._read_hadoop_config(hdfs_conf, config_file)
@@ -111,8 +120,8 @@ class SnakebiteCli(object):
             print "Tried to find core-site.xml in:"
             for hdfs_conf in try_paths:
                 print " - %s" % hdfs_conf
-            print "\nYou can manually create ~/.snakebite with the following content:"
-            print "{'namenode': 'ip/hostname', 'port': 54310}"
+            print "\nYou can manually create ~/.snakebiterc with the following content:"
+            print '{"namenode": "ip/hostname", "port": 54310, "version": 7}'
             sys.exit(1)
 
     def _read_hadoop_config(self, hdfs_conf, config_file):
@@ -129,7 +138,7 @@ class SnakebiteCli(object):
 
                     # Write config to file
                     f = open(config_file, "w")
-                    f.write(json.dumps({"namenode": self.opts.namenode, "port": self.opts.port}))
+                    f.write(json.dumps({"namenode": self.opts.namenode, "port": self.opts.port, "version": self.opts.version}))
                     f.close()
 
     def _parse_opts(self):
@@ -146,6 +155,7 @@ class SnakebiteCli(object):
             action='store_true')
         parser.add_option('-j', '--json', help='JSON output', action='store_true')
         parser.add_option('-n', '--namenode', help='namenode host')
+        parser.add_option('-V', '--version', help='Hadoop protocol version (default:8', default=7)
         parser.add_option('-p', '--port', help='namenode RPC port')
 
         parser.add_option('-R', '--recurse', help='recurse into subdirectories',
@@ -178,8 +188,8 @@ class SnakebiteCli(object):
             loglevel = logging.INFO
         logging.basicConfig(level=loglevel)
 
-    def _setup_client(self, host, port):
-        self.client = Client(host, port)
+    def _setup_client(self, host, port, hadoop_version):
+        self.client = Client(host, port, hadoop_version)
 
     def execute(self):
         if not Commands.methods.get(self.cmd):
@@ -187,11 +197,7 @@ class SnakebiteCli(object):
             sys.exit(-1)
         try:
             return Commands.methods[self.cmd]['method'](self)
-        except FileNotFoundException, e:
-            exitError(e)
-        except DirectoryException, e:
-            exitError(e)
-        except FileException, e:
+        except Exception, e:
             exitError(e)
 
     @command(visible=False)

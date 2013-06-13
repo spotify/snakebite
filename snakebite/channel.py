@@ -74,55 +74,66 @@ class RpcBufferedReader(object):
     def __init__(self, socket):
         self.socket = socket
         self.buffer = ""
-        self.bytes_read = 0
+        self.pos = -1  # position of last byte read
+
+    def _buffer_bytes(self, n):
+        log.debug("Trying to buffer %d bytes" % n)
+        bytes_read = self.socket.recv(n)
+        self.buffer += bytes_read
+        if len(bytes_read) < n:
+            self._buffer_bytes(n - len(bytes_read))
+
+        log.debug("Bytes read: %d, total: %d" % (n, self.buffer_length))
+        return n
 
     def read(self, n):
         '''Reads n bytes from the buffer. This will overwrite the internal buffer.'''
-        self.buffer = ""
-        while len(self.buffer) < n:
-            self.buffer += self.socket.recv(n)
-            self.bytes_read += len(self.buffer)
+        log.debug("read(%d), pos: %d, buffer: %s" % (n, self.pos, format_bytes(self.buffer)))
 
-        log.debug("Bytes read: %d, total: %d" % (len(self.buffer), self.bytes_read))
+        bytes_wanted = n - self.buffer_length + self.pos + 1
+        if bytes_wanted > 0:
+            self._buffer_bytes(bytes_wanted)
 
-        # Read more if we didn't read all requested bytes
-        if len(self.buffer) < n:
-            self.buffer += self.read(n - len(self.buffer))
-        return self.buffer
+        next_pos = self.pos + 1  # position of the next byte
+        log.debug("Buffer: %s", format_bytes(self.buffer))
+        end_pos = next_pos + n - 1
+        ret = self.buffer[next_pos:end_pos + 1]
+        self.pos = end_pos
+        log.debug("Returning buffer[%d:%d], new pos: %d, ret: %s" % (next_pos, end_pos, self.pos, format_bytes(ret)))
+        return ret
 
-    def rewind(self, pos):
+    def rewind(self, places):
         '''Rewinds the current buffer to a position. Needed for reading varints,
         because we might read bytes that belong to the stream after the varint.
         '''
-        self.buffer = self.buffer[pos:]
-        log.debug("Reset buffer to pos %d" % pos)
+        log.debug("Rewinding pos %d with %d places" % (self.pos, places))
+        self.pos -= places
+        log.debug("Reset buffer to pos %d" % self.pos)
 
-    def read_more(self, n):
-        '''Appends the current buffer with reading n bytes.'''
-        self.buffer += self.socket.recv(n)
-        self.bytes_read += n
-        log.debug("More bytes read: %d, total: %d" % (n, self.bytes_read))
-        return self.buffer
+    def peek(self, n):
+        bytes = self.read(n)
+        self.rewind(n)
+        return bytes
 
-    def bytes_read(self):
-        '''Returns amount of bytes read.'''
-        return self.bytes_read
-
-    def buffer_lenght(self):
+    @property
+    def buffer_length(self):
         '''Returns the length of the current buffer.'''
         return len(self.buffer)
 
 
 class SocketRpcChannel(service.RpcChannel):
+    ERROR_BYTES = 18446744073709551615L
+
     '''Socket implementation of an RpcChannel.
     '''
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, version):
         '''SocketRpcChannel to connect to a socket server on a user defined port.'''
         self.host = host
         self.port = port
         self.sock = None
         self.call_id = 0
+        self.version = version
 
     def validate_request(self, request):
         '''Validate the client request against the protocol file.'''
@@ -139,7 +150,7 @@ class SocketRpcChannel(service.RpcChannel):
         +---------------------------------------------------------------------+
         |  Header, 4 bytes ("hrpc")                                           |
         +---------------------------------------------------------------------+
-        |  Version, 1 byte (verion 7)                                         |
+        |  Version, 1 byte (default verion 7)                                 |
         +---------------------------------------------------------------------+
         |  Auth method, 1 byte (Auth method SIMPLE = 80)                      |
         +---------------------------------------------------------------------+
@@ -160,7 +171,7 @@ class SocketRpcChannel(service.RpcChannel):
 
         # Send RPC headers
         self.sock.send("hrpc")                                 # header
-        self.sock.send(struct.pack('B', 7))                    # version
+        self.sock.send(struct.pack('B', self.version))                    # version
         self.sock.send(struct.pack('B', 80))                   # auth method
         self.sock.send(struct.pack('B', 0))                    # serialization type (protobuf = 0)
 
@@ -242,7 +253,7 @@ class SocketRpcChannel(service.RpcChannel):
         byte_stream = RpcBufferedReader(self.sock)
         return byte_stream
 
-    def get_delimited_nessage_bytes(self, byte_stream):
+    def get_delimited_message_bytes(self, byte_stream):
         ''' Parse a delimited protobuf message. This is done by first getting a protobuf varint from
         the stream that represents the length of the message, then reading that amount of
         from the message and then parse it.
@@ -255,8 +266,8 @@ class SocketRpcChannel(service.RpcChannel):
         (length, pos) = decoder._DecodeVarint32(byte_stream.read(4), 0)
         log.debug("Delimited message length (pos %d): %d" % (pos, length))
 
-        byte_stream.rewind(pos)
-        message_bytes = byte_stream.read_more(length - byte_stream.buffer_lenght())
+        byte_stream.rewind(4 - pos)
+        message_bytes = byte_stream.read(length)
         log.debug("Delimited message bytes (%d): %s" % (len(message_bytes), format_bytes(message_bytes)))
         return message_bytes
 
@@ -299,14 +310,20 @@ class SocketRpcChannel(service.RpcChannel):
         |  Stack trace string                                       |
         +-----------------------------------------------------------+
 
-        If the lenght of the strings is -1, the strings are null
+        If the length of the strings is -1, the strings are null
         '''
 
         log.debug("############## PARSING ##############")
         log.debug("Payload class: %s" % response_class)
 
+        # Let's see if we deal with an error on protocol level
+        check = struct.unpack("!Q", byte_stream.read(8))[0]
+        if check == self.ERROR_BYTES:
+            self.handle_error(byte_stream)
+
+        byte_stream.rewind(8)
         log.debug("---- Parsing header ----")
-        header_bytes = self.get_delimited_nessage_bytes(byte_stream)
+        header_bytes = self.get_delimited_message_bytes(byte_stream)
         header = rpcheaderproto.RpcResponseHeaderProto()
         header.ParseFromString(header_bytes)
         self.log_protobuf_message("Response header", header)
@@ -327,26 +344,29 @@ class SocketRpcChannel(service.RpcChannel):
             return response
 
         elif header.status == 1:  # rpcheaderproto.RpcStatusProto.Value('ERROR')
-            length = self.get_length(byte_stream)
-            log.debug("Class name length: %d" % (length))
-            if length == -1:
-                class_name = None
-            else:
-                class_name = byte_stream.read(length)
-                log.debug("Class name (%d): %s" % (len(class_name), class_name))
+            self.handle_error(byte_stream)
 
-            length = self.get_length(byte_stream)
-            log.debug("Stack trace length: %d" % (length))
-            if length == -1:
-                stack_trace = None
-            else:
-                stack_trace = byte_stream.read(length)
-                log.debug("Stack trace (%d): %s" % (len(stack_trace), stack_trace))
+    def handle_error(self, byte_stream):
+        length = self.get_length(byte_stream)
+        log.debug("Class name length: %d" % (length))
+        if length == -1:
+            class_name = None
+        else:
+            class_name = byte_stream.read(length)
+            log.debug("Class name (%d): %s" % (len(class_name), class_name))
 
-            stack_trace_msg = stack_trace.split("\n")[0]
-            log.debug(stack_trace_msg)
+        length = self.get_length(byte_stream)
+        log.debug("Stack trace length: %d" % (length))
+        if length == -1:
+            stack_trace = None
+        else:
+            stack_trace = byte_stream.read(length)
+            log.debug("Stack trace (%d): %s" % (len(stack_trace), stack_trace))
 
-            raise RequestError(stack_trace_msg)
+        stack_trace_msg = stack_trace.split("\n")[0]
+        log.debug(stack_trace_msg)
+
+        raise RequestError(stack_trace_msg)
 
     def close_socket(self):
         '''Closes the socket and resets the channel.'''
