@@ -5,16 +5,15 @@ python:
 jdk:
   - oraclejdk6
 before_install:
-  - sudo sed -e "s/^127.0.0.1.*/127.0.0.1 localhost $(hostname)/" --in-place /etc/hosts
-  - wget http://archive.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.2.1.tar.gz
-  - tar zxf hadoop-2.0.0-cdh4.2.1.tar.gz -C /tmp
+  - source ./scripts/ci/setup_env.sh
   - sudo apt-get update -qq
 install: 
   - pip install protobuf --use-mirrors
   - pip install unittest2 --use-mirrors
 script: nosetests
 env:
-  - HADOOP_HOME=/tmp/hadoop-2.0.0-cdh4.2.1
+  - HADOOP_DISTRO=cdh
+  - HADOOP_DISTRO=hdp
 branches:
   except:
   - gh-pages
