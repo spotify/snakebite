@@ -138,15 +138,19 @@ def format_results(results, json_output=False):
                 yield "ERROR: %s (reason: %s)" % (r.get('path'), r.get('error', ''))
 
 
-def format_counts(results, json_output=False):
+def format_counts(results, json_output=False, human_readable=False):
     if json_output:
         for result in results:
             yield json.dumps(result)
     else:
         for result in results:
+            space_consumed = result.get('spaceConsumed')
+            if human_readable:
+                space_consumed = _sizeof_fmt(int(result.get('spaceConsumed')))
+
             yield "%12s %12s %18s %s" % (result.get('directoryCount'),
                                                 result.get('fileCount'),
-                                                result.get('spaceConsumed'),
+                                                space_consumed,
                                                 result.get('path'))
 
 

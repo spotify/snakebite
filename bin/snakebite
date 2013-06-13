@@ -269,7 +269,8 @@ class SnakebiteCli(object):
     @command(args="[paths]", descr="display stats for paths")
     def count(self):
         counts = self.client.count(self.args)
-        for line in format_counts(counts, json_output=self.opts.json):
+        for line in format_counts(counts, json_output=self.opts.json,
+                                          human_readable=self.opts.human):
             print line
 
     @command(args="", descr="display fs stats")
