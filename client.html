@@ -56,7 +56,7 @@
 <span id="client-library"></span><h1>Client library<a class="headerlink" href="#module-client" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="client.Client">
-<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">Client</tt><big>(</big><em>host</em>, <em>port</em><big>)</big><a class="headerlink" href="#client.Client" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">Client</tt><big>(</big><em>host</em>, <em>port</em>, <em>hadoop_version=7</em><big>)</big><a class="headerlink" href="#client.Client" title="Permalink to this definition">¶</a></dt>
 <dd><p>A pure python HDFS client.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.client</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -80,6 +80,11 @@ paths.</p>
 <p class="last">Parameters like <tt class="docutils literal"><span class="pre">include_children</span></tt> and <tt class="docutils literal"><span class="pre">recurse</span></tt> are not used
 when paths contain globs.</p>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Different Hadoop distributions use different protocol versions. Snakebite defaults to 7, but this can be set by passing
+in the <tt class="docutils literal"><span class="pre">hadoop_version</span></tt> parameter to the constructor.</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -87,6 +92,7 @@ when paths contain globs.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>host</strong> (<em>string</em>) &#8211; Hostname or IP address of the NameNode</li>
 <li><strong>port</strong> (<em>int</em>) &#8211; RPC Port of the NameNode</li>
+<li><strong>hadoop_version</strong> (<em>int</em>) &#8211; What hadoop protocol version should be used (default: 7)</li>
 </ul>
 </td>
 </tr>

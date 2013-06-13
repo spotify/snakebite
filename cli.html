@@ -64,10 +64,13 @@ if that doesn&#8217;t exist, it will check <tt class="docutils literal"><span cl
 <p>A config looks like</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
   <span class="s">&quot;namenode&quot;</span><span class="p">:</span> <span class="s">&quot;&lt;host/ip&gt;&quot;</span><span class="p">,</span>
-  <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="mi">54310</span>
+  <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="mi">54310</span><span class="p">,</span>
+  <span class="s">&quot;version&quot;</span><span class="p">:</span> <span class="mi">7</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>The version property denotes the protocol version used. CDH 4.1.3 uses protocol 7, while
+HDP 2.0 uses protocol 8. Snakebite defaults to 7.</p>
 <p>Snakebite cli comes with bash completion inf /scripts.</p>
 </div>
 <div class="section" id="usage">
@@ -79,8 +82,10 @@ Options:
   -D, --debug           Show debug information
   -j, --json            JSON output
   -n NAMENODE, --namenode=NAMENODE
-                        namenode host (default: localhost)
-  -p PORT, --port=PORT  namenode RPC port (default: 54310)
+                        namenode host
+  -V VERSION, --version=VERSION
+                        Hadoop protocol version (default:8
+  -p PORT, --port=PORT  namenode RPC port
   -R, --recurse         recurse into subdirectories
   -d, --directory       show only the path and no children / check if path is
                         a dir

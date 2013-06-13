@@ -15,8 +15,12 @@ A config looks like
 
   {
     "namenode": "<host/ip>",
-    "port": 54310
+    "port": 54310,
+    "version": 7
   }
+
+The version property denotes the protocol version used. CDH 4.1.3 uses protocol 7, while 
+HDP 2.0 uses protocol 8. Snakebite defaults to 7.
 
 Snakebite cli comes with bash completion inf /scripts.
 
@@ -31,8 +35,10 @@ Usage
       -D, --debug           Show debug information
       -j, --json            JSON output
       -n NAMENODE, --namenode=NAMENODE
-                            namenode host (default: localhost)
-      -p PORT, --port=PORT  namenode RPC port (default: 54310)
+                            namenode host
+      -V VERSION, --version=VERSION
+                            Hadoop protocol version (default:8
+      -p PORT, --port=PORT  namenode RPC port
       -R, --recurse         recurse into subdirectories
       -d, --directory       show only the path and no children / check if path is
                             a dir
