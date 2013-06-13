@@ -94,6 +94,13 @@ by using the <tt class="docutils literal"><span class="pre">HADOOP_JOBCLIENT_JAR
 <p>Also, make sure the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable is set.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
+<p class="last">Different Hadoop distributions use different protocol versions. Snakebite
+and the tests default to version 7 (CDH 4.1.3), but if you want to test with
+different protocol versions (HDP 2.0 uses version 8), set the <tt class="docutils literal"><span class="pre">HADOOP_PROTOCOL_VER</span></tt>
+environment variable to the apropriate version number.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
 <p class="last">A hadoop installation is only required for testing.</p>
 </div>
 </div>
