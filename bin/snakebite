@@ -230,7 +230,7 @@ class SnakebiteCli(object):
                                   include_toplevel=include_toplevel,
                                   include_children=include_children)
 
-        for line in  format_listing(listing, json_output=self.opts.json,
+        for line in format_listing(listing, json_output=self.opts.json,
                                              human_readable=self.opts.human,
                                              recursive=recurse,
                                              summary=self.opts.summary):

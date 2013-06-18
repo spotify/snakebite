@@ -44,7 +44,7 @@ import os
 import pwd
 
 # Third party imports
-import google.protobuf.service as service
+from google.protobuf.service import RpcChannel
 #from error import RpcError
 
 # Protobuf imports
@@ -110,7 +110,7 @@ class RpcBufferedReader(object):
         return len(self.buffer)
 
 
-class SocketRpcChannel(service.RpcChannel):
+class SocketRpcChannel(RpcChannel):
     ERROR_BYTES = 18446744073709551615L
 
     '''Socket implementation of an RpcChannel.
@@ -391,35 +391,3 @@ class SocketRpcChannel(service.RpcChannel):
         except Exception, e:  # All other errors close the socket
             self.close_socket()
             raise e
-
-
-class SocketRpcController(service.RpcController):
-    ''' RpcController implementation to be used by the SocketRpcChannel class.
-
-    The RpcController is used to mediate a single method call.
-    '''
-
-    def __init__(self):
-        '''Constructor which initializes the controller's state.'''
-        self._fail = False
-        self._error = None
-        self.reason = None
-
-    def handleError(self, error_code, message):
-        '''Log and set the controller state.'''
-        self._fail = True
-        self.reason = error_code
-        self._error = message
-
-    def reset(self):
-        '''Resets the controller i.e. clears the error state.'''
-        self._fail = False
-        self._error = None
-        self.reason = None
-
-    def failed(self):
-        '''Returns True if the controller is in a failed state.'''
-        return self._fail
-
-    def error(self):
-        return self._error
