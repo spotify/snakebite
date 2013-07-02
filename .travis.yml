@@ -10,6 +10,7 @@ before_install:
 install: 
   - pip install protobuf --use-mirrors
   - pip install unittest2 --use-mirrors
+  - pip install argparse --use-mirrors
 script: nosetests
 env:
   - HADOOP_DISTRO=cdh

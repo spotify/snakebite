@@ -41,5 +41,6 @@ setup(
     ],
     install_requires=[
         'protobuf>2.4.1',
+        'argparse'
     ]
 )

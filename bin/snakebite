@@ -19,6 +19,7 @@ from snakebite.commandlineparser import CommandLineParser
 
 log = logging.getLogger(__name__)
 
+
 class SnakebiteCli(object):
     def __init__(self):
         clparser = CommandLineParser()

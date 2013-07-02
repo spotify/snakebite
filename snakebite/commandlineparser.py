@@ -45,12 +45,15 @@ def exitError(error):
         raise error
     sys.exit(-1)
 
+
 class Commands(object):
     methods = {}
+
 
 class Parser(argparse.ArgumentParser):
     def print_help(self):
         print ''.join([self.usage, self.epilog])
+
 
 def command(args="", descr="", allowed_opts="", visible=True):
     def wrap(f):
@@ -60,6 +63,7 @@ def command(args="", descr="", allowed_opts="", visible=True):
                                          "allowed_opts": allowed_opts,
                                          "visible": visible}
     return wrap
+
 
 class CommandLineParser(object):
 
@@ -87,9 +91,9 @@ class CommandLineParser(object):
                 'H': {"short": '-H',
                         "long": '--human',
                         "help": 'human readable output',
-                        "action": 'store_true'}     
+                        "action": 'store_true'}
                 }
-        
+
     SUB_OPTS = {'R': {"short": '-R',
                         "long": '--recurse',
                         "help": 'recurse into subdirectories',
@@ -109,10 +113,10 @@ class CommandLineParser(object):
                 'e': {"short": '-e',
                         "long": '--exists',
                         "help": 'check if file exists',
-                        "action": 'store_true'}   
+                        "action": 'store_true'}
                 }
 
-    def __init__(self):        
+    def __init__(self):
         usage = "snakebite [options] cmd [dirs]"
         epilog = "\noptions:\n"
         epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
@@ -120,10 +124,10 @@ class CommandLineParser(object):
         epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (k, v['args']), v['descr']) for k, v in Commands.methods.iteritems() if v['visible']]))
         epilog += "\n\nto see command-specific options use: snakebite [cmd] -h"
 
-        self.parser = Parser(usage = usage, epilog = epilog, formatter_class = argparse.RawTextHelpFormatter)
+        self.parser = Parser(usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter)
         self._build_parent_parser()
         self._add_subparsers()
-        
+
     def _build_parent_parser(self):
         #general options
         for opt_name, opt_data in self.GENERIC_OPTS.iteritems():
@@ -141,35 +145,35 @@ class CommandLineParser(object):
         #sub-options
         arg_parsers = {}
         for opt_name, opt_data in self.SUB_OPTS.iteritems():
-            arg_parsers[opt_name] = argparse.ArgumentParser(add_help = False)
-            arg_parsers[opt_name].add_argument(opt_data['short'], opt_data['long'], help=opt_data['help'], 
+            arg_parsers[opt_name] = argparse.ArgumentParser(add_help=False)
+            arg_parsers[opt_name].add_argument(opt_data['short'], opt_data['long'], help=opt_data['help'],
                 action=opt_data['action'])
 
-        subcommand_help_parser = argparse.ArgumentParser(add_help = False)
+        subcommand_help_parser = argparse.ArgumentParser(add_help=False)
         subcommand_help_parser.add_argument('-h', '--help', action='store_true')
 
         # NOTE: args and dirs are logically equivalent except for default val
         # difference in naming gives more valuable error/help output.
 
         # 0 or more dirs
-        positional_arg_parsers={}
-        positional_arg_parsers['[dirs]'] = argparse.ArgumentParser(add_help = False)
+        positional_arg_parsers = {}
+        positional_arg_parsers['[dirs]'] = argparse.ArgumentParser(add_help=False)
         positional_arg_parsers['[dirs]'].add_argument('dir', nargs='*', default=[default_dir], help="[dirs]")
 
         # 1 or more dirs
-        positional_arg_parsers['dir [dirs]'] = argparse.ArgumentParser(add_help = False)
+        positional_arg_parsers['dir [dirs]'] = argparse.ArgumentParser(add_help=False)
         positional_arg_parsers['dir [dirs]'].add_argument('dir', nargs='+', default=[default_dir], help="dir [dirs]")
 
         # 1 or more args
-        positional_arg_parsers['[args]'] = argparse.ArgumentParser(add_help = False)
+        positional_arg_parsers['[args]'] = argparse.ArgumentParser(add_help=False)
         positional_arg_parsers['[args]'].add_argument('arg', nargs='*', help="[args]")
-        
+
         # 1 arg
-        positional_arg_parsers['arg'] = argparse.ArgumentParser(add_help = False)
+        positional_arg_parsers['arg'] = argparse.ArgumentParser(add_help=False)
         positional_arg_parsers['arg'].add_argument('single_arg', default=default_dir, help="arg")
 
         # 1 (integer) arg
-        positional_arg_parsers['(int) arg'] = argparse.ArgumentParser(add_help = False)
+        positional_arg_parsers['(int) arg'] = argparse.ArgumentParser(add_help=False)
         positional_arg_parsers['(int) arg'].add_argument('single_int_arg', default='0', help="(integer) arg",
             type=int)
 
@@ -179,9 +183,8 @@ class CommandLineParser(object):
             parents += [subcommand_help_parser]
             if 'req_args' in cmd_info and not cmd_info['req_args'] == None:
                 parents += [positional_arg_parsers[arg] for arg in cmd_info['req_args']]
-            command_parser = subparsers.add_parser(cmd_name, add_help = False,
-               parents= parents) 
-            command_parser.set_defaults(command=cmd_name) 
+            command_parser = subparsers.add_parser(cmd_name, add_help=False, parents=parents)
+            command_parser.set_defaults(command=cmd_name)
 
     def read_config(self):
         ''' Check if any directory arguments contain hdfs://'''
@@ -214,7 +217,7 @@ class CommandLineParser(object):
 
         if os.path.exists(config_file):
             config = json.loads(open(os.path.join(os.path.expanduser('~'), '.snakebiterc')).read())
-            self.args.namenode = config['namenode'] 
+            self.args.namenode = config['namenode']
             self.args.port = config['port']
             self.args.version = config.get('version', 7)
         elif os.environ.get('HADOOP_HOME'):
@@ -256,11 +259,11 @@ class CommandLineParser(object):
                     f.write(json.dumps({"namenode": self.args.namenode, "port": self.args.port, "version": self.args.version}))
                     f.close()
 
-    def parse(self, input = None): # allow input for testing purposes
+    def parse(self, input=None):  # allow input for testing purposes
         args = self.parser.parse_args(input)
 
         if args.command == None:
-            parser.print_help()
+            self.parser.print_help()
             sys.exit(-1)
 
         self.cmd = args.command
@@ -271,7 +274,7 @@ class CommandLineParser(object):
         self.client = Client(host, port, hadoop_version)
 
     def execute(self):
-        if self.args.help: 
+        if self.args.help:
             #if 'ls -h' is called, execute 'usage ls'
             self.args.arg = [self.cmd]
             return Commands.methods['usage']['method'](self)
@@ -292,7 +295,7 @@ class CommandLineParser(object):
         self.args.summary = True
         for line in self._listing():
             print line.replace(" ", "\\\\ ")
-    
+
     def command(args="", descr="", allowed_opts="", visible=True, req_args=None):
         def wrap(f):
             Commands.methods[f.func_name] = {"method": f,
@@ -302,7 +305,7 @@ class CommandLineParser(object):
                                          "visible": visible,
                                          "req_args": req_args}
         return wrap
-    
+
     @command(args="[path]", descr="list a path", allowed_opts=["d", "R", "s"], req_args=['[dirs]'])
     def ls(self):
         for line in self._listing():
@@ -391,7 +394,7 @@ class CommandLineParser(object):
         for line in format_du(result, json_output=self.args.json, human_readable=self.args.human):
             print line
 
-    @command(args="[paths] dst", descr="move paths to destination", req_args=['dir [dirs]','arg'])
+    @command(args="[paths] dst", descr="move paths to destination", req_args=['dir [dirs]', 'arg'])
     def mv(self):
         paths = self.args.dir
         dst = self.args.single_arg
@@ -430,7 +433,7 @@ class CommandLineParser(object):
 
     @command(args="<cmd>", descr="show cmd usage", req_args=['[args]'])
     def usage(self):
-        if not 'arg' in self.args: 
+        if not 'arg' in self.args:
             self.parser.print_help()
             sys.exit(-1)
         for sub_cmd in self.args.arg:
