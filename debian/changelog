@@ -1,3 +1,9 @@
+snakebite (1.1.0) unstable; urgency=low
+
+  * Moved from optparse to argparse
+
+ -- Wouter de Bie <wouter@spotify.com>  Thu, 13 Jun 2013 08:29:10 +0000
+
 snakebite (1.0.5) unstable; urgency=low
 
   * Support different hadoop protocol versions, reworked buffered reader
