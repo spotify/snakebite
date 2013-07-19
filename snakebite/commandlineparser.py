@@ -286,16 +286,6 @@ class CommandLineParser(object):
         except Exception, e:
             exitError(e)
 
-    @command(visible=False)
-    def commands(self):
-        print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
-
-    @command(visible=False)
-    def complete(self):
-        self.args.summary = True
-        for line in self._listing():
-            print line.replace(" ", "\\\\ ")
-
     def command(args="", descr="", allowed_opts="", visible=True, req_args=None):
         def wrap(f):
             Commands.methods[f.func_name] = {"method": f,
@@ -305,6 +295,21 @@ class CommandLineParser(object):
                                          "visible": visible,
                                          "req_args": req_args}
         return wrap
+
+    @command(visible=False)
+    def commands(self):
+        print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
+
+    @command(visible=False, req_args=['[dirs]'])
+    def complete(self):
+        self.args.summary = True
+        self.args.directory = False
+        self.args.recurse = False
+        try:
+            for line in self._listing():
+                print line.replace(" ", "\\\\ ")
+        except FileNotFoundException:
+            pass
 
     @command(args="[path]", descr="list a path", allowed_opts=["d", "R", "s"], req_args=['[dirs]'])
     def ls(self):
@@ -465,3 +470,9 @@ class CommandLineParser(object):
             sys.exit(0)
         else:
             sys.exit(1)
+
+    @command(args="[paths]", descr="cat", allowed_opts=[], req_args=['dir [dirs]'])
+    def cat(self):
+        result = self.client.cat(self.args)
+        for line in result:
+            print line

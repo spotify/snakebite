@@ -42,6 +42,7 @@ May 2012
 import socket
 import os
 import pwd
+import sys
 
 # Third party imports
 from google.protobuf.service import RpcChannel
@@ -50,10 +51,13 @@ from google.protobuf.service import RpcChannel
 # Protobuf imports
 import snakebite.protobuf.RpcPayloadHeader_pb2 as rpcheaderproto
 import snakebite.protobuf.IpcConnectionContext_pb2 as connectionContext
+import snakebite.protobuf.datatransfer_pb2 as datatransfer_proto
 import snakebite.protobuf.hadoop_rpc_pb2 as hadoop_rpc
 
 from snakebite.formatter import format_bytes
 from snakebite.errors import RequestError
+from snakebite.crc32c import crc
+import binascii
 
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
@@ -67,14 +71,36 @@ import struct
 log = logger.getLogger(__name__)
 
 
+def log_protobuf_message(header, message):
+    log.debug("%s:\n\n\033[92m%s\033[0m" % (header, message))
+
+
+def get_delimited_message_bytes(byte_stream):
+    ''' Parse a delimited protobuf message. This is done by first getting a protobuf varint from
+    the stream that represents the length of the message, then reading that amount of
+    from the message and then parse it.
+    Since the int can be represented as max 4 bytes, first get 4 bytes and try to decode.
+    The decoder returns the value and the position where the value was found, so we need
+    to rewind the buffer to the position, because the remaining bytes belong to the message
+    after.
+    '''
+
+    (length, pos) = decoder._DecodeVarint32(byte_stream.read(4), 0)
+    log.debug("Delimited message length (pos %d): %d" % (pos, length))
+
+    byte_stream.rewind(4 - pos)
+    message_bytes = byte_stream.read(length)
+    log.debug("Delimited message bytes (%d): %s" % (len(message_bytes), format_bytes(message_bytes)))
+    return message_bytes
+
+
 class RpcBufferedReader(object):
     '''Class that wraps a socket and provides some utility methods for reading
     and rewinding of the buffer. This comes in handy when reading protobuf varints.
     '''
     def __init__(self, socket):
         self.socket = socket
-        self.buffer = ""
-        self.pos = -1  # position of last byte read
+        self.reset()
 
     def read(self, n):
         '''Reads n bytes into the internal buffer'''
@@ -103,6 +129,10 @@ class RpcBufferedReader(object):
         log.debug("Rewinding pos %d with %d places" % (self.pos, places))
         self.pos -= places
         log.debug("Reset buffer to pos %d" % self.pos)
+
+    def reset(self):
+        self.buffer = ""
+        self.pos = -1  # position of last byte read
 
     @property
     def buffer_length(self):
@@ -159,7 +189,7 @@ class SocketRpcChannel(RpcChannel):
 
         # Send RPC headers
         self.sock.send("hrpc")                                 # header
-        self.sock.send(struct.pack('B', self.version))                    # version
+        self.sock.send(struct.pack('B', self.version))         # version
         self.sock.send(struct.pack('B', 80))                   # auth method
         self.sock.send(struct.pack('B', 0))                    # serialization type (protobuf = 0)
 
@@ -169,7 +199,7 @@ class SocketRpcChannel(RpcChannel):
     def create_rpc_request(self, method, request):
         '''Wraps the user's request in an HadoopRpcRequestProto message and serializes it delimited.'''
         s_request = request.SerializeToString()
-        self.log_protobuf_message("Protobuf message", request)
+        log_protobuf_message("Protobuf message", request)
         log.debug("Protobuf message bytes (%d): %s" % (len(s_request), format_bytes(s_request)))
         rpcRequest = hadoop_rpc.HadoopRpcRequestProto()
         rpcRequest.methodName = method.name
@@ -179,7 +209,7 @@ class SocketRpcChannel(RpcChannel):
 
         # Serialize delimited
         s_rpcRequest = rpcRequest.SerializeToString()
-        self.log_protobuf_message("RpcRequest (len: %d)" % len(s_rpcRequest), rpcRequest)
+        log_protobuf_message("RpcRequest (len: %d)" % len(s_rpcRequest), rpcRequest)
         return encoder._VarintBytes(len(s_rpcRequest)) + s_rpcRequest
 
     def create_rpc_header(self):
@@ -192,7 +222,7 @@ class SocketRpcChannel(RpcChannel):
 
         # Serialize delimited
         s_rpcHeader = rpcheader.SerializeToString()
-        self.log_protobuf_message("RpcPayloadHeader (len: %d)" % (len(s_rpcHeader)), rpcheader)
+        log_protobuf_message("RpcPayloadHeader (len: %d)" % (len(s_rpcHeader)), rpcheader)
         return encoder._VarintBytes(len(s_rpcHeader)) + s_rpcHeader
 
     def create_connection_context(self):
@@ -201,7 +231,7 @@ class SocketRpcChannel(RpcChannel):
         context.userInfo.effectiveUser = pwd.getpwuid(os.getuid())[0]
         context.protocol = "org.apache.hadoop.hdfs.protocol.ClientProtocol"
         s_context = context.SerializeToString()
-        self.log_protobuf_message("RequestContext (len: %d)" % len(s_context), context)
+        log_protobuf_message("RequestContext (len: %d)" % len(s_context), context)
         return s_context
 
     def send_rpc_message(self, rpcHeader, rpcRequest):
@@ -230,9 +260,6 @@ class SocketRpcChannel(RpcChannel):
         self.sock.send(rpcHeader)                                  # payload header
         self.sock.send(rpcRequest)                                 # rpc request
 
-    def log_protobuf_message(self, header, message):
-        log.debug("%s:\n\n\033[92m%s\033[0m" % (header, message))
-
     def recv_rpc_message(self):
         '''Handle reading an RPC reply from the server. This is done by wrapping the
         socket in a RcpBufferedReader that allows for rewinding of the buffer stream.
@@ -240,24 +267,6 @@ class SocketRpcChannel(RpcChannel):
         log.debug("############## RECVING ##############")
         byte_stream = RpcBufferedReader(self.sock)
         return byte_stream
-
-    def get_delimited_message_bytes(self, byte_stream):
-        ''' Parse a delimited protobuf message. This is done by first getting a protobuf varint from
-        the stream that represents the length of the message, then reading that amount of
-        from the message and then parse it.
-        Since the int can be represented as max 4 bytes, first get 4 bytes and try to decode.
-        The decoder returns the value and the position where the value was found, so we need
-        to rewind the buffer to the position, because the remaining bytes belong to the message
-        after.
-        '''
-
-        (length, pos) = decoder._DecodeVarint32(byte_stream.read(4), 0)
-        log.debug("Delimited message length (pos %d): %d" % (pos, length))
-
-        byte_stream.rewind(4 - pos)
-        message_bytes = byte_stream.read(length)
-        log.debug("Delimited message bytes (%d): %s" % (len(message_bytes), format_bytes(message_bytes)))
-        return message_bytes
 
     def get_length(self, byte_stream):
         ''' In Hadoop protobuf RPC, some parts of the stream are delimited with protobuf varint,
@@ -311,10 +320,10 @@ class SocketRpcChannel(RpcChannel):
 
         byte_stream.rewind(8)
         log.debug("---- Parsing header ----")
-        header_bytes = self.get_delimited_message_bytes(byte_stream)
+        header_bytes = get_delimited_message_bytes(byte_stream)
         header = rpcheaderproto.RpcResponseHeaderProto()
         header.ParseFromString(header_bytes)
-        self.log_protobuf_message("Response header", header)
+        log_protobuf_message("Response header", header)
 
         if header.status == 0:  # rpcheaderproto.RpcStatusProto.Value('SUCCESS')
             log.debug("---- Parsing response ----")
@@ -328,13 +337,14 @@ class SocketRpcChannel(RpcChannel):
             log.debug("Response bytes (%d): %s" % (len(response_bytes), format_bytes(response_bytes)))
 
             response.ParseFromString(response_bytes)
-            self.log_protobuf_message("Response", response)
+            log_protobuf_message("Response", response)
             return response
 
         elif header.status == 1:  # rpcheaderproto.RpcStatusProto.Value('ERROR')
             self.handle_error(byte_stream)
 
     def handle_error(self, byte_stream):
+        '''Handle errors'''
         length = self.get_length(byte_stream)
         log.debug("Class name length: %d" % (length))
         if length == -1:
@@ -391,3 +401,125 @@ class SocketRpcChannel(RpcChannel):
         except Exception, e:  # All other errors close the socket
             self.close_socket()
             raise e
+
+
+class DataXceiverChannel(object):
+    WRITE_BLOCK = 80
+    READ_BLOCK = 81
+    READ_METADATA = 82
+    REPLACE_BLOCK = 83
+    COPY_BLOCK = 84
+    BLOCK_CHECKSUM = 85
+    TRANSFER_BLOCK = 86
+
+    def __init__(self, host, port):
+        self.host, self.port = host, port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((host, port))
+        log.debug("%s connected to DataNode" % self)
+
+    def _read_bytes(self, n):
+        bytes = self.sock.recv(n)
+        if len(bytes) != n:
+            bytes += self._read_bytes(n - len(bytes))
+        return bytes
+
+    def readBlock(self, length, pool_id, block_id, generation_stamp, offset):
+        log.debug("%s sending readBlock request" % self)
+
+        # Send version and opcode
+        self.sock.send(struct.pack('>h', 28))
+        self.sock.send(struct.pack('b', self.READ_BLOCK))
+
+        # Create and send OpReadBlockProto message
+        request = datatransfer_proto.OpReadBlockProto()
+        request.offset = offset
+        request.len = length
+        header = request.header
+        header.clientName = "snakebite"
+        base_header = header.baseHeader
+        block = base_header.block
+        block.poolId = pool_id
+        block.blockId = block_id
+        block.generationStamp = generation_stamp
+        s_request = request.SerializeToString()
+        log_protobuf_message("OpReadBlockProto:", request)
+        delimited_request = encoder._VarintBytes(len(s_request)) + s_request
+        self.sock.send(delimited_request)
+
+        byte_stream = RpcBufferedReader(self.sock)
+        block_op_response_bytes = get_delimited_message_bytes(byte_stream)
+        block_op_response = datatransfer_proto.BlockOpResponseProto()
+        block_op_response.ParseFromString(block_op_response_bytes)
+        log_protobuf_message("BlockOpResponseProto", block_op_response)
+
+        checksum_type = block_op_response.readOpChecksumInfo.checksum.type
+        bytes_per_checksum = block_op_response.readOpChecksumInfo.checksum.bytesPerChecksum
+        log.debug("Checksum type: %s, bytesPerChecksum: %s" % (checksum_type, bytes_per_checksum))
+        if checksum_type == 2:  # CRC32C
+            checksum_len = 4
+        else:
+            raise Exception("Checksum type %s not implemented" % checksum_type)
+
+        if block_op_response.status == 0:  # datatransfer_proto.Status.Value('SUCCESS')
+            total_read = 0
+            while total_read < length:
+                log.debug("== Reading next packet")
+
+                packet_len = struct.unpack("!I", byte_stream.read(4))[0]
+                log.debug("Packet length: %s", packet_len)
+
+                serialized_size = struct.unpack("!H", byte_stream.read(2))[0]
+                log.debug("Serialized size: %s", serialized_size)
+
+                packet_header_bytes = byte_stream.read(serialized_size)
+                packet_header = datatransfer_proto.PacketHeaderProto()
+                packet_header.ParseFromString(packet_header_bytes)
+                log_protobuf_message("PacketHeaderProto", packet_header)
+
+                data_len = packet_header.dataLen
+
+                num_chunks = int((data_len + bytes_per_checksum - 1) / bytes_per_checksum)
+                log.debug("Nr of chunks: %d" % num_chunks)
+
+                data_len = packet_len - 2 - 4 - num_chunks * checksum_len
+                log.debug("Payload len: %d" % data_len)
+
+                byte_stream.reset()
+
+                # Collect checksums
+                checksums = []
+                for i in xrange(0, num_chunks):
+                    checksum = struct.unpack("I", self._read_bytes(checksum_len))[0]
+                    checksums.append(checksum)
+                    #log.debug("Checksum bytes: %s", checksum)
+
+                for i, checksum in enumerate(checksums):
+                    if i == num_chunks - 1:
+                        bytes_to_read = data_len - total_read
+                    else:
+                        bytes_to_read = bytes_per_checksum
+
+                    chunk = self._read_bytes(bytes_to_read)
+                    total_read += len(chunk)
+
+                    #print total_read
+                    #chunk_crc = crc(chunk)
+                    #sys.stdout.write(chunk)
+
+                #log.debug("Expected CRC: %s, actual CRC: %s" % (checksum, repr(chunk_crc)))
+                #print chunk
+            #print >> sys.stdout, total_read
+            # data = byte_stream.read(bytes_per_checksum)
+            # sys.stdout.write(data)
+            # read = 0
+            # while True:
+            #     bytes = self.sock.recv(4096)
+            #     read += len(bytes)
+            #     #sys.stdout.write(bytes)
+
+            # #sock.close()
+            return True
+
+    def __repr__(self):
+        return "DataXceiverChannel<%s:%d>" % (self.host, self.port)

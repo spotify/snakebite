@@ -21,6 +21,7 @@ from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
 from snakebite.errors import InvalidInputException
+from snakebite.channel import DataXceiverChannel
 
 import logging
 import os
@@ -515,6 +516,52 @@ class Client(object):
             response = self.service.setReplication(request)
             return {"result": response.result, "path": path}
 
+    def cat(self, paths):
+        if not isinstance(paths, list):
+            raise InvalidInputException("Paths should be a list")
+        if not paths:
+            raise InvalidInputException("cat: no path given")
+
+        processor = lambda path, node: self._handle_cat(path, node)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_cat(self, path, node):
+        if self._is_dir(node):
+            raise DirectoryException("cat: `%s': Is a directory" % path)
+
+        offset = 0L
+        while True:
+            request = client_proto.GetBlockLocationsRequestProto()
+            request.src = path
+            request.offset = offset
+            request.length = 1000L
+            response = self.service.getBlockLocations(request)
+            lastblock = response.locations.lastBlock.b
+            for block in response.locations.blocks:
+                block_read = False
+                length = block.b.numBytes
+                pool_id = block.b.poolId
+                for location in block.locs:
+                    host = location.id.ipAddr
+                    port = int(location.id.xferPort)
+                    data_xciever = DataXceiverChannel(host, port)
+                    block_read = data_xciever.readBlock(length, pool_id, block.b.blockId, block.b.generationStamp, 0)
+                    if block_read:
+                        break
+                if block_read:
+                    last_block_read = block.b
+                    break
+
+            if lastblock.blockId == last_block_read.blockId:
+                break
+            else:
+                offset += last_block_read.numBytes
+
+        return None
+
     def _create_file(self, path, replication, blocksize, overwrite):
         if overwrite:
             createFlag = 0x02
@@ -727,7 +774,6 @@ class Client(object):
                 if self._is_dir(fileinfo.fs) and (include_children or recurse):
                     for node in self._get_dir_listing(path):
                         full_path = self._get_full_path(path, node)
-                        last_entry_path = node.path
                         entry = processor(full_path, node)
                         yield entry
 
