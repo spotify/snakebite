@@ -42,11 +42,9 @@ May 2012
 import socket
 import os
 import pwd
-import sys
 
 # Third party imports
 from google.protobuf.service import RpcChannel
-#from error import RpcError
 
 # Protobuf imports
 import snakebite.protobuf.RpcPayloadHeader_pb2 as rpcheaderproto
@@ -57,7 +55,6 @@ import snakebite.protobuf.hadoop_rpc_pb2 as hadoop_rpc
 from snakebite.formatter import format_bytes
 from snakebite.errors import RequestError
 from snakebite.crc32c import crc
-import binascii
 
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
@@ -116,10 +113,9 @@ class RpcBufferedReader(object):
     def _buffer_bytes(self, n):
         bytes_read = self.socket.recv(n)
         self.buffer += bytes_read
+        log.debug("Bytes read: %d, total: %d" % (len(bytes_read), self.buffer_length))
         if len(bytes_read) < n:
-            self._buffer_bytes(n - len(bytes_read))
-
-        log.debug("Bytes read: %d, total: %d" % (n, self.buffer_length))
+            raise Exception("RpcBufferedReader only managed to read %s out of %s bytes" % (len(bytes_read), n))
         return n
 
     def rewind(self, places):
@@ -415,21 +411,29 @@ class DataXceiverChannel(object):
     def __init__(self, host, port):
         self.host, self.port = host, port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((host, port))
-        log.debug("%s connected to DataNode" % self)
+
+    def connect(self):
+        try:
+            self.sock.connect((self.host, self.port))
+            log.debug("%s connected to DataNode" % self)
+            return True
+        except Exception:
+            log.debug("%s connection to DataNode failed" % self)
+            return False
+
+    def _close_socket(self):
+        self.sock.close()
 
     def _read_bytes(self, n):
-        bytes = self.sock.recv(n)
-        if len(bytes) != n:
-            bytes += self._read_bytes(n - len(bytes))
-        return bytes
+        return self.sock.recv(n)
 
-    def readBlock(self, length, pool_id, block_id, generation_stamp, offset):
+    def readBlock(self, length, pool_id, block_id, generation_stamp, offset, check_crc):
         log.debug("%s sending readBlock request" % self)
 
         # Send version and opcode
         self.sock.send(struct.pack('>h', 28))
         self.sock.send(struct.pack('b', self.READ_BLOCK))
+        length = length - offset
 
         # Create and send OpReadBlockProto message
         request = datatransfer_proto.OpReadBlockProto()
@@ -447,8 +451,12 @@ class DataXceiverChannel(object):
         delimited_request = encoder._VarintBytes(len(s_request)) + s_request
         self.sock.send(delimited_request)
 
-        byte_stream = RpcBufferedReader(self.sock)
-        block_op_response_bytes = get_delimited_message_bytes(byte_stream)
+        try:
+            byte_stream = RpcBufferedReader(self.sock)
+            block_op_response_bytes = get_delimited_message_bytes(byte_stream)
+        except Exception:
+            return ('', False)
+
         block_op_response = datatransfer_proto.BlockOpResponseProto()
         block_op_response.ParseFromString(block_op_response_bytes)
         log_protobuf_message("BlockOpResponseProto", block_op_response)
@@ -461,8 +469,9 @@ class DataXceiverChannel(object):
         else:
             raise Exception("Checksum type %s not implemented" % checksum_type)
 
+        output = ""
+        total_read = 0
         if block_op_response.status == 0:  # datatransfer_proto.Status.Value('SUCCESS')
-            total_read = 0
             while total_read < length:
                 log.debug("== Reading next packet")
 
@@ -482,7 +491,7 @@ class DataXceiverChannel(object):
                 num_chunks = int((data_len + bytes_per_checksum - 1) / bytes_per_checksum)
                 log.debug("Nr of chunks: %d" % num_chunks)
 
-                data_len = packet_len - 2 - 4 - num_chunks * checksum_len
+                data_len = packet_len - 4 - num_chunks * checksum_len
                 log.debug("Payload len: %d" % data_len)
 
                 byte_stream.reset()
@@ -490,36 +499,42 @@ class DataXceiverChannel(object):
                 # Collect checksums
                 checksums = []
                 for i in xrange(0, num_chunks):
-                    checksum = struct.unpack("I", self._read_bytes(checksum_len))[0]
+                    checksum_bytes = self._read_bytes(checksum_len)
+                    log.debug("Checksum bytes: %s" % format_bytes(checksum_bytes))
+                    checksum = struct.unpack("!I", checksum_bytes)[0]
                     checksums.append(checksum)
-                    #log.debug("Checksum bytes: %s", checksum)
+                    log.debug("Unpacked checksum: %s", checksum)
 
+                # Read chunks
+                read_on_packet = 0
                 for i, checksum in enumerate(checksums):
                     if i == num_chunks - 1:
-                        bytes_to_read = data_len - total_read
+                        bytes_to_read = data_len - read_on_packet
                     else:
                         bytes_to_read = bytes_per_checksum
 
                     chunk = self._read_bytes(bytes_to_read)
+
+                    if check_crc:
+                        if crc(chunk) != checksum:
+                            return(output, False)
+
                     total_read += len(chunk)
+                    read_on_packet += len(chunk)
+                    output += chunk
 
-                    #print total_read
-                    #chunk_crc = crc(chunk)
-                    #sys.stdout.write(chunk)
+            # Send ClientReadStatusProto message confirming successful read
+            request = datatransfer_proto.ClientReadStatusProto()
+            request.status = 0  # SUCCESS
+            s_request = request.SerializeToString()
+            log_protobuf_message("ClientReadStatusProto:", request)
+            delimited_request = encoder._VarintBytes(len(s_request)) + s_request
+            self.sock.send(delimited_request)
 
-                #log.debug("Expected CRC: %s, actual CRC: %s" % (checksum, repr(chunk_crc)))
-                #print chunk
-            #print >> sys.stdout, total_read
-            # data = byte_stream.read(bytes_per_checksum)
-            # sys.stdout.write(data)
-            # read = 0
-            # while True:
-            #     bytes = self.sock.recv(4096)
-            #     read += len(bytes)
-            #     #sys.stdout.write(bytes)
-
-            # #sock.close()
-            return True
+            self._close_socket()
+            return (output, True)
+        else:
+            return (output, False)
 
     def __repr__(self):
         return "DataXceiverChannel<%s:%d>" % (self.host, self.port)

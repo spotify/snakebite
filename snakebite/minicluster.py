@@ -111,8 +111,22 @@ class MiniCluster(object):
         src = [self._full_hdfs_path(x) for x in src]
         return self._transform_count_output(self._runCmd([self._hadoop_cmd, 'fs', '-count'] + src), self.hdfs_url)
 
+    def cat(self, src, extra_args=[]):
+        return self._runCmd([self._hadoop_cmd, 'fs', '-cat'] + extra_args + [self._full_hdfs_path(src)])
+
+    def copyToLocal(self, src, dst, extra_args=[]):
+        return self._runCmd([self._hadoop_cmd, 'fs', '-copyToLocal'] + extra_args + [self._full_hdfs_path(src), dst])
+
+    def getmerge(self, src, dst, extra_args=[]):
+        return self._runCmd([self._hadoop_cmd, 'fs', '-getmerge'] + extra_args + [self._full_hdfs_path(src), dst])
+
+    def tail(self, src, extra_args=[]):
+        return self._runCmd([self._hadoop_cmd, 'fs', '-tail'] + extra_args + [self._full_hdfs_path(src)])
+
+    def text(self, src):
+        return self._runCmd([self._hadoop_cmd, 'fs', '-text', self._full_hdfs_path(src)])
+
     def _runCmd(self, cmd):
-        print cmd
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return p.communicate()[0]
 
