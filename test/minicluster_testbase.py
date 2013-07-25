@@ -16,10 +16,7 @@ class MiniClusterTestBase(unittest2.TestCase):
             cls.cluster = MiniCluster(testfiles_path)
             cls.cluster.put("/test1", "/test1")
             cls.cluster.put("/test1", "/test2")
-            cls.cluster.put("/test3", "/test3")
-            cls.cluster.put("/test4", "/test4")
-            cls.cluster.put("/test5", "/test5")
-            cls.cluster.put("/test6", "/test6")
+            cls.cluster.put("/test3", "/test3") #1024 bytes
 
             cls.cluster.mkdir("/zipped")
             cls.cluster.put("/zipped/test1.gz", "/zipped")

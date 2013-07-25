@@ -497,26 +497,25 @@ class DataXceiverChannel(object):
                 byte_stream.reset()
 
                 # Collect checksums
-                checksums = []
-                for i in xrange(0, num_chunks):
-                    checksum_bytes = self._read_bytes(checksum_len)
-                    log.debug("Checksum bytes: %s" % format_bytes(checksum_bytes))
-                    checksum = struct.unpack("!I", checksum_bytes)[0]
-                    checksums.append(checksum)
-                    log.debug("Unpacked checksum: %s", checksum)
+                if check_crc:
+                    checksums = []
+                    for _ in xrange(0, num_chunks):
+                        checksum = self._read_bytes(checksum_len)
+                        checksum = struct.unpack("!I", checksum)[0]
+                        checksums.append(checksum)
+                else:
+                    self._read_bytes(checksum_len*num_chunks)
 
                 # Read chunks
                 read_on_packet = 0
-                for i, checksum in enumerate(checksums):
+                for i in range(num_chunks):
                     if i == num_chunks - 1:
                         bytes_to_read = data_len - read_on_packet
                     else:
                         bytes_to_read = bytes_per_checksum
-
                     chunk = self._read_bytes(bytes_to_read)
 
-                    if check_crc:
-                        if crc(chunk) != checksum:
+                    if check_crc and crc(chunk) != checksum[i]:
                             return(output, False)
 
                     total_read += len(chunk)

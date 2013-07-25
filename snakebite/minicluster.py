@@ -87,6 +87,10 @@ class MiniCluster(object):
         src = "%s%s" % (self._testfiles_path, src)
         return self._runCmd([self._hadoop_cmd, 'fs', '-put', src, self._full_hdfs_path(dst)])
 
+    def put_subprocess(self, src, dst):  # This is used for testing with large files.
+        cmd = [self._hadoop_cmd, 'fs', '-put', src, self._full_hdfs_path(dst)]
+        return subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+
     def ls(self, src, extra_args=[]):
         '''List files in a directory'''
         src = [self._full_hdfs_path(x) for x in src]

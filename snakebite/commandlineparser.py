@@ -46,15 +46,6 @@ def exitError(error):
     sys.exit(-1)
 
 
-class Commands(object):
-    methods = {}
-
-
-class Parser(argparse.ArgumentParser):
-    def print_help(self):
-        print ''.join([self.usage, self.epilog])
-
-
 def command(args="", descr="", allowed_opts="", visible=True):
     def wrap(f):
         Commands.methods[f.func_name] = {"method": f,
@@ -63,6 +54,27 @@ def command(args="", descr="", allowed_opts="", visible=True):
                                          "allowed_opts": allowed_opts,
                                          "visible": visible}
     return wrap
+
+
+class Commands(object):
+    methods = {}
+
+
+class ArgumentParserError(Exception):
+
+    def __init__(self, message, error_message, prog, stdout=None, stderr=None, error_code=None):
+        Exception.__init__(self, message, stdout, stderr)
+        self.message = message
+        self.error_message = error_message
+        self.prog = prog
+
+
+class Parser(argparse.ArgumentParser):
+    def print_help(self):
+        print ''.join([self.usage, self.epilog])
+
+    def error(self, message):  # Override error message to show custom help.
+        raise ArgumentParserError("SystemExit", message, self.prog)
 
 
 class CommandLineParser(object):
@@ -88,7 +100,7 @@ class CommandLineParser(object):
                           "long": '--port',
                           "help": 'namenode RPC port',
                           "type": int},
-                    'H': {"short": '-H',
+                    'H': {"short": '-h',
                           "long": '--human',
                           "help": 'human readable output',
                           "action": 'store_true'}
@@ -125,14 +137,14 @@ class CommandLineParser(object):
                 }
 
     def __init__(self):
-        usage = "snakebite [options] cmd [dirs]"
-        epilog = "\noptions:\n"
+        usage = "snakebite [general options] cmd [arguments]"
+        epilog = "\ngeneral options:\n"
         epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
         epilog += "\n\ncommands:\n"
         epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (k, v['args']), v['descr']) for k, v in Commands.methods.iteritems() if v['visible']]))
-        epilog += "\n\nto see command-specific options use: snakebite [cmd] -h"
+        epilog += "\n\nto see command-specific options use: snakebite [cmd] --help"
 
-        self.parser = Parser(usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter)
+        self.parser = Parser(usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter, add_help=False)
         self._build_parent_parser()
         self._add_subparsers()
 
@@ -158,7 +170,7 @@ class CommandLineParser(object):
                                                action=opt_data['action'])
 
         subcommand_help_parser = argparse.ArgumentParser(add_help=False)
-        subcommand_help_parser.add_argument('-h', '--help', action='store_true')
+        subcommand_help_parser.add_argument('-H', '--help', action='store_true')
 
         # NOTE: args and dirs are logically equivalent except for default val.
         # Difference in naming gives more valuable error/help output.
@@ -276,7 +288,20 @@ class CommandLineParser(object):
             self.parser.print_help()
             sys.exit(-1)
 
-        args = self.parser.parse_args(non_cli_input)
+        try:
+            args = self.parser.parse_args(non_cli_input)
+        except ArgumentParserError, error:
+            if "-H" in sys.argv or "--help" in sys.argv:  # non cli input?
+                commands = [cmd for (cmd, description) in Commands.methods.iteritems() if description['visible'] is True]
+                command = error.prog.split()[-1]
+                if command in commands:
+                    self.usage_helper(command)
+                else:
+                    self.parser.print_help()
+                self.parser.exit(2)
+            else:
+                self.parser.print_usage(sys.stderr)
+                self.parser.exit(2, 'error: %s\n' % (error.error_message))
 
         self.cmd = args.command
         self.args = args
@@ -287,7 +312,7 @@ class CommandLineParser(object):
 
     def execute(self):
         if self.args.help:
-            #if 'ls -h' is called, execute 'usage ls'
+            #if 'ls -H' is called, execute 'usage ls'
             self.args.arg = [self.cmd]
             return Commands.methods['usage']['method'](self)
         if not Commands.methods.get(self.cmd):
@@ -450,25 +475,35 @@ class CommandLineParser(object):
 
     @command(args="<cmd>", descr="show cmd usage", req_args=['[args]'])
     def usage(self):
-        if not 'arg' in self.args:
+        if not 'arg' in self.args or self.args.arg == []:
             self.parser.print_help()
             sys.exit(-1)
-        for sub_cmd in self.args.arg:
-            cmd_entry = Commands.methods.get(sub_cmd)
-            if not cmd_entry:
-                self.parser.print_help()
-                sys.exit(-1)
-            cmd_args = []
-            cmd_descriptions = "\ncommand options: \n"
-            allowed_opts = cmd_entry.get('allowed_opts')
-            if allowed_opts:
-                cmd_args += ["[-%s]" % o for o in allowed_opts]
-                cmd_descriptions += "\n".join(sorted([" %-30s %s" % ("%s %s" % (self.SUB_OPTS[o]['short'], self.SUB_OPTS[o]['long']), self.SUB_OPTS[o]['help']) for o in allowed_opts]))
-            args = cmd_entry.get('args')
-            if args:
-                cmd_args.append(args)
 
-            print "usage: snakebite [general options] %s %s" % (sub_cmd, " ".join(cmd_args))
+        for sub_cmd in self.args.arg:
+            self.usage_helper(sub_cmd)
+
+    def usage_helper(self, command):
+        cmd_entry = Commands.methods.get(command)
+        if not cmd_entry:
+            self.parser.print_help()
+            sys.exit(-1)
+        cmd_args = []
+        cmd_descriptions = "\ncommand options: \n"
+        allowed_opts = cmd_entry.get('allowed_opts')
+        if allowed_opts:
+            cmd_args += ["[-%s]" % o for o in allowed_opts]
+            cmd_descriptions += "\n".join(sorted([" %-30s %s" % ("%s %s" % (self.SUB_OPTS[o]['short'], self.SUB_OPTS[o]['long']), self.SUB_OPTS[o]['help']) for o in allowed_opts]))
+        args = cmd_entry.get('args')
+        if args:
+            cmd_args.append(args)
+
+        print "usage: snakebite [general options] %s %s" % (command, " ".join(cmd_args))
+
+        general_opts = "\ngeneral options:\n"
+        general_opts += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
+        print general_opts
+
+        if allowed_opts:
             print cmd_descriptions
 
     @command(args="[paths]", descr="stat information", req_args=['dir [dirs]'])
@@ -525,8 +560,7 @@ class CommandLineParser(object):
     def getmerge(self):
         source = self.args.src_dst[0]
         dst = self.args.src_dst[1]
-        result = self.client.getmerge(source, dst)
-        print result
+        self.client.getmerge(source, dst)
 
     @command(args="[paths] dst", descr="copy sources from local file system to destination", req_args=['dir [dirs]', 'arg'])
     def put(self):
@@ -539,7 +573,7 @@ class CommandLineParser(object):
     @command(args="path", descr="display last kilobyte of the file to stdout", allowed_opts=['f'], req_args=['arg'])
     def tail(self):
         path = self.args.single_arg
-        result = self.client.tail(path, f=self.args.append)
+        result = self.client.tail(path, append=self.args.append)
         for line in result:
             print line
 

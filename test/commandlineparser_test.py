@@ -41,7 +41,7 @@ class CommandLineParserTest(unittest2.TestCase):
         output = parser.parse('--debug ls some_folder'.split())
         self.assertTrue(output.debug)
 
-        output = parser.parse('-H ls some_folder'.split())
+        output = parser.parse('-h ls some_folder'.split())
         self.assertTrue(output.human)
         output = parser.parse('--human ls some_folder'.split())
         self.assertTrue(output.human)
@@ -67,7 +67,7 @@ class CommandLineParserTest(unittest2.TestCase):
         self.assertEqual(output.version, 4)
 
         #all options
-        output = parser.parse('-D -H -j -n 100 -p 1234 -V 4 ls some_folder'.split())
+        output = parser.parse('-D -h -j -n 100 -p 1234 -V 4 ls some_folder'.split())
         self.assertTrue(output.debug)
         self.assertTrue(output.human)
         self.assertTrue(output.json)
