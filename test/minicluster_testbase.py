@@ -8,6 +8,7 @@ from snakebite.client import Client
 class MiniClusterTestBase(unittest2.TestCase):
 
     cluster = None
+    user = None
 
     @classmethod
     def setupClass(cls):
@@ -25,6 +26,7 @@ class MiniClusterTestBase(unittest2.TestCase):
             cls.cluster.put("/zerofile", "/bar/baz/foo/qux")
             cls.cluster.mkdir("/bar/foo/baz", ['-p'])
             cls.cluster.put("/zerofile", "/bar/foo/baz/qux")
+            cls.cluster.chmod("/bar", 0777)
             cls.cluster.put("/log", "/")
 
     @classmethod
@@ -35,7 +37,7 @@ class MiniClusterTestBase(unittest2.TestCase):
     def setUp(self):
         version = os.environ.get("HADOOP_PROTOCOL_VER", 7)
         self.cluster = self.__class__.cluster
-        self.client = Client(self.cluster.host, self.cluster.port, int(version))
+        self.client = Client(self.cluster.host, self.cluster.port, int(version), self.user)
 
 if __name__ == '__main__':
     try:

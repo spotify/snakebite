@@ -111,6 +111,10 @@ class MiniCluster(object):
         src = [self._full_hdfs_path(x) for x in src]
         return self._transform_count_output(self._runCmd([self._hadoop_cmd, 'fs', '-count'] + src), self.hdfs_url)
 
+    def chmod(self, src, mode):
+        '''Perform ``chmod`` on a path'''
+        return self._runCmd([self._hadoop_cmd, 'fs', '-chmod', self._full_hdfs_path(src), str(mode)])
+
     def _runCmd(self, cmd):
         print cmd
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
