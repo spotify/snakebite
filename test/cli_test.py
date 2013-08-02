@@ -66,14 +66,22 @@ class CliTest(unittest2.TestCase):
         output = parser.parse('--version 4 ls some_folder'.split())
         self.assertEqual(output.version, 4)
 
+        output = parser.parse('-u alfred ls some_folder'.split())
+        self.assertEqual(output.user, "alfred")
+        output = parser.parse('--user alfred ls some_folder'.split())
+        self.assertEqual(output.user, "alfred")
+        output = parser.parse('ls some_folder'.split())
+        self.assertEqual(output.user, None)
+
         #all options
-        output = parser.parse('-D -H -j -n 100 -p 1234 -V 4 ls some_folder'.split())
+        output = parser.parse('-D -H -j -n 100 -p 1234 -V 4 -u alfred ls some_folder'.split())
         self.assertTrue(output.debug)
         self.assertTrue(output.human)
         self.assertTrue(output.json)
         self.assertEqual(output.namenode, 100)
         self.assertEqual(output.port, 1234)
         self.assertEqual(output.version, 4)
+        self.assertEqual(output.user, 'alfred')
 
         #options in illegal position
         with self.assertRaises(SystemExit):

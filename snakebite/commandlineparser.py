@@ -88,6 +88,10 @@ class CommandLineParser(object):
                         "long": '--port',
                         "help": 'namenode RPC port',
                         "type": int},
+                'u': {"short": '-u',
+                        "long": '--user',
+                        "help": 'HDFS user name',
+                        "type": str},
                 'H': {"short": '-H',
                         "long": '--human',
                         "help": 'human readable output',
@@ -220,6 +224,7 @@ class CommandLineParser(object):
             self.args.namenode = config['namenode']
             self.args.port = config['port']
             self.args.version = config.get('version', 7)
+            self.args.user = config.get('user', self.args.user) or self.args.user
         elif os.environ.get('HADOOP_HOME'):
             hdfs_conf = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
             self._read_hadoop_config(hdfs_conf, config_file)
@@ -270,8 +275,8 @@ class CommandLineParser(object):
         self.args = args
         return self.args
 
-    def setup_client(self, host, port, hadoop_version):
-        self.client = Client(host, port, hadoop_version)
+    def setup_client(self, host, port, hadoop_version, user=None):
+        self.client = Client(host, port, hadoop_version, user)
 
     def execute(self):
         if self.args.help:

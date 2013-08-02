@@ -64,7 +64,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=7):
+    def __init__(self, host, port, hadoop_version=7, user=None):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -72,11 +72,14 @@ class Client(object):
         :type port: int
         :param hadoop_version: What hadoop protocol version should be used (default: 7)
         :type hadoop_version: int
+        :param user: Which user to identify as (default: current Unix user)
+        :type user: string
         '''
         self.host = host
         self.port = port
+        self.user = user or pwd.getpwuid(os.getuid())[0]
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
-        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version)
+        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, user)
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
         ''' Issues 'ls' command and returns a list of maps that contain fileinfo
@@ -694,7 +697,7 @@ class Client(object):
         #collection = []
 
         if not paths:
-            paths = [os.path.join("/user", pwd.getpwuid(os.getuid())[0])]
+            paths = [os.path.join("/user", self.user)]
 
         # Expand paths if necessary (/foo/{bar,baz} --> ['/foo/bar', '/foo/baz'])
         paths = glob.expand_paths(paths)
@@ -841,4 +844,4 @@ class Client(object):
         return self.service.getFileInfo(request)
 
     def _join_user_path(self, path):
-        return os.path.join("/user", pwd.getpwuid(os.getuid())[0], path)
+        return os.path.join("/user", self.user, path)
