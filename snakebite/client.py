@@ -21,7 +21,11 @@ from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
 from snakebite.errors import InvalidInputException
+from snakebite.channel import DataXceiverChannel
 
+import Queue
+import zlib
+import bz2
 import logging
 import os
 import os.path
@@ -515,31 +519,167 @@ class Client(object):
             response = self.service.setReplication(request)
             return {"result": response.result, "path": path}
 
-    def _create_file(self, path, replication, blocksize, overwrite):
-        if overwrite:
-            createFlag = 0x02
+    def cat(self, paths, check_crc=False):
+        ''' Fetch all files that match the source file pattern
+        and display their content on stdout.
+
+        :param paths: Paths to display
+        :type paths: list of strings
+        :param check_crc: Check for checksum errors
+        :type check_crc: boolean
+        :returns: a generator that yields strings
+        '''
+        if not isinstance(paths, list):
+            raise InvalidInputException("Paths should be a list")
+        if not paths:
+            raise InvalidInputException("cat: no path given")
+
+        processor = lambda path, node, check_crc=check_crc: self._handle_cat(path, node, check_crc)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_cat(self, path, node, check_crc):
+        if self._is_dir(node):
+            raise DirectoryException("cat: `%s': Is a directory" % path)
+
+        for load in self._read_file(path, node, False, check_crc):
+            if load:
+                yield load
+
+    def copyToLocal(self, paths, dst, check_crc=False):
+        ''' Copy files that match the file source pattern
+        to the local name.  Source is kept.  When copying multiple,
+        files, the destination must be a directory.
+
+        :param paths: Paths to copy
+        :type paths: list of strings
+        :param dst: Destination path
+        :type dst: string
+        :param check_crc: Check for checksum errors
+        :type check_crc: boolean
+        :returns: a generator that yields strings
+        '''
+        if not isinstance(paths, list):
+            raise InvalidInputException("Paths should be a list")
+        if not paths:
+            raise InvalidInputException("copyToLocal: no path given")
+        if not dst:
+            raise InvalidInputException("copyToLocal: no destination given")
+
+        self.base_source = None
+        processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_copyToLocal(path, node, dst, check_crc)
+        for item in self._find_items(paths, processor, include_toplevel=True, recurse=True, include_children=True):
+            if item:
+                yield item
+
+    def _handle_copyToLocal(self, path, node, dst, check_crc):
+        # Calculate base directory using the first node only
+        if self.base_source is None:
+            self.dst = os.path.abspath(dst)
+            if os.path.isdir(dst):  # If input destination is an existing directory, include toplevel
+                self.base_source = os.path.dirname(path)
+            else:
+                self.base_source = path
+
+            if self.base_source.endswith("/"):
+                self.base_source = self.base_source[:-1]
+
+        target = dst + (path.replace(self.base_source, "", 1))
+
+        error = ""
+        result = False
+        # Target is an existing file
+        if os.path.isfile(target):
+            error += "file exists"
+        # Target is an existing directory
+        elif os.path.isdir(target):
+            error += "directory exists"
+        # Source is a directory
+        elif self._is_dir(node):
+            os.makedirs(target, mode=node.permission.perm)
+            result = True
+        # Source is a file
+        elif self._is_file(node):
+            temporary_target = "%s._COPYING_" % target
+            f = open(temporary_target, 'w')
+            try:
+                for load in self._read_file(path, node, tail_only=False, check_crc=check_crc):
+                    f.write(load)
+                f.close()
+                os.rename(temporary_target, target)
+                result = True
+            except Exception, e:
+                result = False
+                error = e
+                if os.path.isfile(temporary_target):
+                    os.remove(temporary_target)
+
+        return {"path": target, "result": result, "error": error, "source_path": path}
+
+    def getmerge(self, path, dst, newline=False, check_crc=False):
+        ''' Get all the files in the directories that
+        match the source file pattern and merge and sort them to only
+        one file on local fs.
+
+        :param paths: Directory containing files that will be merged
+        :type paths: string
+        :param dst: Path of file that will be written
+        :type dst: string
+        :param nl: Add a newline character at the end of each file.
+        :type nl: boolean
+        :returns: string content of the merged file at dst
+        '''
+        if not path:
+            raise InvalidInputException("getmerge: no path given")
+        if not dst:
+            raise InvalidInputException("getmerge: no destination given")
+
+        temporary_target = "%s._COPYING_" % dst
+        f = open(temporary_target, 'w')
+
+        processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_getmerge(path, node, dst, check_crc)
+        try:
+            for item in self._find_items([path], processor, include_toplevel=True, recurse=False, include_children=True):
+                for load in item:
+                    if load['result']:
+                        f.write(load['response'])
+                    elif not load['error'] is '':
+                        if os.path.isfile(temporary_target):
+                            os.remove(temporary_target)
+                        raise Exception(load['error'])
+                if newline and load['response']:
+                    f.write("\n")
+            yield {"path": dst, "response": '', "result": True, "error": load['error'], "source_path": path}
+
+        finally:
+            if os.path.isfile(temporary_target):
+                f.close()
+                os.rename(temporary_target, dst)
+
+    def _handle_getmerge(self, path, node, dst, check_crc):
+        log.debug("in handle getmerge")
+        error = ''
+        if not self._is_file(node):
+            # Target is an existing file
+            if os.path.isfile(dst):
+                error += "target file exists"
+            # Target is an existing directory
+            elif os.path.isdir(dst):
+                error += "target directory exists"
+            yield {"path": path, "response": '', "result": False, "error": error, "source_path": path}
+        # Source is a file
         else:
-            createFlag = 0x01
-
-        # Issue a CreateRequestProto
-        request = client_proto.CreateRequestProto()
-        request.src = path
-        request.masked.perm = 0644
-        request.clientName = "snakebite"
-        request.createFlag = createFlag
-        request.createParent = False
-        request.replication = replication
-        request.blockSize = blocksize
-
-        # The response doesn't contain anything
-        self.service.create(request)
-
-        # Issue a CompleteRequestProto
-        request = client_proto.CompleteRequestProto()
-        request.src = path
-        request.clientName = "snakebite"
-
-        return self.service.complete(request)
+            if node.length == 0:  # Empty file
+                yield {"path": path, "response": '', "result": True, "error": error, "source_path": path}
+            else:
+                try:
+                    for load in self._read_file(path, node, tail_only=False, check_crc=check_crc):
+                        yield {"path": path, "response": load, "result": True, "error": error, "source_path": path}
+                except Exception, e:
+                    error = e
+                    yield {"path": path, "response": '', "result": False, "error": error, "source_path": path}
 
     def stat(self, paths):
         ''' Stat a fileCount
@@ -573,6 +713,33 @@ class Client(object):
                 "block_replication": node.block_replication,
                 "blocksize": node.blocksize}
 
+    def tail(self, path, append=False):
+        # Note: append is currently not implemented.
+        ''' Show the last 1KB of the file.
+
+        :param path: Path to read
+        :type path: string
+        :param f: Shows appended data as the file grows.
+        :type f: boolean
+        :returns: a generator that yields strings
+        '''
+        if not path:
+            raise InvalidInputException("tail: no path given")
+
+        processor = lambda path, node, tail_only=True, append=append: self._handle_tail(path, node, tail_only, append)
+        for item in self._find_items([path], processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_tail(self, path, node, tail_only, append):
+        data = ''
+        for load in self._read_file(path, node, tail_only=True, check_crc=False):
+            data += load
+        # We read only the necessary packets but still
+        # need to cut off at the packet level.
+        return data[max(0, len(data)-1024):len(data)]
+
     def test(self, path, exists=False, directory=False, zero_length=False):
         '''Test if a paht exist, is a directory or has zero length
 
@@ -604,6 +771,43 @@ class Client(object):
 
     def _handle_test(self, path, node, exists, directory, zero_length):
         return self._is_directory(directory, node) and self._is_zero_length(zero_length, node)
+
+    def text(self, paths, check_crc=False):
+        ''' Takes a source file and outputs the file in text format.
+        The allowed formats are gzip and bzip2
+
+        :param paths: Paths to display
+        :type paths: list of strings
+        :param check_crc: Check for checksum errors
+        :type check_crc: boolean
+        :returns: a generator that yields strings
+        '''
+        if not isinstance(paths, list):
+            raise InvalidInputException("Paths should be a list")
+        if not paths:
+            raise InvalidInputException("text: no path given")
+
+        processor = lambda path, node, check_crc=check_crc: self._handle_text(path, node, check_crc)
+        for item in self._find_items(paths, processor, include_toplevel=True,
+                                     include_children=False, recurse=False):
+            if item:
+                yield item
+
+    def _handle_text(self, path, node, check_crc):
+        if self._is_dir(node):
+            raise DirectoryException("text: `%s': Is a directory" % path)
+
+        text = ''
+        for load in self._read_file(path, node, False, check_crc):
+            text += load
+
+        extension = os.path.splitext(path)[1]
+        if extension == '.gz':
+            return zlib.decompress(text, 16+zlib.MAX_WBITS)
+        elif extension == '.bz2':
+            return bz2.decompress(text)
+        else:
+            return text
 
     def mkdir(self, paths, create_parent=False, mode=0755):
         ''' Create a directoryCount
@@ -672,6 +876,100 @@ class Client(object):
         else:
             return path
 
+    def _create_file(self, path, replication, blocksize, overwrite):
+        if overwrite:
+            createFlag = 0x02
+        else:
+            createFlag = 0x01
+
+        # Issue a CreateRequestProto
+        request = client_proto.CreateRequestProto()
+        request.src = path
+        request.masked.perm = 0644
+        request.clientName = "snakebite"
+        request.createFlag = createFlag
+        request.createParent = False
+        request.replication = replication
+        request.blockSize = blocksize
+
+        # The response doesn't contain anything
+        self.service.create(request)
+
+        # Issue a CompleteRequestProto
+        request = client_proto.CompleteRequestProto()
+        request.src = path
+        request.clientName = "snakebite"
+
+        return self.service.complete(request)
+
+    def _read_file(self, path, node, tail_only, check_crc):
+        length = node.length
+
+        request = client_proto.GetBlockLocationsRequestProto()
+        request.src = path
+        request.length = length
+
+        if tail_only:  # Only read last KB
+            request.offset = max(0, length - 1024)
+        else:
+            request.offset = 0L
+        response = self.service.getBlockLocations(request)
+
+        if response.locations.fileLength == 0:  # Can't read empty file
+            yield ""
+        lastblock = response.locations.lastBlock
+
+        if tail_only:
+            if lastblock.b.blockId == response.locations.blocks[0].b.blockId:
+                num_blocks_tail = 1  # Tail is on last block
+            else:
+                num_blocks_tail = 2  # Tail is on two blocks
+
+        failed_nodes = []
+        total_bytes_read = 0
+        for block in response.locations.blocks:
+            length = block.b.numBytes
+            pool_id = block.b.poolId
+            offset_in_block = 0
+            if tail_only:
+                if num_blocks_tail == 2 and block.b.blockId != lastblock.b.blockId:
+                    offset_in_block = block.b.numBytes - (1024 - lastblock.b.numBytes)
+                elif num_blocks_tail == 1:
+                    offset_in_block = max(0, lastblock.b.numBytes - 1024)
+
+            # Prioritize locations to read from
+            locations_queue = Queue.PriorityQueue()  # Primitive queuing based on a node's past failure
+            for location in block.locs:
+                if location.id.storageID in failed_nodes:
+                    locations_queue.put((1, location))  # Priority num, data
+                else:
+                    locations_queue.put((0, location))
+
+            # Read data
+            successful_read = False
+            while not locations_queue.empty():
+                location = locations_queue.get()[1]
+                host = location.id.ipAddr
+                port = int(location.id.xferPort)
+                data_xciever = DataXceiverChannel(host, port)
+                if data_xciever.connect():
+                    try:
+                        for load in data_xciever.readBlock(length, pool_id, block.b.blockId, block.b.generationStamp, offset_in_block, check_crc):
+                            offset_in_block += len(load)
+                            total_bytes_read += len(load)
+                            successful_read = True
+                            yield load
+                    except:
+                        if not location.id.storageID in failed_nodes:
+                            failed_nodes.append(location.id.storageID)
+                        successful_read = False
+                else:
+                    raise Exception
+                if successful_read:
+                    break
+            if successful_read is False:
+                raise Exception("Failure to read block %s" % block.b.blockId)
+
     def _find_items(self, paths, processor, include_toplevel=False, include_children=False, recurse=False, check_nonexistence=False):
         ''' Request file info from the NameNode and call the processor on the node(s) returned
 
@@ -691,7 +989,6 @@ class Client(object):
         :param recurse:
             Recurse into children if they are directories.
         '''
-        #collection = []
 
         if not paths:
             paths = [os.path.join("/user", pwd.getpwuid(os.getuid())[0])]
@@ -727,7 +1024,6 @@ class Client(object):
                 if self._is_dir(fileinfo.fs) and (include_children or recurse):
                     for node in self._get_dir_listing(path):
                         full_path = self._get_full_path(path, node)
-                        last_entry_path = node.path
                         entry = processor(full_path, node)
                         yield entry
 
@@ -834,6 +1130,9 @@ class Client(object):
     def _is_dir(self, entry):
         return self.FILETYPES.get(entry.fileType) == "d"
 
+    def _is_file(self, entry):
+        return self.FILETYPES.get(entry.fileType) == "f"
+
     def _get_file_info(self, path):
         request = client_proto.GetFileInfoRequestProto()
         request.src = path
@@ -842,3 +1141,7 @@ class Client(object):
 
     def _join_user_path(self, path):
         return os.path.join("/user", pwd.getpwuid(os.getuid())[0], path)
+
+    def _remove_user_path(self, path):
+        dir_to_remove = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
+        return path.replace(dir_to_remove+'/', "", 1)

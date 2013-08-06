@@ -46,15 +46,6 @@ def exitError(error):
     sys.exit(-1)
 
 
-class Commands(object):
-    methods = {}
-
-
-class Parser(argparse.ArgumentParser):
-    def print_help(self):
-        print ''.join([self.usage, self.epilog])
-
-
 def command(args="", descr="", allowed_opts="", visible=True):
     def wrap(f):
         Commands.methods[f.func_name] = {"method": f,
@@ -65,66 +56,99 @@ def command(args="", descr="", allowed_opts="", visible=True):
     return wrap
 
 
+class Commands(object):
+    methods = {}
+
+
+class ArgumentParserError(Exception):
+
+    def __init__(self, message, error_message, prog, stdout=None, stderr=None, error_code=None):
+        Exception.__init__(self, message, stdout, stderr)
+        self.message = message
+        self.error_message = error_message
+        self.prog = prog
+
+
+class Parser(argparse.ArgumentParser):
+    def print_help(self):
+        print ''.join([self.usage, self.epilog])
+
+    def error(self, message):  # Override error message to show custom help.
+        raise ArgumentParserError("SystemExit", message, self.prog)
+
+
 class CommandLineParser(object):
 
     GENERIC_OPTS = {'D': {"short": '-D',
-                        "long": '--debug',
-                        "help": 'Show debug information',
-                        "action": 'store_true'},
-                'j': {"short": '-j',
-                        "long": '--json',
-                        "help": 'JSON output',
-                        "action": 'store_true'},
-                'n': {"short": '-n',
-                        "long": '--namenode',
-                        "help": 'namenode host',
-                        "type": int},
-                'V': {"short": '-V',
-                        "long": '--version',
-                        "help": 'Hadoop protocol version (default:8)',
-                        "default": 7,
-                        "type": float},
-                'p': {"short": '-p',
-                        "long": '--port',
-                        "help": 'namenode RPC port',
-                        "type": int},
-                'H': {"short": '-H',
-                        "long": '--human',
-                        "help": 'human readable output',
-                        "action": 'store_true'}
-                }
+                          "long": '--debug',
+                          "help": 'Show debug information',
+                          "action": 'store_true'},
+                    'j': {"short": '-j',
+                          "long": '--json',
+                          "help": 'JSON output',
+                          "action": 'store_true'},
+                    'n': {"short": '-n',
+                          "long": '--namenode',
+                          "help": 'namenode host',
+                          "type": int},
+                    'V': {"short": '-V',
+                          "long": '--version',
+                          "help": 'Hadoop protocol version (default:8)',
+                          "default": 7,
+                          "type": float},
+                    'p': {"short": '-p',
+                          "long": '--port',
+                          "help": 'namenode RPC port',
+                          "type": int},
+                    'H': {"short": '-h',
+                          "long": '--human',
+                          "help": 'human readable output',
+                          "action": 'store_true'}
+                    }
 
     SUB_OPTS = {'R': {"short": '-R',
-                        "long": '--recurse',
-                        "help": 'recurse into subdirectories',
-                        "action": 'store_true'},
+                      "long": '--recurse',
+                      "help": 'recurse into subdirectories',
+                      "action": 'store_true'},
                 'd': {"short": '-d',
-                        "long": '--directory',
-                        "help": 'show only the path and no children / check if path is a dir',
-                        "action": 'store_true'},
+                      "long": '--directory',
+                      "help": 'show only the path and no children / check if path is a dir',
+                      "action": 'store_true'},
                 's': {"short": '-s',
-                        "long": '--summary',
-                        "help": 'print summarized output',
-                        "action": 'store_true'},
+                      "long": '--summary',
+                      "help": 'print summarized output',
+                      "action": 'store_true'},
                 'z': {"short": '-z',
-                        "long": '--zero',
-                        "help": 'check for zero length',
-                        "action": 'store_true'},
+                      "long": '--zero',
+                      "help": 'check for zero length',
+                      "action": 'store_true'},
                 'e': {"short": '-e',
-                        "long": '--exists',
-                        "help": 'check if file exists',
-                        "action": 'store_true'}
+                      "long": '--exists',
+                      "help": 'check if file exists',
+                      "action": 'store_true'},
+                'checkcrc': {"short": '-checkcrc',
+                             "long": "--checkcrc",
+                             "help": 'check Crc',
+                             "action": 'store_true'},
+                'f': {"short": '-f',
+                      "long": "--append",
+                      "help": 'show appended data as the file grows',
+                      "action": 'store_true'},
+                'nl': {"short": '-nl',
+                      "long": "--newline",
+                      "help": 'add a newline character at the end of each file.',
+                      "action": 'store_true'}
                 }
 
     def __init__(self):
-        usage = "snakebite [options] cmd [dirs]"
-        epilog = "\noptions:\n"
+        usage = "snakebite [general options] cmd [arguments]"
+        epilog = "\ngeneral options:\n"
         epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
         epilog += "\n\ncommands:\n"
         epilog += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (k, v['args']), v['descr']) for k, v in Commands.methods.iteritems() if v['visible']]))
-        epilog += "\n\nto see command-specific options use: snakebite [cmd] -h"
+        epilog += "\n\nto see command-specific options use: snakebite [cmd] --help"
 
-        self.parser = Parser(usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter)
+        self.parser = Parser(usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter, add_help=False)
         self._build_parent_parser()
         self._add_subparsers()
 
@@ -147,13 +171,13 @@ class CommandLineParser(object):
         for opt_name, opt_data in self.SUB_OPTS.iteritems():
             arg_parsers[opt_name] = argparse.ArgumentParser(add_help=False)
             arg_parsers[opt_name].add_argument(opt_data['short'], opt_data['long'], help=opt_data['help'],
-                action=opt_data['action'])
+                                               action=opt_data['action'])
 
         subcommand_help_parser = argparse.ArgumentParser(add_help=False)
-        subcommand_help_parser.add_argument('-h', '--help', action='store_true')
+        subcommand_help_parser.add_argument('-H', '--help', action='store_true')
 
-        # NOTE: args and dirs are logically equivalent except for default val
-        # difference in naming gives more valuable error/help output.
+        # NOTE: args and dirs are logically equivalent except for default val.
+        # Difference in naming gives more valuable error/help output.
 
         # 0 or more dirs
         positional_arg_parsers = {}
@@ -163,6 +187,10 @@ class CommandLineParser(object):
         # 1 or more dirs
         positional_arg_parsers['dir [dirs]'] = argparse.ArgumentParser(add_help=False)
         positional_arg_parsers['dir [dirs]'].add_argument('dir', nargs='+', default=[default_dir], help="dir [dirs]")
+
+        # 2 dirs
+        positional_arg_parsers['src dst'] = argparse.ArgumentParser(add_help=False)
+        positional_arg_parsers['src dst'].add_argument('src_dst', nargs=2, default=[default_dir], help="src dst")
 
         # 1 or more args
         positional_arg_parsers['[args]'] = argparse.ArgumentParser(add_help=False)
@@ -175,13 +203,13 @@ class CommandLineParser(object):
         # 1 (integer) arg
         positional_arg_parsers['(int) arg'] = argparse.ArgumentParser(add_help=False)
         positional_arg_parsers['(int) arg'].add_argument('single_int_arg', default='0', help="(integer) arg",
-            type=int)
+                                                         type=int)
 
         subparsers = self.parser.add_subparsers()
         for cmd_name, cmd_info in Commands.methods.iteritems():
             parents = [arg_parsers[opt] for opt in cmd_info['allowed_opts'] if opt in arg_parsers]
             parents += [subcommand_help_parser]
-            if 'req_args' in cmd_info and not cmd_info['req_args'] == None:
+            if 'req_args' in cmd_info and not cmd_info['req_args'] is None:
                 parents += [positional_arg_parsers[arg] for arg in cmd_info['req_args']]
             command_parser = subparsers.add_parser(cmd_name, add_help=False, parents=parents)
             command_parser.set_defaults(command=cmd_name)
@@ -259,12 +287,25 @@ class CommandLineParser(object):
                     f.write(json.dumps({"namenode": self.args.namenode, "port": self.args.port, "version": self.args.version}))
                     f.close()
 
-    def parse(self, input=None):  # allow input for testing purposes
-        args = self.parser.parse_args(input)
-
-        if args.command == None:
+    def parse(self, non_cli_input=None):  # Allow input for testing purposes
+        if not sys.argv[1:] and not non_cli_input:
             self.parser.print_help()
             sys.exit(-1)
+
+        try:
+            args = self.parser.parse_args(non_cli_input)
+        except ArgumentParserError, error:
+            if "-H" in sys.argv or "--help" in sys.argv:  # non cli input?
+                commands = [cmd for (cmd, description) in Commands.methods.iteritems() if description['visible'] is True]
+                command = error.prog.split()[-1]
+                if command in commands:
+                    self.usage_helper(command)
+                else:
+                    self.parser.print_help()
+                self.parser.exit(2)
+            else:
+                self.parser.print_usage(sys.stderr)
+                self.parser.exit(2, 'error: %s\n' % (error.error_message))
 
         self.cmd = args.command
         self.args = args
@@ -275,7 +316,7 @@ class CommandLineParser(object):
 
     def execute(self):
         if self.args.help:
-            #if 'ls -h' is called, execute 'usage ls'
+            #if 'ls -H' is called, execute 'usage ls'
             self.args.arg = [self.cmd]
             return Commands.methods['usage']['method'](self)
         if not Commands.methods.get(self.cmd):
@@ -289,18 +330,18 @@ class CommandLineParser(object):
     def command(args="", descr="", allowed_opts="", visible=True, req_args=None):
         def wrap(f):
             Commands.methods[f.func_name] = {"method": f,
-                                         "args": args,
-                                         "descr": descr,
-                                         "allowed_opts": allowed_opts,
-                                         "visible": visible,
-                                         "req_args": req_args}
+                                             "args": args,
+                                             "descr": descr,
+                                             "allowed_opts": allowed_opts,
+                                             "visible": visible,
+                                             "req_args": req_args}
         return wrap
 
     @command(visible=False)
     def commands(self):
         print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
 
-    @command(visible=False, req_args=['[dirs]'])
+    @command(args="[path]", descr="create directories and their parents", visible=False, req_args=['[dirs]'])
     def complete(self):
         self.args.summary = True
         self.args.directory = False
@@ -311,7 +352,7 @@ class CommandLineParser(object):
         except FileNotFoundException:
             pass
 
-    @command(args="[path]", descr="list a path", allowed_opts=["d", "R", "s"], req_args=['[dirs]'])
+    @command(args="[paths]", descr="list a path", allowed_opts=["d", "R", "s"], req_args=['[dirs]'])
     def ls(self):
         for line in self._listing():
             print line
@@ -328,13 +369,13 @@ class CommandLineParser(object):
             recurse = self.args.recurse
 
         listing = self.client.ls(self.args.dir, recurse=recurse,
-                                  include_toplevel=include_toplevel,
-                                  include_children=include_children)
+                                 include_toplevel=include_toplevel,
+                                 include_children=include_children)
 
-        for line in  format_listing(listing, json_output=self.args.json,
-                                             human_readable=self.args.human,
-                                             recursive=recurse,
-                                             summary=self.args.summary):
+        for line in format_listing(listing, json_output=self.args.json,
+                                   human_readable=self.args.human,
+                                   recursive=recurse,
+                                   summary=self.args.summary):
             yield line
 
     @command(args="[paths]", descr="create directories", req_args=['dir [dirs]'])
@@ -377,14 +418,14 @@ class CommandLineParser(object):
     def count(self):
         counts = self.client.count(self.args.dir)
         for line in format_counts(counts, json_output=self.args.json,
-                                          human_readable=self.args.human):
+                                  human_readable=self.args.human):
             print line
 
     @command(args="", descr="display fs stats")
     def df(self):
         result = self.client.df()
         for line in format_fs_stats(result, json_output=self.args.json,
-                                            human_readable=self.args.human):
+                                    human_readable=self.args.human):
             print line
 
     @command(args="[paths]", descr="display disk usage statistics", allowed_opts=["s"], req_args=['[dirs]'])
@@ -438,25 +479,35 @@ class CommandLineParser(object):
 
     @command(args="<cmd>", descr="show cmd usage", req_args=['[args]'])
     def usage(self):
-        if not 'arg' in self.args:
+        if not 'arg' in self.args or self.args.arg == []:
             self.parser.print_help()
             sys.exit(-1)
-        for sub_cmd in self.args.arg:
-            cmd_entry = Commands.methods.get(sub_cmd)
-            if not cmd_entry:
-                self.parser.print_help()
-                sys.exit(-1)
-            cmd_args = []
-            cmd_descriptions = "\ncommand options: \n"
-            allowed_opts = cmd_entry.get('allowed_opts')
-            if allowed_opts:
-                cmd_args += ["[-%s]" % o for o in allowed_opts]
-                cmd_descriptions += "\n".join(sorted([" %-30s %s" % ("%s %s" % (self.SUB_OPTS[o]['short'], self.SUB_OPTS[o]['long']), self.SUB_OPTS[o]['help']) for o in allowed_opts]))
-            args = cmd_entry.get('args')
-            if args:
-                cmd_args.append(args)
 
-            print "usage: snakebite [general options] %s %s" % (sub_cmd, " ".join(cmd_args))
+        for sub_cmd in self.args.arg:
+            self.usage_helper(sub_cmd)
+
+    def usage_helper(self, command):
+        cmd_entry = Commands.methods.get(command)
+        if not cmd_entry:
+            self.parser.print_help()
+            sys.exit(-1)
+        cmd_args = []
+        cmd_descriptions = "\ncommand options: \n"
+        allowed_opts = cmd_entry.get('allowed_opts')
+        if allowed_opts:
+            cmd_args += ["[-%s]" % o for o in allowed_opts]
+            cmd_descriptions += "\n".join(sorted([" %-30s %s" % ("%s %s" % (self.SUB_OPTS[o]['short'], self.SUB_OPTS[o]['long']), self.SUB_OPTS[o]['help']) for o in allowed_opts]))
+        args = cmd_entry.get('args')
+        if args:
+            cmd_args.append(args)
+
+        print "usage: snakebite [general options] %s %s" % (command, " ".join(cmd_args))
+
+        general_opts = "\ngeneral options:\n"
+        general_opts += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
+        print general_opts
+
+        if allowed_opts:
             print cmd_descriptions
 
     @command(args="[paths]", descr="stat information", req_args=['dir [dirs]'])
@@ -470,3 +521,71 @@ class CommandLineParser(object):
             sys.exit(0)
         else:
             sys.exit(1)
+
+    @command(args="[paths]", descr="copy source paths to stdout", allowed_opts=['checkcrc'], req_args=['dir [dirs]'])
+    def cat(self):
+        for file_to_read in self.client.cat(self.args.dir, check_crc=self.args.checkcrc):
+            for load in file_to_read:
+                print load
+
+    @command(args="path dst", descr="copy local file reference to destination", req_args=['dir [dirs]', 'arg'])
+    def copyFromLocal(self):
+        src = self.args.dir
+        dst = self.args.single_arg
+        result = self.client.copyFromLocal(src, dst)
+        for line in format_results(result, json_output=self.args.json):
+            print line
+
+    @command(args="[paths] dst", descr="copy paths to local file system destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
+    def copyToLocal(self):
+        paths = self.args.dir
+        dst = self.args.single_arg
+        result = self.client.copyToLocal(paths, dst, check_crc=self.args.checkcrc)
+        for line in format_results(result, json_output=self.args.json):
+            print line
+
+    @command(args="[paths] dst", descr="copy files from source to destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
+    def cp(self):
+        paths = self.args.dir
+        dst = self.args.single_arg
+        result = self.client.cp(paths, dst, checkcrc=self.args.checkcrc)
+        for line in format_results(result, json_output=self.args.json):
+            print line
+
+    @command(args="file dst", descr="copy files to local file system destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
+    def get(self):
+        paths = self.args.dir
+        dst = self.args.single_arg
+        result = self.client.copyToLocal(paths, dst, check_crc=self.args.checkcrc)
+        for line in format_results(result, json_output=self.args.json):
+            print line
+
+    @command(args="dir dst", descr="concatenates files in source dir into destination local file", allowed_opts=['nl'], req_args=['src dst'])
+    def getmerge(self):
+        source = self.args.src_dst[0]
+        dst = self.args.src_dst[1]
+        result = self.client.getmerge(source, dst, newline=self.args.newline)
+        for line in format_results(result, json_output=self.args.json):
+            print line
+
+    @command(args="[paths] dst", descr="copy sources from local file system to destination", req_args=['dir [dirs]', 'arg'])
+    def put(self):
+        paths = self.args.dir
+        dst = self.args.single_arg
+        result = self.client.put(paths, dst)
+        for line in format_results(result, json_output=self.args.json):
+            print line
+
+    @command(args="path", descr="display last kilobyte of the file to stdout", allowed_opts=['f'], req_args=['arg'])
+    def tail(self):
+        path = self.args.single_arg
+        result = self.client.tail(path, append=self.args.append)
+        for line in result:
+            print line
+
+    @command(args="path [paths]", descr="output file in text format", allowed_opts=['checkcrc'], req_args=['dir [dirs]'])
+    def text(self):
+        paths = self.args.dir
+        result = self.client.text(paths)
+        for line in result:
+            print line

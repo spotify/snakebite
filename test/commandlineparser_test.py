@@ -19,7 +19,7 @@ import pwd
 from snakebite.commandlineparser import CommandLineParser
 
 
-class CliTest(unittest2.TestCase):
+class CommandLineParserTest(unittest2.TestCase):
 
     def setUp(self):
         self.parser = CommandLineParser()
@@ -41,7 +41,7 @@ class CliTest(unittest2.TestCase):
         output = parser.parse('--debug ls some_folder'.split())
         self.assertTrue(output.debug)
 
-        output = parser.parse('-H ls some_folder'.split())
+        output = parser.parse('-h ls some_folder'.split())
         self.assertTrue(output.human)
         output = parser.parse('--human ls some_folder'.split())
         self.assertTrue(output.human)
@@ -67,7 +67,7 @@ class CliTest(unittest2.TestCase):
         self.assertEqual(output.version, 4)
 
         #all options
-        output = parser.parse('-D -H -j -n 100 -p 1234 -V 4 ls some_folder'.split())
+        output = parser.parse('-D -h -j -n 100 -p 1234 -V 4 ls some_folder'.split())
         self.assertTrue(output.debug)
         self.assertTrue(output.human)
         self.assertTrue(output.json)
@@ -425,3 +425,171 @@ class CliTest(unittest2.TestCase):
         self.assertTrue(output.zero)
         self.assertTrue(output.exists)
         self.assertEqual(output.single_arg, 'some_dir')
+
+    def test_cat(self):
+        parser = self.parser
+
+        #no path
+        with self.assertRaises(SystemExit):
+            parser.parse('cat'.split())
+
+        #one path
+        output = parser.parse('cat some_file'.split())
+        self.assertEqual(output.command, 'cat')
+        self.assertEqual(output.dir, ['some_file'])
+
+        #multiple paths
+        output = parser.parse('cat dir1 dir2 dir3'.split())
+        self.assertEqual(output.dir, ['dir1', 'dir2', 'dir3'])
+
+        #specific commands
+        output = parser.parse('cat -checkcrc dir1 dir2'.split())
+        self.assertEqual(output.checkcrc, True)
+
+    def test_copyFromLocal(self):
+        parser = self.parser
+
+        #no dir
+        with self.assertRaises(SystemExit):
+            parser.parse('copyFromLocal'.split())
+
+        #one dir
+        with self.assertRaises(SystemExit):
+            parser.parse('copyFromLocal some_dir'.split())
+
+        #two dirs
+        output = parser.parse('copyFromLocal dir1 dir2'.split())
+        self.assertEqual(output.dir, ['dir1'])
+        self.assertEqual(output.single_arg, 'dir2')
+
+    def test_copyToLocal(self):
+        parser = self.parser
+
+        #no dir
+        with self.assertRaises(SystemExit):
+            parser.parse('copyToLocal'.split())
+
+        #one dir
+        with self.assertRaises(SystemExit):
+            parser.parse('copyToLocal some_dir'.split())
+
+        #two dirs
+        output = parser.parse('copyToLocal dir1 dir2'.split())
+        self.assertEqual(output.dir, ['dir1'])
+        self.assertEqual(output.single_arg, 'dir2')
+        self.assertEqual(output.checkcrc, False)
+
+        #specific commands
+        output = parser.parse('copyToLocal -checkcrc dir1 dir2'.split())
+        self.assertEqual(output.checkcrc, True)
+
+    def test_cp(self):
+        parser = self.parser
+
+        #no dir
+        with self.assertRaises(SystemExit):
+            parser.parse('cp'.split())
+
+        #one dir
+        with self.assertRaises(SystemExit):
+            parser.parse('cp some_dir'.split())
+
+        #multiple dirs
+        output = parser.parse('cp dir1 dir2 dir3'.split())
+        self.assertEqual(output.dir, ['dir1', 'dir2'])
+        self.assertEqual(output.single_arg, 'dir3')
+
+    def test_get(self):
+        parser = self.parser
+
+        #no dir
+        with self.assertRaises(SystemExit):
+            parser.parse('get'.split())
+
+        #one dir
+        with self.assertRaises(SystemExit):
+            parser.parse('get some_dir'.split())
+
+        #multiple dirs
+        output = parser.parse('get dir1 dir2 dir3'.split())
+        self.assertEqual(output.dir, ['dir1', 'dir2'])
+        self.assertEqual(output.single_arg, 'dir3')
+
+        #specific commands
+        output = parser.parse('get -checkcrc dir1 dir2'.split())
+        self.assertEqual(output.checkcrc, True)
+
+    def test_getmerge(self):
+        parser = self.parser
+
+        #no dir
+        with self.assertRaises(SystemExit):
+            parser.parse('getmerge'.split())
+
+        #one dir
+        with self.assertRaises(SystemExit):
+            parser.parse('getmerge some_dir'.split())
+
+        #two dirs
+        output = parser.parse('getmerge dir1 dir2'.split())
+        self.assertEqual(output.src_dst[0], 'dir1')
+        self.assertEqual(output.src_dst[1], 'dir2')
+
+        #multiple dirs
+        with self.assertRaises(SystemExit):
+            parser.parse('getmerge dir1 dir2 dir3'.split())
+
+    def test_put(self):
+        parser = self.parser
+
+        #no dir
+        with self.assertRaises(SystemExit):
+            parser.parse('put'.split())
+
+        #one dir
+        with self.assertRaises(SystemExit):
+            parser.parse('put some_dir'.split())
+
+        #multiple dirs
+        output = parser.parse('put dir1 dir2 dir3'.split())
+        self.assertEqual(output.dir, ['dir1', 'dir2'])
+        self.assertEqual(output.single_arg, 'dir3')
+
+    def test_tail(self):
+        parser = self.parser
+
+        #no dir
+        with self.assertRaises(SystemExit):
+            parser.parse('tail'.split())
+
+        #one dir
+        output = parser.parse('tail some_dir'.split())
+        self.assertEqual(output.single_arg, 'some_dir')
+
+        #multiple dirs
+        with self.assertRaises(SystemExit):
+            parser.parse('tail dir1 dir2'.split())
+
+        #specific commands
+        output = parser.parse('tail -f some_dir'.split())
+        self.assertTrue(output.append)
+
+    def test_text(self):
+        parser = self.parser
+
+        #no path
+        with self.assertRaises(SystemExit):
+            parser.parse('text'.split())
+
+        #one path
+        output = parser.parse('text some_file'.split())
+        self.assertEqual(output.command, 'text')
+        self.assertEqual(output.dir, ['some_file'])
+
+        #multiple paths
+        output = parser.parse('text dir1 dir2 dir3'.split())
+        self.assertEqual(output.dir, ['dir1', 'dir2', 'dir3'])
+
+        #specific commands
+        output = parser.parse('text -checkcrc dir1 dir2'.split())
+        self.assertEqual(output.checkcrc, True)
