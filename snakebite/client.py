@@ -959,7 +959,8 @@ class Client(object):
                             total_bytes_read += len(load)
                             successful_read = True
                             yield load
-                    except:
+                    except Exception as e:
+                        log.error(e)
                         if not location.id.storageID in failed_nodes:
                             failed_nodes.append(location.id.storageID)
                         successful_read = False

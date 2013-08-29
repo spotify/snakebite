@@ -513,7 +513,7 @@ class DataXceiverChannel(object):
         checksum_type = block_op_response.readOpChecksumInfo.checksum.type
         bytes_per_chunk = block_op_response.readOpChecksumInfo.checksum.bytesPerChecksum
         log.debug("Checksum type: %s, bytesPerChecksum: %s" % (checksum_type, bytes_per_chunk))
-        if checksum_type == self.CHECKSUM_CRC32C:
+        if checksum_type in [self.CHECKSUM_CRC32C, self.CHECKSUM_CRC32]:
             checksum_len = 4
         else:
             raise Exception("Checksum type %s not implemented" % checksum_type)
