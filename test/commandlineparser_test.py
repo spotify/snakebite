@@ -33,7 +33,7 @@ class CommandLineParserTest(unittest2.TestCase):
         self.assertFalse(output.human)
         self.assertFalse(output.json)
         self.assertEqual(output.namenode, None)
-        self.assertEqual(output.port, None)
+        self.assertEqual(output.port, 8020)
 
         #each option
         output = parser.parse('-D ls some_folder'.split())
