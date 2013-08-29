@@ -1,3 +1,9 @@
+snakebite (1.2.0) unstable; urgency=low
+
+  * Added read commands (cat, copytolocal, getmerge, get, tail, text)
+
+ -- Gianna Badiali <gianna@spotify.com>  Tue, 16 Aug 2013 09:47:10 +0000
+
 snakebite (1.1.1) unstable; urgency=low
 
   * Fixed command line completion
