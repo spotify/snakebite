@@ -62,26 +62,13 @@ TODO
 ====
 * Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well
 * More tests. Currently only integration tests with a minicluster are available.
-* Tests for the CLI.
-* Move to argparse to have arguments per command
 * Return correct exit codes from cli client.
-* The python packaging (pip stuff) probably needs some more love.
 * Improve methods:
     * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f and -skipTrash)
 
 * Implement more methods (those need interaction with DataNodes):
     * [-expunge]
-    * [-cat [-ignoreCrc] <src> ...]
-    * [-copyFromLocal <localsrc> ... <dst>]
-    * [-copyToLocal [-ignoreCrc] [-crc] <src> ... <localdst>]
-    * [-cp <src> ... <dst>]
-    * [-get [-ignoreCrc] [-crc] <src> ... <localdst>]
-    * [-getmerge [-nl] <src> <localdst>]
-    * [-moveFromLocal <localsrc> ... <dst>]
-    * [-moveToLocal <src> <localdst>]
-    * [-put <localsrc> ... <dst>]
-    * [-tail [-f] <file>]
-    * [-text [-ignoreCrc] <src> ...]
+
 
 LICENSE
 =======
