@@ -90,7 +90,7 @@ class CommandLineParser(object):
                     'n': {"short": '-n',
                           "long": '--namenode',
                           "help": 'namenode host',
-                          "type": int},
+                          "type": str},
                     'V': {"short": '-V',
                           "long": '--version',
                           "help": 'Hadoop protocol version (default:8)',
@@ -99,6 +99,7 @@ class CommandLineParser(object):
                     'p': {"short": '-p',
                           "long": '--port',
                           "help": 'namenode RPC port',
+                          "default": 8020,
                           "type": int},
                     'H': {"short": '-h',
                           "long": '--human',
@@ -228,7 +229,10 @@ class CommandLineParser(object):
                         sys.exit(-1)
                     else:
                         self.args.namenode = parse_result.hostname
-                        self.args.port = parse_result.port
+                        if parse_result.port:
+                            self.args.port = parse_result.port
+                        else:
+                            if parse_result.port = 8020
                         directory = parse_result.path
 
         if self.args.namenode and self.args.port:
