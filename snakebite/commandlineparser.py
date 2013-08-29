@@ -90,7 +90,7 @@ class CommandLineParser(object):
                     'n': {"short": '-n',
                           "long": '--namenode',
                           "help": 'namenode host',
-                          "type": int},
+                          "type": str},
                     'V': {"short": '-V',
                           "long": '--version',
                           "help": 'Hadoop protocol version (default:8)',

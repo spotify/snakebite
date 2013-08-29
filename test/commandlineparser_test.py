@@ -51,10 +51,10 @@ class CommandLineParserTest(unittest2.TestCase):
         output = parser.parse('--json ls some_folder'.split())
         self.assertTrue(output.json)
 
-        output = parser.parse('-n 100 ls some_folder'.split())  # what are typical values for namenodes?
-        self.assertEqual(output.namenode, 100)
-        output = parser.parse('--namenode 100 ls some_folder'.split())
-        self.assertEqual(output.namenode, 100)
+        output = parser.parse('-n namenode_fqdn ls some_folder'.split())  # what are typical values for namenodes?
+        self.assertEqual(output.namenode, "namenode_fqdn")
+        output = parser.parse('--namenode namenode_fqdn ls some_folder'.split())
+        self.assertEqual(output.namenode, "namenode_fqdn")
 
         output = parser.parse('-p 1234 ls some_folder'.split())
         self.assertEqual(output.port, 1234)
@@ -67,11 +67,11 @@ class CommandLineParserTest(unittest2.TestCase):
         self.assertEqual(output.version, 4)
 
         #all options
-        output = parser.parse('-D -h -j -n 100 -p 1234 -V 4 ls some_folder'.split())
+        output = parser.parse('-D -h -j -n namenode_fqdn -p 1234 -V 4 ls some_folder'.split())
         self.assertTrue(output.debug)
         self.assertTrue(output.human)
         self.assertTrue(output.json)
-        self.assertEqual(output.namenode, 100)
+        self.assertEqual(output.namenode, "namenode_fqdn")
         self.assertEqual(output.port, 1234)
         self.assertEqual(output.version, 4)
 
