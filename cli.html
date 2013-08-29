@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>CLI client &mdash; snakebite 1.0 documentation</title>
+    <title>CLI client &mdash; snakebite 1.2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0',
+        VERSION:     '1.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="snakebite 1.0 documentation" href="index.html" />
+    <link rel="top" title="snakebite 1.2.0 documentation" href="index.html" />
     <link rel="next" title="Minicluster" href="minicluster.html" />
     <link rel="prev" title="Client library" href="client.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="client.html" title="Client library"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">snakebite 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 1.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -75,44 +75,45 @@ HDP 2.0 uses protocol 8. Snakebite defaults to 7.</p>
 </div>
 <div class="section" id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-python"><pre>Usage: snakebite [options] cmd [args]
+<div class="highlight-python"><pre>snakebite [general options] cmd [arguments]
+general options:
+  -D --debug                     Show debug information
+  -V --version                   Hadoop protocol version (default:8)
+  -h --human                     human readable output
+  -j --json                      JSON output
+  -n --namenode                  namenode host
+  -p --port                      namenode RPC port
 
-Options:
-  -h, --help            show this help message and exit
-  -D, --debug           Show debug information
-  -j, --json            JSON output
-  -n NAMENODE, --namenode=NAMENODE
-                        namenode host
-  -V VERSION, --version=VERSION
-                        Hadoop protocol version (default:8
-  -p PORT, --port=PORT  namenode RPC port
-  -R, --recurse         recurse into subdirectories
-  -d, --directory       show only the path and no children / check if path is
-                        a dir
-  -H, --human           human readable output
-  -s, --summary         print summarized output
-  -z, --zero            check for zero length
-  -e, --exists          check if file exists
-
-Commands:
+commands:
+  cat [paths]                    copy source paths to stdout
   chgrp &lt;grp&gt; [paths]            change group
   chmod &lt;mode&gt; [paths]           change file mode (octal)
   chown &lt;owner:grp&gt; [paths]      change owner
+  copyFromLocal path dst         copy local file reference to destination
+  copyToLocal [paths] dst        copy paths to local file system destination
   count [paths]                  display stats for paths
+  cp [paths] dst                 copy files from source to destination
   df                             display fs stats
   du [paths]                     display disk usage statistics
-  ls [path]                      list a path
+  get file dst                   copy files to local file system destination
+  getmerge dir dst               concatenates files in source dir into destination local file
+  ls [paths]                     list a path
   mkdir [paths]                  create directories
   mkdirp [paths]                 create directories and their parents
   mv [paths] dst                 move paths to destination
+  put [paths] dst                copy sources from local file system to destination
   rm [paths]                     remove paths
   rmdir [dirs]                   delete a directory
   serverdefaults                 show server information
   setrep &lt;rep&gt; [paths]           set replication factor
   stat [paths]                   stat information
+  tail path                      display last kilobyte of the file to stdout
   test path                      test a path
+  text path [paths]              output file in text format
   touchz [paths]                 creates a file of zero length
-  usage &lt;cmd&gt;                    show cmd usage</pre>
+  usage &lt;cmd&gt;                    show cmd usage
+
+to see command-specific options use: snakebite [cmd] --help</pre>
 </div>
 </div>
 
@@ -171,7 +172,7 @@ Commands:
         <li class="right" >
           <a href="client.html" title="Client library"
              >previous</a> |</li>
-        <li><a href="index.html">snakebite 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 1.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

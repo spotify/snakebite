@@ -28,41 +28,42 @@ Usage
 =====
 ::
 
-    Usage: snakebite [options] cmd [args]
+    snakebite [general options] cmd [arguments]
+    general options:
+      -D --debug                     Show debug information
+      -V --version                   Hadoop protocol version (default:8)
+      -h --human                     human readable output
+      -j --json                      JSON output
+      -n --namenode                  namenode host
+      -p --port                      namenode RPC port
 
-    Options:
-      -h, --help            show this help message and exit
-      -D, --debug           Show debug information
-      -j, --json            JSON output
-      -n NAMENODE, --namenode=NAMENODE
-                            namenode host
-      -V VERSION, --version=VERSION
-                            Hadoop protocol version (default:8
-      -p PORT, --port=PORT  namenode RPC port
-      -R, --recurse         recurse into subdirectories
-      -d, --directory       show only the path and no children / check if path is
-                            a dir
-      -H, --human           human readable output
-      -s, --summary         print summarized output
-      -z, --zero            check for zero length
-      -e, --exists          check if file exists
-
-    Commands:
+    commands:
+      cat [paths]                    copy source paths to stdout
       chgrp <grp> [paths]            change group
       chmod <mode> [paths]           change file mode (octal)
       chown <owner:grp> [paths]      change owner
+      copyFromLocal path dst         copy local file reference to destination
+      copyToLocal [paths] dst        copy paths to local file system destination
       count [paths]                  display stats for paths
+      cp [paths] dst                 copy files from source to destination
       df                             display fs stats
       du [paths]                     display disk usage statistics
-      ls [path]                      list a path
+      get file dst                   copy files to local file system destination
+      getmerge dir dst               concatenates files in source dir into destination local file
+      ls [paths]                     list a path
       mkdir [paths]                  create directories
       mkdirp [paths]                 create directories and their parents
       mv [paths] dst                 move paths to destination
+      put [paths] dst                copy sources from local file system to destination
       rm [paths]                     remove paths
       rmdir [dirs]                   delete a directory
       serverdefaults                 show server information
       setrep <rep> [paths]           set replication factor
       stat [paths]                   stat information
+      tail path                      display last kilobyte of the file to stdout
       test path                      test a path
+      text path [paths]              output file in text format
       touchz [paths]                 creates a file of zero length
       usage <cmd>                    show cmd usage
+
+    to see command-specific options use: snakebite [cmd] --help
