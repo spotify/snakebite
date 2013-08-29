@@ -539,21 +539,21 @@ class CommandLineParserTest(unittest2.TestCase):
         with self.assertRaises(SystemExit):
             parser.parse('getmerge dir1 dir2 dir3'.split())
 
-    def test_put(self):
-        parser = self.parser
+    # def test_put(self):
+    #     parser = self.parser
 
-        #no dir
-        with self.assertRaises(SystemExit):
-            parser.parse('put'.split())
+    #     #no dir
+    #     with self.assertRaises(SystemExit):
+    #         parser.parse('put'.split())
 
-        #one dir
-        with self.assertRaises(SystemExit):
-            parser.parse('put some_dir'.split())
+    #     #one dir
+    #     with self.assertRaises(SystemExit):
+    #         parser.parse('put some_dir'.split())
 
-        #multiple dirs
-        output = parser.parse('put dir1 dir2 dir3'.split())
-        self.assertEqual(output.dir, ['dir1', 'dir2'])
-        self.assertEqual(output.single_arg, 'dir3')
+    #     #multiple dirs
+    #     output = parser.parse('put dir1 dir2 dir3'.split())
+    #     self.assertEqual(output.dir, ['dir1', 'dir2'])
+    #     self.assertEqual(output.single_arg, 'dir3')
 
     def test_tail(self):
         parser = self.parser
