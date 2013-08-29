@@ -99,6 +99,28 @@ in the <tt class="docutils literal"><span class="pre">hadoop_version</span></tt>
 </tbody>
 </table>
 <dl class="method">
+<dt id="client.Client.cat">
+<tt class="descname">cat</tt><big>(</big><em>paths</em>, <em>check_crc=False</em><big>)</big><a class="headerlink" href="#client.Client.cat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all files that match the source file pattern
+and display their content on stdout.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paths</strong> (<em>list of strings</em>) &#8211; Paths to display</li>
+<li><strong>check_crc</strong> (<em>boolean</em>) &#8211; Check for checksum errors</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields strings</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="client.Client.chgrp">
 <tt class="descname">chgrp</tt><big>(</big><em>paths</em>, <em>group</em>, <em>recurse=False</em><big>)</big><a class="headerlink" href="#client.Client.chgrp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change the group of paths.</p>
@@ -167,6 +189,30 @@ in the <tt class="docutils literal"><span class="pre">hadoop_version</span></tt>
 </tbody>
 </table>
 <p>This always include the toplevel when recursing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.copyToLocal">
+<tt class="descname">copyToLocal</tt><big>(</big><em>paths</em>, <em>dst</em>, <em>check_crc=False</em><big>)</big><a class="headerlink" href="#client.Client.copyToLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy files that match the file source pattern
+to the local name.  Source is kept.  When copying multiple,
+files, the destination must be a directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paths</strong> (<em>list of strings</em>) &#8211; Paths to copy</li>
+<li><strong>dst</strong> (<em>string</em>) &#8211; Destination path</li>
+<li><strong>check_crc</strong> (<em>boolean</em>) &#8211; Check for checksum errors</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields strings</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -268,6 +314,30 @@ deleted. Snakebite doesn&#8217;t.</p>
 <span class="go">[{&#39;path&#39;: &#39;/&#39;, &#39;length&#39;: 260185L}]</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.getmerge">
+<tt class="descname">getmerge</tt><big>(</big><em>path</em>, <em>dst</em>, <em>newline=False</em>, <em>check_crc=False</em><big>)</big><a class="headerlink" href="#client.Client.getmerge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all the files in the directories that
+match the source file pattern and merge and sort them to only
+one file on local fs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paths</strong> (<em>string</em>) &#8211; Directory containing files that will be merged</li>
+<li><strong>dst</strong> (<em>string</em>) &#8211; Path of file that will be written</li>
+<li><strong>nl</strong> (<em>boolean</em>) &#8211; Add a newline character at the end of each file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">string content of the merged file at dst</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -431,6 +501,27 @@ deleted. Snakebite doesn&#8217;t.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="client.Client.tail">
+<tt class="descname">tail</tt><big>(</big><em>path</em>, <em>append=False</em><big>)</big><a class="headerlink" href="#client.Client.tail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the last 1KB of the file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>string</em>) &#8211; Path to read</li>
+<li><strong>f</strong> (<em>boolean</em>) &#8211; Shows appended data as the file grows.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields strings</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="client.Client.test">
 <tt class="descname">test</tt><big>(</big><em>path</em>, <em>exists=False</em>, <em>directory=False</em>, <em>zero_length=False</em><big>)</big><a class="headerlink" href="#client.Client.test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if a paht exist, is a directory or has zero length</p>
@@ -455,6 +546,28 @@ deleted. Snakebite doesn&#8217;t.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">directory and zero length are AND&#8217;d.</p>
 </div>
+</dd></dl>
+
+<dl class="method">
+<dt id="client.Client.text">
+<tt class="descname">text</tt><big>(</big><em>paths</em>, <em>check_crc=False</em><big>)</big><a class="headerlink" href="#client.Client.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a source file and outputs the file in text format.
+The allowed formats are gzip and bzip2</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paths</strong> (<em>list of strings</em>) &#8211; Paths to display</li>
+<li><strong>check_crc</strong> (<em>boolean</em>) &#8211; Check for checksum errors</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a generator that yields strings</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
