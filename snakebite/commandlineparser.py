@@ -568,13 +568,13 @@ class CommandLineParser(object):
         for line in format_results(result, json_output=self.args.json):
             print line
 
-    @command(args="[paths] dst", descr="copy sources from local file system to destination", req_args=['dir [dirs]', 'arg'])
-    def put(self):
-        paths = self.args.dir
-        dst = self.args.single_arg
-        result = self.client.put(paths, dst)
-        for line in format_results(result, json_output=self.args.json):
-            print line
+    # @command(args="[paths] dst", descr="copy sources from local file system to destination", req_args=['dir [dirs]', 'arg'])
+    # def put(self):
+    #     paths = self.args.dir
+    #     dst = self.args.single_arg
+    #     result = self.client.put(paths, dst)
+    #     for line in format_results(result, json_output=self.args.json):
+    #         print line
 
     @command(args="path", descr="display last kilobyte of the file to stdout", allowed_opts=['f'], req_args=['arg'])
     def tail(self):

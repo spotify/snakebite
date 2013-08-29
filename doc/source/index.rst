@@ -68,6 +68,8 @@ TODO
 
 * Implement more methods (those need interaction with DataNodes):
     * [-expunge]
+    * put [paths] dst                copy sources from local file system to destination
+
 
 
 LICENSE
