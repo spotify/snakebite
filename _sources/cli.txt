@@ -54,7 +54,6 @@ Usage
       mkdir [paths]                  create directories
       mkdirp [paths]                 create directories and their parents
       mv [paths] dst                 move paths to destination
-      put [paths] dst                copy sources from local file system to destination
       rm [paths]                     remove paths
       rmdir [dirs]                   delete a directory
       serverdefaults                 show server information
