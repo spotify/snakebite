@@ -36,6 +36,10 @@ used in different projects, so we made it a part of snakebite.
 And since it's nice to have a CLI that uses :mod:`snakebite.client <client>`
 we've implemented a :doc:`cli` as well.
 
+.. warning:: all methods that read data from a data node are able to check the
+   CRC during transfer, but this is disabled by default because of performance
+   reasons. This is the opposite behaviour from the stock Hadoop client.
+
 Testing
 =======
 .. warning:: :mod:`snakebite.client <client>` hasn't been tested in the wild
@@ -63,6 +67,7 @@ TODO
 * Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well
 * More tests. Currently only integration tests with a minicluster are available.
 * Return correct exit codes from cli client.
+* Imrove speed of CRC verification. 
 * Improve methods:
     * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f and -skipTrash)
 
