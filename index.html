@@ -77,6 +77,12 @@ that wraps a Hadoop Java mini cluster. Obviously this <a class="reference intern
 used in different projects, so we made it a part of snakebite.</p>
 <p>And since it&#8217;s nice to have a CLI that uses <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a>
 we&#8217;ve implemented a <a class="reference internal" href="cli.html"><em>CLI client</em></a> as well.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">all methods that read data from a data node are able to check the
+CRC during transfer, but this is disabled by default because of performance
+reasons. This is the opposite behaviour from the stock Hadoop client.</p>
+</div>
 </div>
 <div class="section" id="testing">
 <h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
@@ -112,6 +118,8 @@ environment variable to the apropriate version number.</p>
 <li><p class="first">More tests. Currently only integration tests with a minicluster are available.</p>
 </li>
 <li><p class="first">Return correct exit codes from cli client.</p>
+</li>
+<li><p class="first">Imrove speed of CRC verification.</p>
 </li>
 <li><dl class="first docutils">
 <dt>Improve methods:</dt>
