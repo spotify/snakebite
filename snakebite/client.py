@@ -68,11 +68,11 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=7):
+    def __init__(self, host, port=8020, hadoop_version=7):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
-        :param port: RPC Port of the NameNode
+        :param port: RPC Port of the NameNode (default: 8020)
         :type port: int
         :param hadoop_version: What hadoop protocol version should be used (default: 7)
         :type hadoop_version: int
