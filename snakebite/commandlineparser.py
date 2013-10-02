@@ -32,6 +32,7 @@ from snakebite.formatter import format_counts
 from snakebite.formatter import format_fs_stats
 from snakebite.formatter import format_stat
 from snakebite.formatter import format_du
+from snakebite.version import version
 
 
 def exitError(error):
@@ -103,6 +104,10 @@ class CommandLineParser(object):
                     'h': {"short": '-h',
                           "long": '--help',
                           "help": 'show help',
+                          "type": int},
+                    'v': {"short": '-v',
+                          "long": '--ver',
+                          "help": 'Display snakebite version',
                           "type": int}
                     }
 
@@ -308,9 +313,12 @@ class CommandLineParser(object):
                 else:
                     self.parser.print_help()
                 self.parser.exit(2)
+            elif "-v" in sys.argv or "--ver" in sys.argv:
+                print version()
+                self.parser.exit(0)
             else:
                 self.parser.print_usage(sys.stderr)
-                self.parser.exit(2, 'error: %s\n' % (error.error_message))
+                self.parser.exit(2, 'error: %s. Use -h for help.\n' % (error.error_message))
 
         self.cmd = args.command
         self.args = args

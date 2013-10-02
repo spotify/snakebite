@@ -19,7 +19,7 @@ from snakebite.version import version
 
 setup(
     name='snakebite',
-    version='1.3.1',
+    version=version(),
     author=u'Wouter de Bie',
     author_email='wouter@spotify.com',
     description='Pure Python HDFS client',
