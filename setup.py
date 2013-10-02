@@ -15,10 +15,11 @@
 # the License.
 
 from distutils.core import setup
+from snakebite.version import version
 
 setup(
     name='snakebite',
-    version='1.3.0',
+    version='1.3.1',
     author=u'Wouter de Bie',
     author_email='wouter@spotify.com',
     description='Pure Python HDFS client',

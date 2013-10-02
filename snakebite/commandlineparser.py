@@ -346,11 +346,12 @@ class CommandLineParser(object):
     def commands(self):
         print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
 
-    @command(args="[path]", descr="create directories and their parents", visible=False, req_args=['[dirs]'])
+    @command(args="[path]", descr="Used for command line completion", visible=False, req_args=['[dirs]'])
     def complete(self):
         self.args.summary = True
         self.args.directory = False
         self.args.recurse = False
+        self.args.human = False
         try:
             for line in self._listing():
                 print line.replace(" ", "\\\\ ")
