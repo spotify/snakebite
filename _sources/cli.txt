@@ -32,7 +32,6 @@ Usage
     general options:
       -D --debug                     Show debug information
       -V --version                   Hadoop protocol version (default:8)
-      -h --human                     human readable output
       -j --json                      JSON output
       -n --namenode                  namenode host
       -p --port                      namenode RPC port
