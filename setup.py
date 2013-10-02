@@ -18,7 +18,7 @@ from distutils.core import setup
 
 setup(
     name='snakebite',
-    version='1.2.3',
+    version='1.3.0',
     author=u'Wouter de Bie',
     author_email='wouter@spotify.com',
     description='Pure Python HDFS client',

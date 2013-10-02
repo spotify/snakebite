@@ -1,3 +1,10 @@
+snakebite (1.3.0) unstable; urgency=low
+
+  * Changed -h/--human behaviour
+  * Fixes handling hdfs://
+
+ -- Wouter de Bie <wouter@spotify.com>  Thu, 2 Oct 2013 08:29:12 +0000
+
 snakebite (1.2.3) unstable; urgency=low
 
   * Fixed test
