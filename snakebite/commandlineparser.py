@@ -100,10 +100,10 @@ class CommandLineParser(object):
                           "long": '--port',
                           "help": 'namenode RPC port',
                           "type": int},
-                    'H': {"short": '-h',
-                          "long": '--human',
-                          "help": 'human readable output',
-                          "action": 'store_true'}
+                    'h': {"short": '-h',
+                          "long": '--help',
+                          "help": 'show help',
+                          "type": int}
                     }
 
     SUB_OPTS = {'R': {"short": '-R',
@@ -135,8 +135,12 @@ class CommandLineParser(object):
                       "help": 'show appended data as the file grows',
                       "action": 'store_true'},
                 'nl': {"short": '-nl',
-                      "long": "--newline",
-                      "help": 'add a newline character at the end of each file.',
+                       "long": "--newline",
+                       "help": 'add a newline character at the end of each file.',
+                       "action": 'store_true'},
+                'h': {"short": '-h',
+                      "long": '--human',
+                      "help": 'human readable output',
                       "action": 'store_true'}
                 }
 
@@ -296,7 +300,7 @@ class CommandLineParser(object):
         try:
             args = self.parser.parse_args(non_cli_input)
         except ArgumentParserError, error:
-            if "-H" in sys.argv or "--help" in sys.argv:  # non cli input?
+            if "-h" in sys.argv or "--help" in sys.argv:  # non cli input?
                 commands = [cmd for (cmd, description) in Commands.methods.iteritems() if description['visible'] is True]
                 command = error.prog.split()[-1]
                 if command in commands:
@@ -353,7 +357,7 @@ class CommandLineParser(object):
         except FileNotFoundException:
             pass
 
-    @command(args="[paths]", descr="list a path", allowed_opts=["d", "R", "s"], req_args=['[dirs]'])
+    @command(args="[paths]", descr="list a path", allowed_opts=["d", "R", "s", "h"], req_args=['[dirs]'])
     def ls(self):
         for line in self._listing():
             print line
@@ -415,21 +419,21 @@ class CommandLineParser(object):
         for line in format_results(mods, json_output=self.args.json):
             print line
 
-    @command(args="[paths]", descr="display stats for paths", req_args=['[dirs]'])
+    @command(args="[paths]", descr="display stats for paths", allowed_opts=['h'], req_args=['[dirs]'])
     def count(self):
         counts = self.client.count(self.args.dir)
         for line in format_counts(counts, json_output=self.args.json,
                                   human_readable=self.args.human):
             print line
 
-    @command(args="", descr="display fs stats")
+    @command(args="", descr="display fs stats", allowed_opts=['h'])
     def df(self):
         result = self.client.df()
         for line in format_fs_stats(result, json_output=self.args.json,
                                     human_readable=self.args.human):
             print line
 
-    @command(args="[paths]", descr="display disk usage statistics", allowed_opts=["s"], req_args=['[dirs]'])
+    @command(args="[paths]", descr="display disk usage statistics", allowed_opts=["s", "h"], req_args=['[dirs]'])
     def du(self):
         if self.args.summary:
             include_children = False
@@ -513,7 +517,7 @@ class CommandLineParser(object):
 
     @command(args="[paths]", descr="stat information", req_args=['dir [dirs]'])
     def stat(self):
-        print format_stat(self.client.stat(self.args.dir))
+        print format_stat(self.client.stat(self.args.dir), json_output=self.args.json)
 
     @command(args="path", descr="test a path", allowed_opts=['d', 'z', 'e'], req_args=['arg'])
     def test(self):

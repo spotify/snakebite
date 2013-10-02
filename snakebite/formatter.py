@@ -224,9 +224,9 @@ def _create_count_listing(nodes, human_readable):
 def format_stat(results, json_output=False):
     ret = []
     if json_output:
-        return json.dumps(list(results))
-    for result in results:
-        ret.append(str(result))
+        return json.dumps(results)
+    for k, v in sorted(results.iteritems()):
+        ret.append("%-20s\t%s" % (k, v))
     return "\n".join(ret)
 
 

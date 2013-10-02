@@ -41,11 +41,6 @@ class CommandLineParserTest(unittest2.TestCase):
         output = parser.parse('--debug ls some_folder'.split())
         self.assertTrue(output.debug)
 
-        output = parser.parse('-h ls some_folder'.split())
-        self.assertTrue(output.human)
-        output = parser.parse('--human ls some_folder'.split())
-        self.assertTrue(output.human)
-
         output = parser.parse('-j ls some_folder'.split())
         self.assertTrue(output.json)
         output = parser.parse('--json ls some_folder'.split())
@@ -67,9 +62,8 @@ class CommandLineParserTest(unittest2.TestCase):
         self.assertEqual(output.version, 4)
 
         #all options
-        output = parser.parse('-D -h -j -n namenode_fqdn -p 1234 -V 4 ls some_folder'.split())
+        output = parser.parse('-D -j -n namenode_fqdn -p 1234 -V 4 ls some_folder'.split())
         self.assertTrue(output.debug)
-        self.assertTrue(output.human)
         self.assertTrue(output.json)
         self.assertEqual(output.namenode, "namenode_fqdn")
         self.assertEqual(output.port, 1234)
@@ -98,10 +92,11 @@ class CommandLineParserTest(unittest2.TestCase):
         self.assertEqual(output.dir, ['dir1', 'dir2', 'dir3'])
 
         #specific commands
-        output = parser.parse('ls -d -R -s some_dir'.split())
+        output = parser.parse('ls -d -R -s -h some_dir'.split())
         self.assertTrue(output.directory)
         self.assertTrue(output.recurse)
         self.assertTrue(output.summary)
+        self.assertTrue(output.human)
         self.assertEqual(output.dir, ['some_dir'])
 
     def test_mkdir(self):
@@ -228,12 +223,21 @@ class CommandLineParserTest(unittest2.TestCase):
         output = parser.parse('count dir1 dir2 dir3'.split())
         self.assertEqual(output.dir, ['dir1', 'dir2', 'dir3'])
 
+        # Human output
+        output = parser.parse('count -h dir1 dir2 dir3'.split())
+        self.assertTrue(output.human)
+
     def test_df(self):
         parser = self.parser
 
         #no dir
         output = parser.parse('df'.split())
         self.assertEqual(output.command, 'df')
+
+        # Human output
+        output = parser.parse('df -h'.split())
+        self.assertEqual(output.command, 'df')
+        self.assertTrue(output.human)
 
         with self.assertRaises(SystemExit):
             parser.parse('df some_additional_argument'.split())
@@ -257,6 +261,10 @@ class CommandLineParserTest(unittest2.TestCase):
         #summary
         output = parser.parse('du -s some_dir'.split())
         self.assertTrue(output.summary)
+
+        #human
+        output = parser.parse('du -h some_dir'.split())
+        self.assertTrue(output.human)
 
     def test_mv(self):
         parser = self.parser
