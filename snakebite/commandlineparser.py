@@ -229,7 +229,8 @@ class CommandLineParser(object):
                     else:
                         self.args.namenode = parse_result.hostname
                         self.args.port = parse_result.port
-                        directory = parse_result.path
+                        self.args.dir.remove(directory)
+                        self.args.dir.append(parse_result.path)
 
         if self.args.namenode and self.args.port:
             return
