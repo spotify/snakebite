@@ -97,14 +97,6 @@ class CommandLineParserTest(unittest2.TestCase):
         output = parser.parse('ls dir1 dir2 dir3'.split())
         self.assertEqual(output.dir, ['dir1', 'dir2', 'dir3'])
 
-        #hdfs file
-        output = parser.parse('ls hdfs://localhost:8020/tmp/file1'.split())
-        self.assertEqual(output.dir, ['/tmp/file1'])
-
-        #multiple hdfs files
-        output = parser.parse('ls hdfs://localhost:8020/tmp/file1 hdfs://localhost:8020/tmp/file2'.split())
-        self.assertEqual(output.dir, ['/tmp/file1', '/tmp/file2'])
-
         #specific commands
         output = parser.parse('ls -d -R -s some_dir'.split())
         self.assertTrue(output.directory)
