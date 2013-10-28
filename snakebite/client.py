@@ -77,6 +77,9 @@ class Client(object):
         :param hadoop_version: What hadoop protocol version should be used (default: 7)
         :type hadoop_version: int
         '''
+        if hadoop_version not in [7, 8]:
+            raise Exception("Only protocol versions 7 and 8 are supported")
+
         self.host = host
         self.port = port
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
