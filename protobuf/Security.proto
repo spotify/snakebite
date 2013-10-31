@@ -22,29 +22,42 @@
  * for what changes are allowed for a *stable* .proto interface.
  */
 
-option java_package = "org.apache.hadoop.ipc.protobuf";
-option java_outer_classname = "IpcConnectionContextProtos";
+option java_package = "org.apache.hadoop.security.proto";
+option java_outer_classname = "SecurityProtos";
+option java_generic_services = true;
 option java_generate_equals_and_hash = true;
 package hadoop.common;
 
 /**
- * Spec for UserInformationProto is specified in ProtoUtil#makeIpcConnectionContext
+ * Security token identifier
  */
-message UserInformationProto {
-  optional string effectiveUser = 1;
-  optional string realUser = 2;
+message TokenProto {
+  required bytes identifier = 1;
+  required bytes password = 2;
+  required string kind = 3;
+  required string service = 4;
 }
 
-/**
- * The connection context is sent as part of the connection establishment.
- * It establishes the context for ALL Rpc calls within the connection.
- */
-message IpcConnectionContextProto {
-  // UserInfo beyond what is determined as part of security handshake 
-  // at connection time (kerberos, tokens etc).
-  optional UserInformationProto userInfo = 2;
-
-  // Protocol name for next rpc layer.
-  // The client created a proxy with this protocol name
-  optional string protocol = 3;
+message GetDelegationTokenRequestProto {
+  required string renewer = 1;
 }
+
+message GetDelegationTokenResponseProto {
+  optional hadoop.common.TokenProto token = 1;
+}
+
+message RenewDelegationTokenRequestProto {
+  required hadoop.common.TokenProto token = 1;
+}
+
+message RenewDelegationTokenResponseProto {
+  required uint64 newExpiryTime = 1;
+}
+
+message CancelDelegationTokenRequestProto {
+  required hadoop.common.TokenProto token = 1;
+}
+
+message CancelDelegationTokenResponseProto { // void response
+}
+

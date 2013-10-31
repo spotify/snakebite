@@ -16,12 +16,20 @@
  * limitations under the License.
  */
 
+/**
+ * These .proto interfaces are private and stable.
+ * Please see http://wiki.apache.org/hadoop/Compatibility
+ * for what changes are allowed for a *stable* .proto interface.
+ */
+
 option java_package = "org.apache.hadoop.hdfs.protocol.proto";
 option java_outer_classname = "ClientNamenodeProtocolProtos";
 option java_generic_services = true;
 option java_generate_equals_and_hash = true;
 option py_generic_services = true;
+package hadoop.hdfs;
 
+import "Security.proto";
 import "hdfs.proto";
 
 /**
@@ -66,7 +74,8 @@ message CreateRequestProto {
   required uint64 blockSize = 7;
 }
 
-message CreateResponseProto { // void response
+message CreateResponseProto {
+  optional HdfsFileStatusProto fs = 1;
 }
 
 message AppendRequestProto {
@@ -118,6 +127,8 @@ message AddBlockRequestProto {
   required string clientName = 2;
   optional ExtendedBlockProto previous = 3;
   repeated DatanodeInfoProto excludeNodes = 4;
+  optional uint64 fileId = 5 [default = 0];  // default as a bogus id
+  repeated string favoredNodes = 6; //the set of datanodes to use for the block
 }
 
 message AddBlockResponseProto {
@@ -141,6 +152,7 @@ message CompleteRequestProto {
   required string src = 1;
   required string clientName = 2;
   optional ExtendedBlockProto last = 3;
+  optional uint64 fileId = 4 [default = 0];  // default to GRANDFATHER_INODE_ID
 }
 
 message CompleteResponseProto {
@@ -167,7 +179,7 @@ message RenameRequestProto {
   required string dst = 2;
 }
 
-message RenameResponseProto { // void response
+message RenameResponseProto {
   required bool result = 1;
 }
 
@@ -206,6 +218,21 @@ message GetListingRequestProto {
 }
 message GetListingResponseProto {
   optional DirectoryListingProto dirList = 1;
+}
+
+message GetSnapshottableDirListingRequestProto { // no input parameters
+}
+message GetSnapshottableDirListingResponseProto {
+  optional SnapshottableDirectoryListingProto snapshottableDirList = 1;
+}
+
+message GetSnapshotDiffReportRequestProto {
+  required string snapshotRoot = 1;
+  required string fromSnapshot = 2;
+  required string toSnapshot = 3;
+}
+message GetSnapshotDiffReportResponseProto {
+  required SnapshotDiffReportProto diffReport = 1;
 }
 
 message RenewLeaseRequestProto {
@@ -265,6 +292,7 @@ enum SafeModeActionProto {
 
 message SetSafeModeRequestProto {
   required SafeModeActionProto action = 1;
+  optional bool checked = 2 [default = false];
 }
 
 message SetSafeModeResponseProto {
@@ -304,19 +332,6 @@ message FinalizeUpgradeRequestProto { // no parameters
 message FinalizeUpgradeResponseProto { // void response
 }
 
-enum UpgradeActionProto {
-  GET_STATUS = 1;
-  DETAILED_STATUS = 2;
-  FORCE_PROCEED = 3;
-}
-
-message DistributedUpgradeProgressRequestProto {
-  required UpgradeActionProto action = 1;
-}
-message DistributedUpgradeProgressResponseProto {
-  optional UpgradeStatusReportProto report = 1;
-}
-
 message ListCorruptFileBlocksRequestProto {
   required string path = 1;
   optional string cookie = 2;
@@ -339,6 +354,14 @@ message GetFileInfoRequestProto {
 
 message GetFileInfoResponseProto {
   optional HdfsFileStatusProto fs = 1;
+}
+
+message IsFileClosedRequestProto {
+  required string src = 1;
+}
+
+message IsFileClosedResponseProto {
+  required bool result = 1;
 }
 
 message GetFileLinkInfoRequestProto {
@@ -369,6 +392,7 @@ message SetQuotaResponseProto { // void response
 message FsyncRequestProto {
   required string src = 1;
   required string client = 2;
+  optional sint64 lastBlockLength = 3 [default = -1];
 }
 
 message FsyncResponseProto { // void response
@@ -397,7 +421,7 @@ message GetLinkTargetRequestProto {
   required string path = 1;
 }
 message GetLinkTargetResponseProto {
-  required string targetPath = 1;
+  optional string targetPath = 1;
 }
 
 message UpdateBlockForPipelineRequestProto {
@@ -419,29 +443,6 @@ message UpdatePipelineRequestProto {
 message UpdatePipelineResponseProto { // void response
 }
 
-message GetDelegationTokenRequestProto {
-  required string renewer = 1;
-}
-
-message GetDelegationTokenResponseProto {
-  required BlockTokenIdentifierProto token = 1;
-}
-
-message RenewDelegationTokenRequestProto {
-  required BlockTokenIdentifierProto token = 1;
-}
-
-message RenewDelegationTokenResponseProto {
-  required uint64 newExireTime = 1;
-}
-
-message CancelDelegationTokenRequestProto {
-  required BlockTokenIdentifierProto token = 1;
-}
-
-message CancelDelegationTokenResponseProto { // void response
-}
-
 message SetBalancerBandwidthRequestProto {
   required int64 bandwidth = 1;
 }
@@ -453,7 +454,47 @@ message GetDataEncryptionKeyRequestProto { // no parameters
 }
 
 message GetDataEncryptionKeyResponseProto {
-  required DataEncryptionKeyProto dataEncryptionKey = 1;
+  optional DataEncryptionKeyProto dataEncryptionKey = 1;
+}
+
+message CreateSnapshotRequestProto {
+  required string snapshotRoot = 1;
+  optional string snapshotName = 2;
+}
+
+message CreateSnapshotResponseProto {
+  required string snapshotPath = 1;
+}
+
+message RenameSnapshotRequestProto {
+  required string snapshotRoot = 1;
+  required string snapshotOldName = 2;
+  required string snapshotNewName = 3;
+}
+
+message RenameSnapshotResponseProto { // void response
+}
+
+message AllowSnapshotRequestProto {
+  required string snapshotRoot = 1;
+}
+
+message AllowSnapshotResponseProto {
+}
+
+message DisallowSnapshotRequestProto {
+  required string snapshotRoot = 1;
+}
+
+message DisallowSnapshotResponseProto {
+}
+
+message DeleteSnapshotRequestProto {
+  required string snapshotRoot = 1;
+  required string snapshotName = 2;
+}
+
+message DeleteSnapshotResponseProto { // void response
 }
 
 service ClientNamenodeProtocol {
@@ -500,8 +541,6 @@ service ClientNamenodeProtocol {
   rpc refreshNodes(RefreshNodesRequestProto) returns(RefreshNodesResponseProto);
   rpc finalizeUpgrade(FinalizeUpgradeRequestProto)
       returns(FinalizeUpgradeResponseProto);
-  rpc distributedUpgradeProgress(DistributedUpgradeProgressRequestProto)
-      returns(DistributedUpgradeProgressResponseProto);
   rpc listCorruptFileBlocks(ListCorruptFileBlocksRequestProto)
       returns(ListCorruptFileBlocksResponseProto);
   rpc metaSave(MetaSaveRequestProto) returns(MetaSaveResponseProto);
@@ -521,14 +560,30 @@ service ClientNamenodeProtocol {
       returns(UpdateBlockForPipelineResponseProto);
   rpc updatePipeline(UpdatePipelineRequestProto)
       returns(UpdatePipelineResponseProto);
-  rpc getDelegationToken(GetDelegationTokenRequestProto)
-      returns(GetDelegationTokenResponseProto);
-  rpc renewDelegationToken(RenewDelegationTokenRequestProto)
-      returns(RenewDelegationTokenResponseProto);
-  rpc cancelDelegationToken(CancelDelegationTokenRequestProto)
-      returns(CancelDelegationTokenResponseProto);
+  rpc getDelegationToken(hadoop.common.GetDelegationTokenRequestProto)
+      returns(hadoop.common.GetDelegationTokenResponseProto);
+  rpc renewDelegationToken(hadoop.common.RenewDelegationTokenRequestProto)
+      returns(hadoop.common.RenewDelegationTokenResponseProto);
+  rpc cancelDelegationToken(hadoop.common.CancelDelegationTokenRequestProto)
+      returns(hadoop.common.CancelDelegationTokenResponseProto);
   rpc setBalancerBandwidth(SetBalancerBandwidthRequestProto)
       returns(SetBalancerBandwidthResponseProto);
   rpc getDataEncryptionKey(GetDataEncryptionKeyRequestProto)
       returns(GetDataEncryptionKeyResponseProto);
+  rpc createSnapshot(CreateSnapshotRequestProto)
+      returns(CreateSnapshotResponseProto);
+  rpc renameSnapshot(RenameSnapshotRequestProto)
+      returns(RenameSnapshotResponseProto);
+  rpc allowSnapshot(AllowSnapshotRequestProto)
+      returns(AllowSnapshotResponseProto);
+  rpc disallowSnapshot(DisallowSnapshotRequestProto)
+      returns(DisallowSnapshotResponseProto);   
+  rpc getSnapshottableDirListing(GetSnapshottableDirListingRequestProto)
+      returns(GetSnapshottableDirListingResponseProto);
+  rpc deleteSnapshot(DeleteSnapshotRequestProto)
+      returns(DeleteSnapshotResponseProto);
+  rpc getSnapshotDiffReport(GetSnapshotDiffReportRequestProto)
+      returns(GetSnapshotDiffReportResponseProto);
+  rpc isFileClosed(IsFileClosedRequestProto)
+      returns(IsFileClosedResponseProto);
 }

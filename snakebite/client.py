@@ -68,7 +68,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=7):
+    def __init__(self, host, port, hadoop_version=9):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -77,8 +77,8 @@ class Client(object):
         :param hadoop_version: What hadoop protocol version should be used (default: 7)
         :type hadoop_version: int
         '''
-        if hadoop_version not in [7, 8]:
-            raise Exception("Only protocol versions 7 and 8 are supported")
+        if hadoop_version < 9:
+            raise Exception("Only protocol versions >= 9 supported")
 
         self.host = host
         self.port = port

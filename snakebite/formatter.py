@@ -232,4 +232,5 @@ def format_stat(results, json_output=False):
 
 def format_bytes(bytes):
     ascii = binascii.b2a_hex(bytes)
-    return " ".join([ascii[i:i + 2] for i in range(0, len(ascii), 2)])
+    byte_array = [ascii[i:i + 2] for i in range(0, len(ascii), 2)]
+    return  "%s (len: %d)"% (" ".join(byte_array), len(byte_array))

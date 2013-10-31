@@ -10,13 +10,19 @@ reasons. This is the opposite behaviour from the stock Hadoop client.
 
 Snakebite requires python2 (python3 is not supported yet) and python-protobuf 2.4.1 or higher.
 
-Snakebite has been tested mainly against Cloudera CDH4.1.3 (hadoop 2.0.0) in production. Tests pass on HortonWorks HDP 2.0.3.22-alpha
+Snakebite 1.3.x has been tested mainly against Cloudera CDH4.1.3 (hadoop 2.0.0) in production. Tests pass on HortonWorks HDP 2.0.3.22-alpha
+
+Snakebite 2.0.x has been tested on Hortonworks HDP2.0 and ONLY supports Hadoop 2.2.0 and up!
 
 Installing
 **********
-The quickest way to install snakebite is to run:
+The quickest way to install snakebite (1.3.x) is to run:
 
   pip install snakebite
+
+To install snakebite 2.x, clone this repo (2.0 branch) and run:
+
+  python setup.py
 
 Documentation
 *************

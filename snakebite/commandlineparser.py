@@ -540,7 +540,7 @@ class CommandLineParser(object):
     def cat(self):
         for file_to_read in self.client.cat(self.args.dir, check_crc=self.args.checkcrc):
             for load in file_to_read:
-                print load
+                sys.stdout.write(load)
 
     @command(args="path dst", descr="copy local file reference to destination", req_args=['dir [dirs]', 'arg'])
     def copyFromLocal(self):
