@@ -57,7 +57,7 @@ Also, make sure the ``JAVA_HOME`` environment variable is set.
 
 .. note:: Different Hadoop distributions use different protocol versions. Snakebite 1.3.x
    and the tests default to version 7 (CDH 4.1.3).
-   Snakebite 2.x **ONLY** supports Hadoop > 2.2.0 (protocol version >9, e.g. HDP2.0)! I
+   Snakebite 2.x **ONLY** supports Hadoop > 2.2.0 (protocol version >9, e.g. HDP2.0/CDH5)! I
    If you want to test with different protocol versions, set the ``HADOOP_PROTOCOL_VER``
    environment variable to the apropriate version number.
 
