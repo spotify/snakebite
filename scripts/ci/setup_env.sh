@@ -8,8 +8,8 @@ sudo sed -e "s/^127.0.0.1.*/127.0.0.1 localhost $(hostname)/" --in-place /etc/ho
 mkdir $HADOOP_HOME
 
 if [ $HADOOP_DISTRO = "cdh" ]; then
-    URL="http://archive.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.2.1.tar.gz"
-    export HADOOP_PROTOCOL_VER=7
+    URL="http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.2.0-cdh5.0.0-beta-1.tar.gz"
+    export HADOOP_PROTOCOL_VER=9
 elif [ $HADOOP_DISTRO = "hdp" ]; then
     URL="http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.0.6.0/tars/hadoop-2.2.0.2.0.6.0-76.tar.gz"
     export HADOOP_PROTOCOL_VER=9
