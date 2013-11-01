@@ -458,7 +458,7 @@ class CommandLineParser(object):
     def mv(self):
         paths = self.args.dir
         dst = self.args.single_arg
-        result = self.client.rename(paths, dst)
+        result = self.client.rename(paths[:-1], dst)
         for line in format_results(result, json_output=self.args.json):
             print line
 

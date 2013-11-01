@@ -293,6 +293,8 @@ class SocketRpcChannel(RpcChannel):
         request_header = self.create_request_header(method)
         #2. Param
         param = request.SerializeToString()
+        if log.getEffectiveLevel() == logging.DEBUG:
+            log_protobuf_message("Request", request)
 
         rpc_message_length = len(rpc_request_header) + encoder._VarintSize(len(rpc_request_header)) + \
                              len(request_header) + encoder._VarintSize(len(request_header)) + \
