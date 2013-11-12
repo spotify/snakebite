@@ -601,7 +601,7 @@ The allowed formats are gzip and bzip2</p>
 <em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">AutoConfigClient</tt><big>(</big><em>hadoop_version=9</em><big>)</big><a class="headerlink" href="#client.AutoConfigClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>A pure python HDFS client that is auto configured through the <tt class="docutils literal"><span class="pre">HADOOP_PATH</span></tt> environment variable.</p>
 <p>This client tries to read <tt class="docutils literal"><span class="pre">${HADOOP_PATH}/conf/hdfs-site.xml</span></tt> to get the address of the namenode.
-The behaviour is the same as <a href="#id1"><span class="problematic" id="id2">`Client`_</span></a>.</p>
+The behaviour is the same as Client.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.client</span> <span class="kn">import</span> <span class="n">AutoConfigClient</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">AutoConfigClient</span><span class="p">()</span>
