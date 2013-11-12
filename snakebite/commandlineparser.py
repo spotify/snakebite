@@ -270,14 +270,14 @@ class CommandLineParser(object):
             # Try to find other paths
             for hdfs_conf in try_paths:
                 config_result = read_hadoop_config(hdfs_conf)
+                if config_result:
+                    self.args.namenode = config_result[0]
+                    self.args.port = config_result[1]
 
-                self.args.namenode = config_result[0]
-                self.args.port = config_result[1]
-
-                self._write_hadoop_config(config_file)
-                # Bail out on the first find
-                if self.args.namenode and self.args.port:
-                    continue
+                    self._write_hadoop_config(config_file)
+                    # Bail out on the first find
+                    if self.args.namenode and self.args.port:
+                        break
 
         if self.args.namenode and self.args.port:
             return
