@@ -1,3 +1,9 @@
+snakebite (2.0.1) unstable; urgency=low
+
+  * Fixes bug in command line parser regarding versioning
+
+ -- Wouter de Bie <wouter@spotify.com>  Thu, 12 Nov 2013 10:29:12 +0000
+
 snakebite (2.0.0) unstable; urgency=low
 
   * Compatible with Hadoop 2.2.0 (HDP2). No longer supports client version < 9.

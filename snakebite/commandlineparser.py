@@ -94,8 +94,8 @@ class CommandLineParser(object):
                           "type": str},
                     'V': {"short": '-V',
                           "long": '--version',
-                          "help": 'Hadoop protocol version (default:8)',
-                          "default": 7,
+                          "help": 'Hadoop protocol version (default:9)',
+                          "default": 9,
                           "type": float},
                     'p': {"short": '-p',
                           "long": '--port',
@@ -257,7 +257,7 @@ class CommandLineParser(object):
             config = json.loads(open(os.path.join(os.path.expanduser('~'), '.snakebiterc')).read())
             self.args.namenode = config['namenode']
             self.args.port = config['port']
-            self.args.version = config.get('version', 7)
+            self.args.version = config.get('version', 9)
         elif os.environ.get('HADOOP_HOME'):
             hdfs_conf = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
             self._read_hadoop_config(hdfs_conf, config_file)
@@ -277,7 +277,7 @@ class CommandLineParser(object):
             for hdfs_conf in try_paths:
                 print " - %s" % hdfs_conf
             print "\nYou can manually create ~/.snakebiterc with the following content:"
-            print '{"namenode": "ip/hostname", "port": 54310, "version": 7}'
+            print '{"namenode": "ip/hostname", "port": 54310, "version": 9}'
             sys.exit(1)
 
     def _read_hadoop_config(self, hdfs_conf, config_file):
