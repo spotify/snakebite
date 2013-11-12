@@ -1156,7 +1156,7 @@ class AutoConfigClient(Client):
     ''' A pure python HDFS client that is auto configured through the ``HADOOP_PATH`` environment variable.
 
     This client tries to read ``${HADOOP_PATH}/conf/hdfs-site.xml`` to get the address of the namenode.
-    The behaviour is the same as `Client`_.
+    The behaviour is the same as Client.
 
     **Example:**
 

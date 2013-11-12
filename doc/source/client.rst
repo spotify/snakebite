@@ -4,3 +4,6 @@ Client library
 
 .. autoclass:: Client
     :members:
+
+.. autoclass:: AutoConfigClient
+    :members:
