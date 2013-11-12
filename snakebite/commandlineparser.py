@@ -18,7 +18,6 @@ import sys
 import os
 import pwd
 import json
-import xml.etree.ElementTree as ET
 from urlparse import urlparse
 
 from snakebite.client import Client
@@ -32,6 +31,7 @@ from snakebite.formatter import format_counts
 from snakebite.formatter import format_fs_stats
 from snakebite.formatter import format_stat
 from snakebite.formatter import format_du
+from snakebite.config import read_hadoop_config, get_config_from_env
 from snakebite.version import version
 
 
@@ -259,12 +259,22 @@ class CommandLineParser(object):
             self.args.port = config['port']
             self.args.version = config.get('version', 9)
         elif os.environ.get('HADOOP_HOME'):
-            hdfs_conf = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
-            self._read_hadoop_config(hdfs_conf, config_file)
+            
+            config_result = get_config_from_env()
+
+            self.args.namenode = config_result[0]
+            self.args.port = config_result[1]
+
+            self._write_hadoop_config(config_file)
         else:
             # Try to find other paths
             for hdfs_conf in try_paths:
-                self._read_hadoop_config(hdfs_conf, config_file)
+                config_result = read_hadoop_config(hdfs_conf)
+
+                self.args.namenode = config_result[0]
+                self.args.port = config_result[1]
+
+                self._write_hadoop_config(config_file)
                 # Bail out on the first find
                 if self.args.namenode and self.args.port:
                     continue
@@ -280,22 +290,11 @@ class CommandLineParser(object):
             print '{"namenode": "ip/hostname", "port": 54310, "version": 9}'
             sys.exit(1)
 
-    def _read_hadoop_config(self, hdfs_conf, config_file):
-        if os.path.exists(hdfs_conf):
-            tree = ET.parse(hdfs_conf)
-            root = tree.getroot()
-            for p in root.findall("./property"):
-                if p.findall('name')[0].text == 'fs.defaultFS':
-                    parse_result = urlparse(p.findall('value')[0].text)
-
-                    # Set config
-                    self.args.namenode = parse_result.hostname
-                    self.args.port = parse_result.port
-
-                    # Write config to file
-                    f = open(config_file, "w")
-                    f.write(json.dumps({"namenode": self.args.namenode, "port": self.args.port, "version": self.args.version}))
-                    f.close()
+    def _write_hadoop_config(self, config_file):
+        # Write config to file
+        f = open(config_file, "w")
+        f.write(json.dumps({"namenode": self.args.namenode, "port": self.args.port, "version": self.args.version}))
+        f.close()
 
     def parse(self, non_cli_input=None):  # Allow input for testing purposes
         if not sys.argv[1:] and not non_cli_input:

@@ -22,6 +22,7 @@ from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
 from snakebite.errors import InvalidInputException
 from snakebite.channel import DataXceiverChannel
+from snakebite.config import get_config_from_env
 
 import Queue
 import zlib
@@ -59,7 +60,7 @@ class Client(object):
         when paths contain globs.
 
     .. note::
-        Different Hadoop distributions use different protocol versions. Snakebite defaults to 7, but this can be set by passing
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``hadoop_version`` parameter to the constructor.
     '''
     FILETYPES = {
@@ -74,7 +75,7 @@ class Client(object):
         :type host: string
         :param port: RPC Port of the NameNode
         :type port: int
-        :param hadoop_version: What hadoop protocol version should be used (default: 7)
+        :param hadoop_version: What hadoop protocol version should be used (default: 9)
         :type hadoop_version: int
         '''
         if hadoop_version < 9:
@@ -1149,3 +1150,26 @@ class Client(object):
     def _remove_user_path(self, path):
         dir_to_remove = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
         return path.replace(dir_to_remove+'/', "", 1)
+
+
+class AutoConfigClient(Client):
+    ''' A pure python HDFS client that is auto configured through the ``HADOOP_PATH`` environment variable.
+
+    This client tries to read ``${HADOOP_PATH}/conf/hdfs-site.xml`` to get the address of the namenode.
+    The behaviour is the same as `Client`_.
+
+    **Example:**
+
+    >>> from snakebite.client import AutoConfigClient
+    >>> client = AutoConfigClient()
+    >>> for x in client.ls(['/']):
+    ...     print x
+
+    .. note::
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
+        in the ``hadoop_version`` parameter to the constructor.
+    '''
+    def __init__(self, hadoop_version=9):
+        config = get_config_from_env()
+        super(AutoConfigClient, self).__init__(config[0], config[1], hadoop_version)
+
