@@ -373,6 +373,31 @@ class Client(object):
         response = self.service.rename(request)
         return {"path": path, "result": response.result}
 
+    def symlink(self, path, dst):
+        ''' Create a symbolic link pointing at a file or directory
+
+        :param path: The existing path
+        :type path: string
+        :param dest: The path of the symlink
+        :type dst: string
+        '''
+
+        if not isinstance(path, str):
+            raise InvalidInputException("Path should be a string")
+        if not dst:
+            raise InvalidInputException("symlink: no destination given")
+
+        if not dst.startswith("/"):
+            dst = self._join_user_path(dst)
+
+        request = client_proto.CreateSymlinkRequestProto()
+        request.target = path
+        request.link = dst
+        request.dirPerm.perm = 0644
+        request.createParent = False
+
+        self.service.createSymlink(request)
+
     def delete(self, paths, recurse=False):
         ''' Delete paths
 
