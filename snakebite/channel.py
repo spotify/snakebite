@@ -410,11 +410,11 @@ class SocketRpcChannel(RpcChannel):
 
             byte_stream = self.recv_rpc_message()
             return self.parse_response(byte_stream, response_class)
-        except RequestError, e:  # Raise a request error, but don't close the socket
-            raise e
-        except Exception, e:  # All other errors close the socket
+        except RequestError:  # Raise a request error, but don't close the socket
+            raise
+        except Exception:  # All other errors close the socket
             self.close_socket()
-            raise e
+            raise
 
 
 class DataXceiverChannel(object):

@@ -1,3 +1,9 @@
+snakebite (2.1.2) unstable; urgency=low
+
+  * Preserve original stacktrace in client.CallMethod. Fixes #32
+
+ -- Wouter de Bie <wouter@spotify.com>  Thu, 12 Nov 2013 13:29:12 +0000
+
 snakebite (2.1.1) unstable; urgency=low
 
   * Don't crash when config is missing
