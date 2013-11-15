@@ -462,6 +462,12 @@ class CommandLineParser(object):
         for line in format_results(result, json_output=self.args.json):
             print line
 
+    @command(args="path dst", descr="create a link at destination pointing at another path", req_args=['src dst'])
+    def symlink(self):
+        path = self.args.src_dest[0]
+        dst = self.args.src_dest[1]
+        self.client.symlink(path, dst)
+
     @command(args="[paths]", descr="remove paths", allowed_opts=["R"], req_args=['dir [dirs]'])
     def rm(self):
         result = self.client.delete(self.args.dir, recurse=self.args.recurse)
