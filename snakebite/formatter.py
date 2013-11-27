@@ -43,7 +43,7 @@ def _octal_to_perm(octal):
 
 
 def _sizeof_fmt(num):
-    for x in ['', 'k', 'm', 'g', 't']:
+    for x in ['', 'k', 'M', 'G', 'T', 'P']:
         if num < 1024.0:
             if x == '':
                 return num
