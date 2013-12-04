@@ -104,7 +104,7 @@ class RpcBufferedReader(object):
     '''Class that wraps a socket and provides some utility methods for reading
     and rewinding of the buffer. This comes in handy when reading protobuf varints.
     '''
-    MAX_CONNECTION_ATTEMPTS = 100
+    MAX_READ_ATTEMPTS = 100
 
     def __init__(self, socket):
         self.socket = socket
@@ -123,7 +123,7 @@ class RpcBufferedReader(object):
 
     def _buffer_bytes(self, n):
         to_read = n
-        for _ in xrange(self.MAX_CONNECTION_ATTEMPTS):
+        for _ in xrange(self.MAX_READ_ATTEMPTS):
             bytes_read = self.socket.recv(to_read)
             self.buffer += bytes_read
             to_read -= len(bytes_read)
@@ -437,6 +437,8 @@ class DataXceiverChannel(object):
     CHECKSUM_DEFAULT = 3
     CHECKSUM_MIXED = 4
 
+    MAX_READ_ATTEMPTS = 100
+
     def __init__(self, host, port):
         self.host, self.port = host, port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -453,10 +455,15 @@ class DataXceiverChannel(object):
     def _close_socket(self):
         self.sock.close()
 
-    def _read_bytes(self, n):
+    def _read_bytes(self, n, depth=0):
+        if depth > self.MAX_READ_ATTEMPTS:
+            raise Exception("Tried to read %d more bytes, but failed after %d attempts" % (n, self.MAX_READ_ATTEMPTS))
+
         bytes = self.sock.recv(n)
         if len(bytes) < n:
-            raise Exception("Reading Exception")
+            left = n - len(bytes)
+            depth += 1
+            bytes += self._read_bytes(left, depth)
         return bytes
 
     def write(self, data):
