@@ -1,3 +1,15 @@
+snakebite (1.3.8) unstable; urgency=low
+
+  * Retry reading. Fixes #35
+
+ -- Wouter de Bie <wouter@spotify.com>  Mon, 9 Dec 2013 10:29:12 +0000
+
+snakebite (1.3.7) unstable; urgency=low
+
+  * Fix bug when petabytes in df. Fixes #36.
+
+ -- Wouter de Bie <wouter@spotify.com>  Mon, 27 Nov 2013 10:29:12 +0000
+
 snakebite (1.3.6) unstable; urgency=low
 
   * Fix bug when petabytes in df. Fixes #36.
