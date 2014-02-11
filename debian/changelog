@@ -1,3 +1,9 @@
+snakebite (2.2.0) unstable; urgency=low
+
+  * HA support
+
+ -- Rafal Wojdyla <rav@spotify.com>  Thu, 11 Feb 2014 13:29:12 +0000
+
 snakebite (2.1.4) unstable; urgency=low
 
   * Retry reading. Fixes #35
