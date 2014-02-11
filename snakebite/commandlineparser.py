@@ -581,7 +581,7 @@ class CommandLineParser(object):
             for load in file_to_read:
                 sys.stdout.write(load)
 
-    @command(args="path dst", descr="copy local file reference to destination", req_args=['dir [dirs]', 'arg'])
+    @command(args="path dst", descr="copy local file reference to destination", req_args=['dir [dirs]', 'arg'], visible=False)
     def copyFromLocal(self):
         src = self.args.dir
         dst = self.args.single_arg
@@ -597,7 +597,7 @@ class CommandLineParser(object):
         for line in format_results(result, json_output=self.args.json):
             print line
 
-    @command(args="[paths] dst", descr="copy files from source to destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
+    @command(args="[paths] dst", descr="copy files from source to destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'], visible=False)
     def cp(self):
         paths = self.args.dir
         dst = self.args.single_arg
