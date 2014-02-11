@@ -20,7 +20,7 @@ import pwd
 import json
 from urlparse import urlparse
 
-from snakebite.client import Client
+from snakebite.client import HAClient
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
@@ -31,8 +31,9 @@ from snakebite.formatter import format_counts
 from snakebite.formatter import format_fs_stats
 from snakebite.formatter import format_stat
 from snakebite.formatter import format_du
-from snakebite.config import read_hadoop_config, get_config_from_env
+from snakebite.config import HDFSConfig
 from snakebite.version import version
+from snakebite.namenode import Namenode
 
 
 def exitError(error):
@@ -94,8 +95,8 @@ class CommandLineParser(object):
                           "type": str},
                     'V': {"short": '-V',
                           "long": '--version',
-                          "help": 'Hadoop protocol version (default:9)',
-                          "default": 9,
+                          "help": 'Hadoop protocol version (default:%d)' % Namenode.DEFAULT_VERSION,
+                          "default": Namenode.DEFAULT_VERSION,
                           "type": float},
                     'p': {"short": '-p',
                           "long": '--port',
@@ -160,6 +161,7 @@ class CommandLineParser(object):
         self.parser = Parser(usage=usage, epilog=epilog, formatter_class=argparse.RawTextHelpFormatter, add_help=False)
         self._build_parent_parser()
         self._add_subparsers()
+        self.namenodes = []
 
     def _build_parent_parser(self):
         #general options
@@ -224,77 +226,115 @@ class CommandLineParser(object):
             command_parser.set_defaults(command=cmd_name)
 
     def read_config(self):
+
+        # Try to retrieve namenode config from within CL arguments
+        if self._read_config_cl():
+            return
+
+        ''' Try to read the config from ~/.snakebiterc and if that doesn't exist,
+        check $HADOOP_HOME/core-site.xml and $HADOOP_HOME/hdfs-site.xml
+        and create a ~/.snakebiterc from that.
+        '''
+        config_file = os.path.join(os.path.expanduser('~'), '.snakebiterc')
+
+        if os.path.exists(config_file):
+            #if ~/.snakebiterc exists - read config from it
+            self._read_config_snakebiterc()
+        else:
+            # Try to read the configuration for HDFS configuration files
+            configs = HDFSConfig.get_external_config()
+
+            # if configs exist and contain something
+            if configs:
+                for config in configs:
+                    nn = Namenode(config['namenode'],
+                                  config['port'])
+                    self.namenodes.append(nn)
+
+                # Save retrieved configuration to snakebite config file
+                self._write_hadoop_config(config_file)
+
+        if len(self.namenodes):
+            return
+        else:
+            print "No ~/.snakebiterc found, no HADOOP_HOME set and no -n and -p provided"
+            print "Tried to find core-site.xml in:"
+            for core_conf_path in HDFSConfig.core_try_paths:
+                print " - %s" % core_conf_path
+            print "Tried to find hdfs-site.xml in:"
+            for hdfs_conf_path in HDFSConfig.hdfs_try_paths:
+                print " - %s" % hdfs_conf_path
+            print "\nYou can manually create ~/.snakebiterc with the following content:"
+            print '{"namenode": "ip/hostname", "port": 54310, "version": %d}' % Namenode.DEFAULT_VERSION
+            sys.exit(1)
+
+    def _read_config_snakebiterc(self):
+        with open(os.path.join(os.path.expanduser('~'), '.snakebiterc')) as config_file:
+            configs = json.load(config_file)
+
+        if isinstance(configs, list):
+            # config is a list of namenode(s) - possibly HA
+            for config in configs:
+                nn = Namenode(config['namenode'],
+                              config['port'],
+                              config.get('version', Namenode.DEFAULT_VERSION))
+                self.namenodes.append(nn)
+        elif isinstance(configs, dict):
+             # config is a single namenode - no HA
+            self.namenodes.append(Namenode(configs['namenode'],
+                                           configs['port'],
+                                           configs.get('version', Namenode.DEFAULT_VERSION)))
+        else:
+            print "Config retrieved from ~/.snakebiterc is corrupted! Remove it!"
+            sys.exit(1)
+
+    def _read_config_cl(self):
         ''' Check if any directory arguments contain hdfs://'''
         if self.args and 'dir' in self.args:
-            dirs_to_check = self.args.dir
+            dirs_to_check = list(self.args.dir)
             if self.args.command == 'mv':
                 dirs_to_check.append(self.args.single_arg)
             for directory in dirs_to_check:
                 if 'hdfs://' in directory:
                     parse_result = urlparse(directory)
+
                     if not self.args.namenode is None and not self.args.port is None and (self.args.port != parse_result.port or self.args.namenode != parse_result.hostname):
                         print "error: conflicting nodenames or ports"
                         sys.exit(-1)
                     else:
                         self.args.namenode = parse_result.hostname
                         self.args.port = parse_result.port
-                        self.args.dir.remove(directory)
-                        self.args.dir.append(parse_result.path)
+
+                        if directory in self.args.dir:
+                            self.args.dir.remove(directory)
+                            self.args.dir.append(parse_result.path)
+                        else:
+                            self.args.single_arg = parse_result.path
 
         if self.args.namenode and self.args.port:
-            return
-
-        ''' Try to read the config from ~/.snakebiterc and if that doesn't exist, check $HADOOP_HOME/core-site.xml
-        and create a ~/.snakebiterc from that.
-        '''
-        config_file = os.path.join(os.path.expanduser('~'), '.snakebiterc')
-
-        try_paths = ['/etc/hadoop/conf/core-site.xml',
-                     '/usr/local/etc/hadoop/conf/core-site.xml',
-                     '/usr/local/hadoop/conf/core-site.xml']
-
-        if os.path.exists(config_file):
-            config = json.loads(open(os.path.join(os.path.expanduser('~'), '.snakebiterc')).read())
-            self.args.namenode = config['namenode']
-            self.args.port = config['port']
-            self.args.version = config.get('version', 9)
-        elif os.environ.get('HADOOP_HOME'):
-            
-            config_result = get_config_from_env()
-
-            self.args.namenode = config_result[0]
-            self.args.port = config_result[1]
-
-            self._write_hadoop_config(config_file)
+            # If namenode config found based on arguments, save namenode
+            self.namenodes.append(Namenode(self.args.namenode, self.args.port))
+            return True
         else:
-            # Try to find other paths
-            for hdfs_conf in try_paths:
-                config_result = read_hadoop_config(hdfs_conf)
-                if config_result:
-                    self.args.namenode = config_result[0]
-                    self.args.port = config_result[1]
+            return False
 
-                    self._write_hadoop_config(config_file)
-                    # Bail out on the first find
-                    if self.args.namenode and self.args.port:
-                        break
-
-        if self.args.namenode and self.args.port:
-            return
-        else:
-            print "No ~/.snakebiterc found, no HADOOP_HOME set and no -n and -p provided"
-            print "Tried to find core-site.xml in:"
-            for hdfs_conf in try_paths:
-                print " - %s" % hdfs_conf
-            print "\nYou can manually create ~/.snakebiterc with the following content:"
-            print '{"namenode": "ip/hostname", "port": 54310, "version": 9}'
-            sys.exit(1)
-
-    def _write_hadoop_config(self, config_file):
+    def _write_hadoop_config(self, config_file_path):
         # Write config to file
-        f = open(config_file, "w")
-        f.write(json.dumps({"namenode": self.args.namenode, "port": self.args.port, "version": self.args.version}))
-        f.close()
+        with open(config_file_path, "w") as config_file:
+            config = []
+            for namenode in self.namenodes:
+                config.append(namenode.toDict())
+
+            if len(config) > 1:
+                #If many NNs use list syntax
+                pretty_config = json.dumps(config).split('},')
+                config_file.write('},\n'.join(pretty_config))
+            elif len(config) == 1:
+                #If just one NN use old syntax
+                config_file.write(json.dumps(config[0]))
+            else:
+                print "Try to write configuration without NameNode configuration!"
+                sys.exit(-1)
 
     def parse(self, non_cli_input=None):  # Allow input for testing purposes
         if not sys.argv[1:] and not non_cli_input:
@@ -323,8 +363,8 @@ class CommandLineParser(object):
         self.args = args
         return self.args
 
-    def setup_client(self, host, port, hadoop_version):
-        self.client = Client(host, port, hadoop_version)
+    def setup_client(self):
+        self.client = HAClient(self.namenodes)
 
     def execute(self):
         if self.args.help:
@@ -457,7 +497,7 @@ class CommandLineParser(object):
     def mv(self):
         paths = self.args.dir
         dst = self.args.single_arg
-        result = self.client.rename(paths[:-1], dst)
+        result = self.client.rename(paths, dst)
         for line in format_results(result, json_output=self.args.json):
             print line
 

@@ -42,3 +42,8 @@ class FileException(Exception):
 class InvalidInputException(Exception):
     def __init__(self, msg):
         super(InvalidInputException, self).__init__(msg)
+
+
+class OutOfNNException(Exception):
+    def __init__(self, msg):
+        super(OutOfNNException, self).__init__(msg)
