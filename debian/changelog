@@ -1,3 +1,9 @@
+snakebite (2.2.1) unstable; urgency=low
+
+  * Fix config reader
+
+ -- Rafal Wojdyla <rav@spotify.com>  Thu, 11 Feb 2014 16:29:12 +0000
+
 snakebite (2.2.0) unstable; urgency=low
 
   * HA support
