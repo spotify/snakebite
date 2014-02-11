@@ -15,9 +15,12 @@
 import unittest2
 import os
 import pwd
+import json
 
+from mock import patch, mock_open
+
+from snakebite.namenode import Namenode
 from snakebite.commandlineparser import CommandLineParser
-
 
 class CommandLineParserTest(unittest2.TestCase):
 
@@ -601,3 +604,178 @@ class CommandLineParserTest(unittest2.TestCase):
         #specific commands
         output = parser.parse('text -checkcrc dir1 dir2'.split())
         self.assertEqual(output.checkcrc, True)
+
+
+
+class MockParseArgs(object):
+    # dir is a list of directories
+    def __init__(self, dir=[],
+                single_arg=None,
+                command=None,
+                namenode=None,
+                port=None):
+        self.dir = dir
+        self.single_arg = single_arg
+        self.command = command
+        self.namenode = namenode
+        self.port = port
+
+    def __contains__(self, b):
+        return b in self.__dict__
+
+class CommandLineParserInternalConfigTest(unittest2.TestCase):
+    def setUp(self):
+        self.parser = CommandLineParser()
+        self.default_dir = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
+
+
+    def assert_namenode_spec(self, host, port, version=None):
+        self.assertEqual(self.parser.args.namenode, host)
+        self.assertEqual(self.parser.args.port, port)
+        if version:
+            self.assertEqual(self.parser.args.version, version)
+
+    def assert_namenodes_spec(self, host, port, version=None):
+        for namenode in self.parser.namenodes:
+            try:
+                self.assertEqual(namenode.host, host)
+                self.assertEqual(namenode.port, port)
+                if version:
+                    self.assertEqual(namenode.version, version)
+            except AssertionError:
+                continue
+            # There was no AssertError -> we found our NN
+            return
+        self.fail("NN not found in namenodes")
+
+
+    def test_cl_config_conflicted(self):
+
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070/user/rav",
+                                              "hdfs://foobar2:50070/user/rav"])
+        with self.assertRaises(SystemExit):
+            self.parser.read_config()
+
+
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50071/user/rav",
+                                              "hdfs://foobar:50070/user/rav"])
+        with self.assertRaises(SystemExit):
+            self.parser.read_config()
+
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50072/user/rav",
+                                              "hdfs://foobar2:50070/user/rav"])
+        with self.assertRaises(SystemExit):
+            self.parser.read_config()
+
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070/user/rav",
+                                              "hdfs://foobar:50070/user/rav"],
+                                         single_arg="hdfs://foobar2:50070/user/rav",
+                                         command="mv")
+        with self.assertRaises(SystemExit):
+            self.parser.read_config()
+
+    def test_cl_config_simple(self):
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070/user/rav",
+                                              "hdfs://foobar:50070/user/rav2"])
+
+        self.parser.read_config()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assert_namenodes_spec("foobar", 50070)
+
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070/user/rav",
+                                              "hdfs://foobar:50070/user/rav2"],
+                                         single_arg="hdfs://foobar:50070/user/rav",
+                                         command="mv")
+        self.parser.read_config()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assert_namenodes_spec("foobar", 50070)
+
+    def test_cl_config_reduce_paths(self):
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070/user/rav",
+                                              "hdfs://foobar:50070/user/rav2"],
+                                         single_arg="hdfs://foobar:50070/user/rav3",
+                                         command="mv")
+        self.parser.read_config()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assertIn("/user/rav", self.parser.args.dir)
+        self.assertIn("/user/rav2", self.parser.args.dir)
+        self.assertEqual(self.parser.args.single_arg, "/user/rav3")
+
+    def test_config_no_config(self):
+        self.parser.args = MockParseArgs()
+        with self.assertRaises(SystemExit):
+            self.parser.read_config()
+
+        self.assert_namenode_spec(None, None)
+
+
+    valid_snake_one_rc = {"namenode": "foobar", "version": 9, "port": 54310}
+    valid_snake_ha_rc = [{"namenode": "foobar", "version": 9, "port": 54310},
+                         {"namenode": "foobar2", "version": 9, "port": 54310}]
+
+    invalid_snake_rc = "hdfs://foobar:54310"
+
+    @patch("os.path.exists")
+    def test_read_config_snakebiterc_one_valid(self, exists_mock):
+        m = mock_open(read_data=json.dumps(self.valid_snake_one_rc))
+
+        with patch("snakebite.commandlineparser.open", m, create=True):
+            self.parser.args = MockParseArgs()
+            self.parser.read_config()
+
+            self.assert_namenodes_spec("foobar", 54310, 9)
+
+    @patch("os.path.exists")
+    def test_read_config_snakebiterc_ha_valid(self, exists_mock):
+        m = mock_open(read_data=json.dumps(self.valid_snake_ha_rc))
+
+        with patch("snakebite.commandlineparser.open", m, create=True):
+            self.parser.args = MockParseArgs()
+            self.parser.read_config()
+
+            self.assert_namenodes_spec("foobar", 54310, 9)
+            self.assert_namenodes_spec("foobar2", 54310, 9)
+
+
+    @patch("os.path.exists")
+    def test_read_config_snakebiterc_invalid(self, exists_mock):
+        m = mock_open(read_data=json.dumps(self.invalid_snake_rc))
+
+        with patch("snakebite.commandlineparser.open", m, create=True):
+            self.parser.args = MockParseArgs()
+            with self.assertRaises(SystemExit):
+                self.parser.read_config()
+
+    def test_write_one_config(self):
+        m = mock_open()
+
+        with patch("snakebite.commandlineparser.open", m, create=True):
+            self.parser.namenodes = [Namenode(host="foobar",
+                                              port=54310,
+                                              version=9)]
+            self.parser._write_hadoop_config("foobar_config_file")
+            handle = m()
+            handle.write.assert_called_once_with('{"namenode": "foobar", "version": 9, "port": 54310}')
+
+    def test_write_ha_config(self):
+        m = mock_open()
+
+        with patch("snakebite.commandlineparser.open", m, create=True):
+            self.parser.namenodes = [Namenode(host="foobar",
+                                              port=54310,
+                                              version=9),
+                                     Namenode(host="foobar2",
+                                              port=54311,
+                                              version=9)]
+            self.parser._write_hadoop_config("foobar_config_file")
+            handle = m()
+            handle.write.assert_called_once_with('[{"namenode": "foobar", "version": 9, "port": 54310},\n '
+                                                 '{"namenode": "foobar2", "version": 9, "port": 54311}]')
+
+    def test_write_none_config(self):
+        m = mock_open()
+
+        with patch("snakebite.commandlineparser.open", m, create=True):
+            self.parser.namenodes = []
+            with self.assertRaises(SystemExit):
+                self.parser._write_hadoop_config("foobar_config_file")

@@ -21,8 +21,10 @@ from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
 from snakebite.errors import InvalidInputException
+from snakebite.errors import OutOfNNException
 from snakebite.channel import DataXceiverChannel
-from snakebite.config import get_config_from_env
+from snakebite.config import HDFSConfig
+from snakebite.namenode import Namenode
 
 import Queue
 import zlib
@@ -32,6 +34,9 @@ import os
 import os.path
 import pwd
 import fnmatch
+import inspect
+import socket
+import errno
 
 log = logging.getLogger(__name__)
 
@@ -69,7 +74,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=9):
+    def __init__(self, host, port, hadoop_version=Namenode.DEFAULT_VERSION):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -1169,7 +1174,84 @@ class AutoConfigClient(Client):
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``hadoop_version`` parameter to the constructor.
     '''
-    def __init__(self, hadoop_version=9):
-        config = get_config_from_env()
+    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
+        config = HDFSConfig.get_config_from_env()
         super(AutoConfigClient, self).__init__(config[0], config[1], hadoop_version)
+
+class HAClient(Client):
+    ''' Snakebite client with support for High Availability
+    
+    HAClient is fully backward compatible with vanilla Client and can be used for non HA cluster.
+     '''
+    def __init__(self, namenodes):
+        self.namenode = self._switch_namenode(namenodes)
+        self.namenode.next()
+
+        # Add HA support to all public Client methods
+        for name, meth in inspect.getmembers(HAClient, inspect.ismethod):
+            if not name.startswith("_"): # Only public methods
+                if inspect.isgeneratorfunction(meth):
+                    setattr(HAClient, name, HAClient._ha_gen_method(meth))
+                else:
+                    setattr(HAClient, name, HAClient._ha_return_method(meth))
+
+
+    def _switch_namenode(self, namenodes):
+        for namenode in namenodes:
+            log.debug("Switch to namenode: %s:%d" % (namenode.host, namenode.port))
+            yield super(HAClient, self).__init__(namenode.host,
+                                                 namenode.port,
+                                                 namenode.version)
+        else:
+            msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
+            for namenode in namenodes:
+                msg += "\n\t* %s:%d" % (namenode.host, namenode.port)
+            msg += "\nLook into debug messages - add -D flag!"
+            raise OutOfNNException(msg)
+
+    def __handle_request_error(self, exception):
+	log.debug("Request failed with %s" % exception)
+        if exception.args[0].startswith("org.apache.hadoop.ipc.StandbyException"):
+            self.namenode.next()
+        else:
+            # There's a valid NN in active state, but there's still request error - raise
+            raise
+
+    def __handle_socket_error(self, exception):
+	log.debug("Request failed with %s" % exception)
+        if exception.errno == errno.ECONNREFUSED:
+            # if NN is down or machine is not available, get next NN:
+            self.namenode.next()
+        else:
+            raise
+
+    @staticmethod
+    def _ha_return_method(func):
+        ''' Method decorator for 'return type' methods '''
+        def wrapped(self, *args, **kw):
+            while(True): # switch between all namenodes
+                try:
+                     return func(self, *args, **kw)
+                except RequestError as e:
+                    self.__handle_request_error(e)
+                except socket.error as e:
+                    self.__handle_socket_error(e)
+        return wrapped
+
+    @staticmethod
+    def _ha_gen_method(func):
+        ''' Method decorator for 'generator type' methods '''
+        def wrapped(self, *args, **kw):
+            while(True): # switch between all namenodes
+                try:
+                    results = func(self, *args, **kw)
+                    while(True): # yield all results
+                        yield results.next()
+                except RequestError as e:
+                    self.__handle_request_error(e)
+                except socket.error as e:
+                    self.__handle_socket_error(e)
+        return wrapped
+
+
 
