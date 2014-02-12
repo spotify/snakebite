@@ -1,3 +1,11 @@
+snakebite (2.2.2) unstable; urgency=low
+
+  * Fix df output from commandline
+  * Disabled cp and copyFromLocal
+
+ -- Rafal Wojdyla <rav@spotify.com>  Thu, 12 Feb 2014 12:01:12 +0000
+
+
 snakebite (2.2.1) unstable; urgency=low
 
   * Fix config reader

@@ -41,10 +41,8 @@ Usage
       chgrp <grp> [paths]            change group
       chmod <mode> [paths]           change file mode (octal)
       chown <owner:grp> [paths]      change owner
-      copyFromLocal path dst         copy local file reference to destination
       copyToLocal [paths] dst        copy paths to local file system destination
       count [paths]                  display stats for paths
-      cp [paths] dst                 copy files from source to destination
       df                             display fs stats
       du [paths]                     display disk usage statistics
       get file dst                   copy files to local file system destination
