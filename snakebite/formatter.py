@@ -162,10 +162,11 @@ def format_fs_stats(result, json_output=False, human_readable=False):
         size = result['capacity']
         used = result['used']
         avail = result['remaining']
-        if avail == 0:
-            pct_used = 0
+        if size == 0:
+            pct_used = "0.00"
         else:
-            pct_used = str((used / avail) * 100)
+            pct_used = (float(used) / float(size)) * 100.0
+            pct_used = "%.2f" % pct_used
 
         if human_readable:
             size = _sizeof_fmt(int(size))
