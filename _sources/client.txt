@@ -7,3 +7,6 @@ Client library
 
 .. autoclass:: AutoConfigClient
     :members:
+
+.. autoclass:: HAClient
+    :members:

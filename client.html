@@ -616,6 +616,28 @@ in the <tt class="docutils literal"><span class="pre">hadoop_version</span></tt>
 </div>
 </dd></dl>
 
+<dl class="class">
+<dt id="client.HAClient">
+<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">HAClient</tt><big>(</big><em>namenodes</em><big>)</big><a class="headerlink" href="#client.HAClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Snakebite client with support for High Availability</p>
+<p>HAClient is fully backward compatible with vanilla Client and can be used for non HA cluster.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.client</span> <span class="kn">import</span> <span class="n">HAClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.namenode</span> <span class="kn">import</span> <span class="n">Namenode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">Namenode</span><span class="p">(</span><span class="s">&quot;namenode1.mydomain&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">Namenode</span><span class="p">(</span><span class="s">&quot;namenode2.mydomain&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">HAClient</span><span class="p">([</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">x</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
+in the <tt class="docutils literal"><span class="pre">version</span></tt> parameter to the Namenode class constructor.</p>
+</div>
+</dd></dl>
+
 </div>
 
 
