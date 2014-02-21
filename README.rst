@@ -20,7 +20,7 @@ Snakebite releases are available through pypi at https://pypi.python.org/pypi/sn
 
 The quickest way to install snakebite (1.3.x) is to run:
 
-  pip install -I snakebite=1.3.x
+  pip install -I snakebite==1.3.x
 
 To install snakebite 2.x run:
 
