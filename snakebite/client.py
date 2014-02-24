@@ -1157,27 +1157,6 @@ class Client(object):
         return path.replace(dir_to_remove+'/', "", 1)
 
 
-class AutoConfigClient(Client):
-    ''' A pure python HDFS client that is auto configured through the ``HADOOP_PATH`` environment variable.
-
-    This client tries to read ``${HADOOP_PATH}/conf/hdfs-site.xml`` to get the address of the namenode.
-    The behaviour is the same as Client.
-
-    **Example:**
-
-    >>> from snakebite.client import AutoConfigClient
-    >>> client = AutoConfigClient()
-    >>> for x in client.ls(['/']):
-    ...     print x
-
-    .. note::
-        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
-        in the ``hadoop_version`` parameter to the constructor.
-    '''
-    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
-        config = HDFSConfig.get_config_from_env()
-        super(AutoConfigClient, self).__init__(config[0], config[1], hadoop_version)
-
 class HAClient(Client):
     ''' Snakebite client with support for High Availability
     
@@ -1268,4 +1247,25 @@ class HAClient(Client):
         return wrapped
 
 
+class AutoConfigClient(HAClient):
+    ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_PATH`` environment variable.
 
+    HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.
+    This client tries to read ``${HADOOP_PATH}/conf/hdfs-site.xml`` to get the address of the namenode.
+    The behaviour is the same as Client.
+
+    **Example:**
+
+    >>> from snakebite.client import AutoConfigClient
+    >>> client = AutoConfigClient()
+    >>> for x in client.ls(['/']):
+    ...     print x
+
+    .. note::
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
+        in the ``hadoop_version`` parameter to the constructor.
+    '''
+    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
+        nns = [Namenode(c['namenode'], c['port'], hadoop_version)
+               for c in HDFSConfig.get_external_config()]
+        super(AutoConfigClient, self).__init__(nns)
