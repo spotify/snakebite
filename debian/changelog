@@ -1,3 +1,9 @@
+snakebite (1.3.9) unstable; urgency=low
+
+  * Fix bug in client.test() when using globs
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 11 Mar 2014 10:29:12 +0000
+
 snakebite (1.3.8) unstable; urgency=low
 
   * Retry reading. Fixes #35
