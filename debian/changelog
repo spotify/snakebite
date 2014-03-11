@@ -1,3 +1,9 @@
+snakebite (2.2.5) unstable; urgency=low
+
+  Fix bug in Client.test() when using globs
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 11 Mar 2014 12:01:12 +0000
+
 snakebite (2.2.4) unstable; urgency=low
 
   Auto configured client uses HA

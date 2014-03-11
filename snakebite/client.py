@@ -756,7 +756,7 @@ class Client(object):
         :type path: string
         :param exists: Check if the path exists
         :type exists: boolean
-        :param directory: Check if the path exists
+        :param directory: Check if the path is a directory
         :type exists: boolean
         :param zero_length: Check if the path is zero-length
         :type zero_length: boolean
@@ -771,7 +771,10 @@ class Client(object):
 
         processor = lambda path, node, exists=exists, directory=directory, zero_length=zero_length: self._handle_test(path, node, exists, directory, zero_length)
         try:
-            return all(self._find_items([path], processor, include_toplevel=True))
+            items = list(self._find_items([path], processor, include_toplevel=True))
+            if len(items) == 0:
+                return False
+            return all(items)
         except FileNotFoundException, e:
             if exists:
                 return False
