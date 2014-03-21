@@ -1,3 +1,35 @@
+snakebite (2.3.0) unstable; urgency=low
+
+  Release 2.3.0
+
+  Quite a few things in this release:
+      - Trash functionality. Configuration will now look for trash
+        settings and apply them. When trash is enabled, deleting files
+        will move them to the trash. The Client class now also takes a
+        use_trash argument. The command line client's rm command now takes
+        -S or --skiptrash to skip the trash.
+      - Security fix for UIDs. Snakebite used to set the realUser property
+        for requests to the Namenode which caused everything to be
+        excecuted as the user the NN was running at. This is dangerous
+        and completely circumvents security. This has been changed to use
+        the effectiveUser property.
+      - Config format: a new .snakebiterc format has been introduced that
+        is verioned. The new format support skiptrash. Config is backwards
+        compatible with both single line NN config and HA, but defaults to
+        skiptrash=False for those cases.
+      - ~/.snakebiterc isn't written anymore. This change is made, since
+        cluster config changes didnt get reflected in .snakebiterc so
+        users had to remove their .snakebiterc. Right now, .snakebiterc
+        is used in cases that require a permanent override, or where no
+        hadoop configuration is available.
+      - Tests that use the java MiniCluster will not run anymore when an
+        active Hadoop cluster is found (i.e. when `hadoop fs -ls /` can be
+        run from the host running the tests). This is done because in
+        certain cases, the MiniCluster java class still interacts with the
+        Hadoop environment (e.g. format journal nodes).
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 11 Mar 2014 12:01:12 +0000
+
 snakebite (2.2.5) unstable; urgency=low
 
   Fix bug in Client.test() when using globs

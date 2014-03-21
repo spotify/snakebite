@@ -124,6 +124,11 @@ class CommandLineParser(object):
                       "long": '--summary',
                       "help": 'print summarized output',
                       "action": 'store_true'},
+                'S': {"short": '-S',
+                      "long": '--skiptrash',
+                      "help": 'skip the trash (when trash is enabled)',
+                      "default": False,
+                      "action": 'store_true'},
                 'z': {"short": '-z',
                       "long": '--zero',
                       "help": 'check for zero length',
@@ -243,7 +248,6 @@ class CommandLineParser(object):
         else:
             # Try to read the configuration for HDFS configuration files
             configs = HDFSConfig.get_external_config()
-
             # if configs exist and contain something
             if configs:
                 for config in configs:
@@ -251,8 +255,7 @@ class CommandLineParser(object):
                                   config['port'])
                     self.namenodes.append(nn)
 
-                # Save retrieved configuration to snakebite config file
-                self._write_hadoop_config(config_file)
+                self.args.skiptrash = not any([c['use_trash'] for c in configs])
 
         if len(self.namenodes):
             return
@@ -265,7 +268,15 @@ class CommandLineParser(object):
             for hdfs_conf_path in HDFSConfig.hdfs_try_paths:
                 print " - %s" % hdfs_conf_path
             print "\nYou can manually create ~/.snakebiterc with the following content:"
-            print '{"namenode": "ip/hostname", "port": 54310, "version": %d}' % Namenode.DEFAULT_VERSION
+            print '{'
+            print '  "config_version": 2,'
+            print '  "use_trash": true,'
+            print '  "namenodes": ['
+            print '    {"host": "namenode-ha1", "port": 54310, "version": %d},' % Namenode.DEFAULT_VERSION
+            print '    {"host": "namenode-ha2", "port": 54310, "version": %d}' % Namenode.DEFAULT_VERSION
+            print '  ]'
+            print '}'
+
             sys.exit(1)
 
     def _read_config_snakebiterc(self):
@@ -273,6 +284,7 @@ class CommandLineParser(object):
             configs = json.load(config_file)
 
         if isinstance(configs, list):
+            # Version 1: List of namenodes
             # config is a list of namenode(s) - possibly HA
             for config in configs:
                 nn = Namenode(config['namenode'],
@@ -280,10 +292,18 @@ class CommandLineParser(object):
                               config.get('version', Namenode.DEFAULT_VERSION))
                 self.namenodes.append(nn)
         elif isinstance(configs, dict):
-             # config is a single namenode - no HA
-            self.namenodes.append(Namenode(configs['namenode'],
-                                           configs['port'],
-                                           configs.get('version', Namenode.DEFAULT_VERSION)))
+            if configs.get("config_version"):
+                # Config ersion > 2
+                for nn_config in configs['namenodes']:
+                    nn = Namenode(nn_config['host'], nn_config['port'], nn_config.get('version', Namenode.DEFAULT_VERSION))
+                    self.namenodes.append(nn)
+
+                self.args.skiptrash = configs.get("skiptrash")
+            else:
+            # config is a single namenode - no HA
+                self.namenodes.append(Namenode(configs['namenode'],
+                                               configs['port'],
+                                               configs.get('version', Namenode.DEFAULT_VERSION)))
         else:
             print "Config retrieved from ~/.snakebiterc is corrupted! Remove it!"
             sys.exit(1)
@@ -318,24 +338,6 @@ class CommandLineParser(object):
         else:
             return False
 
-    def _write_hadoop_config(self, config_file_path):
-        # Write config to file
-        with open(config_file_path, "w") as config_file:
-            config = []
-            for namenode in self.namenodes:
-                config.append(namenode.toDict())
-
-            if len(config) > 1:
-                #If many NNs use list syntax
-                pretty_config = json.dumps(config).split('},')
-                config_file.write('},\n'.join(pretty_config))
-            elif len(config) == 1:
-                #If just one NN use old syntax
-                config_file.write(json.dumps(config[0]))
-            else:
-                print "Try to write configuration without NameNode configuration!"
-                sys.exit(-1)
-
     def parse(self, non_cli_input=None):  # Allow input for testing purposes
         if not sys.argv[1:] and not non_cli_input:
             self.parser.print_help()
@@ -364,7 +366,8 @@ class CommandLineParser(object):
         return self.args
 
     def setup_client(self):
-        self.client = HAClient(self.namenodes)
+        use_trash = not self.args.skiptrash
+        self.client = HAClient(self.namenodes, use_trash)
 
     def execute(self):
         if self.args.help:
@@ -501,7 +504,7 @@ class CommandLineParser(object):
         for line in format_results(result, json_output=self.args.json):
             print line
 
-    @command(args="[paths]", descr="remove paths", allowed_opts=["R"], req_args=['dir [dirs]'])
+    @command(args="[paths]", descr="remove paths", allowed_opts=["R", "S"], req_args=['dir [dirs]'])
     def rm(self):
         result = self.client.delete(self.args.dir, recurse=self.args.recurse)
         for line in format_results(result, json_output=self.args.json):

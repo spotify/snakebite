@@ -8,6 +8,7 @@ from urlparse import urlparse
 log = logging.getLogger(__name__)
 
 class HDFSConfig(object):
+    use_trash = False
 
     @classmethod
     def get_config_from_env(cls):
@@ -25,8 +26,9 @@ class HDFSConfig(object):
             # if config exists in hdfs - it's HA config, update configs
             configs = tmp_config
 
-        if configs is None:
+        if not configs:
             raise Exception("No config found in %s nor in %s" % (core_path, hdfs_path))
+
         return configs
 
 
@@ -41,13 +43,21 @@ class HDFSConfig(object):
 
     @classmethod
     def read_core_config(cls, core_site_path):
+        config = []
         for property in cls.read_hadoop_config(core_site_path):
             if property.findall('name')[0].text == 'fs.defaultFS':
                 parse_result = urlparse(property.findall('value')[0].text)
                 log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), core_site_path))
-                return [{"namenode": parse_result.hostname,
-                         "port": parse_result.port}]
-        return []
+                config.append({"namenode": parse_result.hostname,
+                         "port": parse_result.port})
+
+            if property.findall('name')[0].text == 'fs.trash.interval':
+                cls.use_trash = True
+
+        for c in config:
+            c["use_trash"] = cls.use_trash
+
+        return config
 
     @classmethod
     def read_hdfs_config(cls, hdfs_site_path):
@@ -58,6 +68,12 @@ class HDFSConfig(object):
                 log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), hdfs_site_path))
                 configs.append({"namenode": parse_result.hostname,
                                 "port": parse_result.port})
+
+            if property.findall('name')[0].text == 'fs.trash.interval':
+                cls.use_trash = True
+
+        for c in configs:
+            c["use_trash"] = cls.use_trash
 
         return configs
 
@@ -87,5 +103,4 @@ class HDFSConfig(object):
                 if tmp_config:
                     # if there is hdfs-site data available return it
                     return tmp_config
-
             return configs

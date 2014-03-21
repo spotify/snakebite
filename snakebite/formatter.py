@@ -133,7 +133,10 @@ def format_results(results, json_output=False):
     else:
         for r in results:
             if r['result']:
-                yield "OK: %s" % r.get('path')
+                if r.get('message'):
+                    yield "OK: %s %s" % (r.get('path'), r.get('message'))
+                else:
+                    yield "OK: %s" % r.get('path')
             else:
                 yield "ERROR: %s (reason: %s)" % (r.get('path'), r.get('error', ''))
 

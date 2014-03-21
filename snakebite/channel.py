@@ -258,7 +258,8 @@ class SocketRpcChannel(RpcChannel):
     def create_connection_context(self):
         '''Creates and seriazlies a IpcConnectionContextProto (not delimited)'''
         context = IpcConnectionContextProto()
-        context.userInfo.realUser = pwd.getpwuid(os.getuid())[0]
+        local_user = pwd.getpwuid(os.getuid())[0]
+        context.userInfo.effectiveUser = local_user
         context.protocol = "org.apache.hadoop.hdfs.protocol.ClientProtocol"
 
         s_context = context.SerializeToString()

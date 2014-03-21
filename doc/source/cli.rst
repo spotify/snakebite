@@ -6,18 +6,21 @@ The CLI client first tries parse the path and in case it's in the form
 ``hdfs://namenode:port/path`` it will use that configuration.
 Otherwise it will use -n and -p command line arguments.
 If the previous aren't set it tries to read the config from ``~/.snakebiterc`` and
-if that doesn't exist, it will check ``$HADOOP_HOME/core-site.xml`` and create a
-``~/.snakebiterc`` from that.
+if that doesn't exist, it will check ``$HADOOP_HOME/core-site.xml``.
 
 A config looks like
 
 ::
 
   {
-    "namenode": "<host/ip>",
-    "port": 54310,
-    "version": 7
+      "config_version": 2,
+      "skiptrash": true,
+      "namenodes": [
+          {"host": "mynamenode1", "port": 54310, "version": 9},
+          {"host": "mynamenode2", "port": 54310, "version": 9}
+      ]
   }
+
 
 The version property denotes the protocol version used. CDH 4.1.3 uses protocol 7, while 
 HDP 2.0 uses protocol 8. Snakebite defaults to 7.

@@ -37,6 +37,7 @@ import fnmatch
 import inspect
 import socket
 import errno
+import time
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class Client(object):
     **Example:**
 
     >>> from snakebite.client import Client
-    >>> client = Client("localhost", 54310)
+    >>> client = Client("localhost", 54310, use_trash=False)
     >>> for x in client.ls(['/']):
     ...     print x
 
@@ -74,7 +75,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=Namenode.DEFAULT_VERSION):
+    def __init__(self, host, port, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -82,6 +83,8 @@ class Client(object):
         :type port: int
         :param hadoop_version: What hadoop protocol version should be used (default: 9)
         :type hadoop_version: int
+        :param use_trash: Use a trash when removing files.
+        :type use_trash: boolean
         '''
         if hadoop_version < 9:
             raise Exception("Only protocol versions >= 9 supported")
@@ -90,6 +93,10 @@ class Client(object):
         self.port = port
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
         self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version)
+        self.use_trash = use_trash
+        self.trash = self._join_user_path(".Trash")
+
+        log.debug("Created client for %s:%s with trash=%s" % (host, port, use_trash))
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
         ''' Issues 'ls' command and returns a list of maps that contain fileinfo
@@ -410,11 +417,51 @@ class Client(object):
         if not recurse:
             recurse = False
 
-        request = client_proto.DeleteRequestProto()
-        request.src = path
-        request.recursive = recurse
-        response = self.service.delete(request)
-        return {"path": path, "result": response.result}
+        if self.__should_move_to_trash(path):
+            if path.endswith("/"):
+                suffix_path = path[1:-1]
+            else:
+                suffix_path = path[1:]
+
+            trash_path = os.path.join(self.trash, "Current", suffix_path)
+            if trash_path.endswith("/"):
+                trash_path = trash_path[:-1]
+
+            base_trash_path = os.path.join(self.trash, "Current", os.path.dirname(suffix_path))
+            if base_trash_path.endswith("/"):
+                base_trash_path = base_trash_path[:-1]
+
+            # Try twice, in case checkpoint between mkdir() and rename()
+            for i in range(0, 2):
+                list(self.mkdir([base_trash_path], create_parent=True, mode=0700))
+
+                original_path = trash_path
+
+                while self.test(trash_path, exists=True):
+                    unix_timestamp = str(int(time.time() * 1000))
+                    trash_path = "%s%s" % (original_path, unix_timestamp)
+
+                result = self._handle_rename(path, node, trash_path)
+                if result['result']:
+                    result['message'] = ". Moved %s to %s" % (path, trash_path)
+                    return result
+            raise Exception("Failed to move to trash: %s" % path)
+        else:
+            request = client_proto.DeleteRequestProto()
+            request.src = path
+            request.recursive = recurse
+            response = self.service.delete(request)
+            return {"path": path, "result": response.result}
+
+    def __should_move_to_trash(self, path):
+        if not self.use_trash:
+            return False
+        if path.startswith(self.trash):
+            return False  # Path already in trash
+        if os.path.dirname(self.trash).startswith(path):
+            raise Exception("Cannot move %s to the trash, as it contains the trash" % path)
+
+        return True
 
     def rmdir(self, paths):
         ''' Delete a directory
@@ -1171,7 +1218,7 @@ class HAClient(Client):
     >>> from snakebite.namenode import Namenode
     >>> n1 = Namenode("namenode1.mydomain", 54310)
     >>> n2 = Namenode("namenode2.mydomain", 54310)
-    >>> client = HAClient([n1, n2])
+    >>> client = HAClient([n1, n2], use_trash=True)
     >>> for x in client.ls(['/']):
     ...     print x
 
@@ -1179,7 +1226,8 @@ class HAClient(Client):
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``version`` parameter to the Namenode class constructor.
      '''
-    def __init__(self, namenodes):
+    def __init__(self, namenodes, use_trash=False):
+        self.use_trash = use_trash
         self.namenode = self._switch_namenode(namenodes)
         self.namenode.next()
 
@@ -1195,9 +1243,11 @@ class HAClient(Client):
     def _switch_namenode(self, namenodes):
         for namenode in namenodes:
             log.debug("Switch to namenode: %s:%d" % (namenode.host, namenode.port))
+
             yield super(HAClient, self).__init__(namenode.host,
                                                  namenode.port,
-                                                 namenode.version)
+                                                 namenode.version,
+                                                 self.use_trash)
         else:
             msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
             for namenode in namenodes:
@@ -1269,6 +1319,7 @@ class AutoConfigClient(HAClient):
         in the ``hadoop_version`` parameter to the constructor.
     '''
     def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
-        nns = [Namenode(c['namenode'], c['port'], hadoop_version)
-               for c in HDFSConfig.get_external_config()]
-        super(AutoConfigClient, self).__init__(nns)
+        configs = HDFSConfig.get_external_config()
+        nns = [Namenode(c['namenode'], c['port'], hadoop_version, c['use_trash']) for c in configs]
+        use_trash = any([c['use_trash'] for c in configs])
+        super(AutoConfigClient, self).__init__(nns, use_trash)
