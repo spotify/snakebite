@@ -14,12 +14,12 @@
 
   <property>
     <name>dfs.namenode.rpc-address.testha.namenode1-mydomain</name>
-    <value>namenode1.mydomain:8020</value>
+    <value>namenode1.mydomain:8888</value>
   </property>
 
   <property>
     <name>dfs.namenode.rpc-address.testha.namenode2-mydomain</name>
-    <value>namenode2.mydomain:8020</value>
+    <value>namenode2.mydomain:8888</value>
   </property>
 
   <property>

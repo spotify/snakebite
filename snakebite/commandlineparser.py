@@ -36,6 +36,13 @@ from snakebite.version import version
 from snakebite.namenode import Namenode
 
 
+def print_error_exit(msg, fd=sys.stderr):
+    print >> fd, "Error: %s" % msg
+    sys.exit(-1)
+
+def print_info(msg, fd=sys.stderr):
+    print >> fd, "Info: %s" % msg
+
 def exitError(error):
     if isinstance(error, FileNotFoundException) or \
        isinstance(error, DirectoryException) or \
@@ -100,7 +107,7 @@ class CommandLineParser(object):
                           "type": float},
                     'p': {"short": '-p',
                           "long": '--port',
-                          "help": 'namenode RPC port',
+                          "help": 'namenode RPC port (default: %d)' % Namenode.DEFAULT_PORT,
                           "type": int},
                     'h': {"short": '-h',
                           "long": '--help',
@@ -128,6 +135,10 @@ class CommandLineParser(object):
                       "long": '--skiptrash',
                       "help": 'skip the trash (when trash is enabled)',
                       "default": False,
+                      "action": 'store_true'},
+                'T': {"short": '-T',
+                      "long": "--usetrash",
+                      "help": "enable the trash",
                       "action": 'store_true'},
                 'z': {"short": '-z',
                       "long": '--zero',
@@ -230,6 +241,28 @@ class CommandLineParser(object):
             command_parser = subparsers.add_parser(cmd_name, add_help=False, parents=parents)
             command_parser.set_defaults(command=cmd_name)
 
+    def init(self):
+        self.read_config()
+        self._clean_args()
+        self.setup_client()
+
+    def _clean_args(self):
+        for path in self.__get_all_directories():
+            if path.startswith('hdfs://'):
+                parse_result = urlparse(path)
+                if path in self.args.dir:
+                    self.args.dir.remove(path)
+                    self.args.dir.append(parse_result.path)
+                else:
+                    self.args.single_arg = parse_result.path
+
+    def __usetrash_unset(self):
+        return not 'usetrash' in self.args or self.args.usetrash == False
+
+    def __use_cl_port_first(self, alt):
+        # Port provided from CL has the highest priority:
+        return self.args.port if self.args.port else alt
+
     def read_config(self):
 
         # Try to retrieve namenode config from within CL arguments
@@ -252,10 +285,10 @@ class CommandLineParser(object):
             if configs:
                 for config in configs:
                     nn = Namenode(config['namenode'],
-                                  config['port'])
+                                  self.__use_cl_port_first(config['port']))
                     self.namenodes.append(nn)
-
-                self.args.skiptrash = not any([c['use_trash'] for c in configs])
+                if self.__usetrash_unset():
+                    self.args.usetrash = HDFSConfig.use_trash
 
         if len(self.namenodes):
             return
@@ -272,14 +305,15 @@ class CommandLineParser(object):
             print '  "config_version": 2,'
             print '  "use_trash": true,'
             print '  "namenodes": ['
-            print '    {"host": "namenode-ha1", "port": 54310, "version": %d},' % Namenode.DEFAULT_VERSION
-            print '    {"host": "namenode-ha2", "port": 54310, "version": %d}' % Namenode.DEFAULT_VERSION
+            print '    {"host": "namenode-ha1", "port": %d, "version": %d},' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
+            print '    {"host": "namenode-ha2", "port": %d, "version": %d}' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
             print '  ]'
             print '}'
 
             sys.exit(1)
 
     def _read_config_snakebiterc(self):
+        old_version_info = "You're are using snakebite %s with Trash support together with old snakebiterc, please update/remove your ~/.snakebiterc file. By default Trash is %s." % (version(), 'disabled' if not HDFSConfig.use_trash else 'enabled')
         with open(os.path.join(os.path.expanduser('~'), '.snakebiterc')) as config_file:
             configs = json.load(config_file)
 
@@ -288,52 +322,81 @@ class CommandLineParser(object):
             # config is a list of namenode(s) - possibly HA
             for config in configs:
                 nn = Namenode(config['namenode'],
-                              config['port'],
+                              self.__use_cl_port_first(config.get('port', Namenode.DEFAULT_PORT)),
                               config.get('version', Namenode.DEFAULT_VERSION))
                 self.namenodes.append(nn)
+            if self.__usetrash_unset():
+                # commandline setting has higher priority
+                print_info(old_version_info)
+                # There's no info about Trash in version 1, use default policy:
+                self.args.usetrash = HDFSConfig.use_trash
         elif isinstance(configs, dict):
-            if configs.get("config_version"):
-                # Config ersion > 2
+            # Version 2: {}
+            # Can be either new configuration or just one namenode
+            # which was the very first configuration syntax
+            if 'config_version' in configs:
+                # Config version => 2
                 for nn_config in configs['namenodes']:
-                    nn = Namenode(nn_config['host'], nn_config['port'], nn_config.get('version', Namenode.DEFAULT_VERSION))
+                    nn = Namenode(nn_config['host'],
+                                  self.__use_cl_port_first(nn_config.get('port', Namenode.DEFAULT_PORT)),
+                                  nn_config.get('version', Namenode.DEFAULT_VERSION))
                     self.namenodes.append(nn)
 
-                self.args.skiptrash = configs.get("skiptrash")
+                if self.__usetrash_unset():
+                    # commandline setting has higher priority
+                    self.args.usetrash = configs.get("use_trash", HDFSConfig.use_trash)
             else:
-            # config is a single namenode - no HA
+                # config is a single namenode - no HA
                 self.namenodes.append(Namenode(configs['namenode'],
-                                               configs['port'],
+                                               self.__use_cl_port_first(configs.get('port', Namenode.DEFAULT_PORT)),
                                                configs.get('version', Namenode.DEFAULT_VERSION)))
+                if self.__usetrash_unset():
+                    # commandline setting has higher priority
+                    print_info(old_version_info)
+                    self.args.usetrash = HDFSConfig.use_trash
         else:
-            print "Config retrieved from ~/.snakebiterc is corrupted! Remove it!"
-            sys.exit(1)
+            print_error_exit("Config retrieved from ~/.snakebiterc is corrupted! Remove it!")
 
-    def _read_config_cl(self):
-        ''' Check if any directory arguments contain hdfs://'''
+    def __get_all_directories(self):
         if self.args and 'dir' in self.args:
             dirs_to_check = list(self.args.dir)
             if self.args.command == 'mv':
                 dirs_to_check.append(self.args.single_arg)
-            for directory in dirs_to_check:
-                if 'hdfs://' in directory:
-                    parse_result = urlparse(directory)
+            return dirs_to_check
+        else:
+            return ()
 
-                    if not self.args.namenode is None and not self.args.port is None and (self.args.port != parse_result.port or self.args.namenode != parse_result.hostname):
-                        print "error: conflicting nodenames or ports"
-                        sys.exit(-1)
-                    else:
-                        self.args.namenode = parse_result.hostname
-                        self.args.port = parse_result.port
+    def _read_config_cl(self):
+        ''' Check if any directory arguments contain hdfs://'''
+        dirs_to_check = self.__get_all_directories()
+        hosts, ports = [], []
+        for path in dirs_to_check:
+            if path.startswith('hdfs://'):
+                parse_result = urlparse(path)
+                hosts.append(parse_result.hostname)
+                ports.append(parse_result.port)
 
-                        if directory in self.args.dir:
-                            self.args.dir.remove(directory)
-                            self.args.dir.append(parse_result.path)
-                        else:
-                            self.args.single_arg = parse_result.path
+        # remove duplicates and None from (hosts + self.args.namenode)
+        hosts = filter(lambda x: x != None, set(hosts + [self.args.namenode]))
+        if len(hosts) > 1:
+            print_error_exit('Conficiting namenode hosts in commandline arguments, hosts: %s' % str(hosts))
 
-        if self.args.namenode and self.args.port:
-            # If namenode config found based on arguments, save namenode
+        ports = filter(lambda x: x != None, set(ports + [self.args.port]))
+        if len(ports) > 1:
+            print_error_exit('Conflicting namenode ports in commandline arguments, ports: %s' % str(ports))
+
+        # Store port from CL in arguments - CL port has the highest priority
+        if len(ports) == 1:
+            self.args.port = ports[0]
+
+        # do we agree on one namenode?
+        if len(hosts) == 1 and len(ports) <= 1:
+            self.args.namenode = hosts[0]
+            self.args.port = ports[0] if len(ports) == 1 else Namenode.DEFAULT_PORT
             self.namenodes.append(Namenode(self.args.namenode, self.args.port))
+            # we got the info from CL -> check if use_trash is set - if not use default policy:
+            if self.__usetrash_unset():
+                self.args.usetrash = HDFSConfig.use_trash
             return True
         else:
             return False
@@ -366,7 +429,10 @@ class CommandLineParser(object):
         return self.args
 
     def setup_client(self):
-        use_trash = not self.args.skiptrash
+        if 'skiptrash' in self.args:
+            use_trash = self.args.usetrash and not self.args.skiptrash
+        else:
+            use_trash = self.args.usetrash
         self.client = HAClient(self.namenodes, use_trash)
 
     def execute(self):
@@ -504,7 +570,7 @@ class CommandLineParser(object):
         for line in format_results(result, json_output=self.args.json):
             print line
 
-    @command(args="[paths]", descr="remove paths", allowed_opts=["R", "S"], req_args=['dir [dirs]'])
+    @command(args="[paths]", descr="remove paths", allowed_opts=["R", "S", "T"], req_args=['dir [dirs]'])
     def rm(self):
         result = self.client.delete(self.args.dir, recurse=self.args.recurse)
         for line in format_results(result, json_output=self.args.json):
