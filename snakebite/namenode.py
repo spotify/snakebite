@@ -15,10 +15,10 @@
 
 class Namenode(object):
     '''Namenode class - represents HDFS namenode'''
-
+    DEFAULT_PORT = 8020
     DEFAULT_VERSION = 9
 
-    def __init__(self, host, port, version=DEFAULT_VERSION):
+    def __init__(self, host, port=DEFAULT_PORT, version=DEFAULT_VERSION):
         self.host = host
         self.port = port
         self.version = version
