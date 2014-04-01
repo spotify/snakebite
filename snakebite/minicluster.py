@@ -37,14 +37,14 @@ class MiniCluster(object):
     Example without :mod:`snakebite.client <client>`
 
     >>> from snakebite.minicluster import MiniCluster
-    >>> cluster = Minicluster("/path/to/test/files")
+    >>> cluster = MiniCluster("/path/to/test/files")
     >>> ls_output = cluster.ls(["/"])
 
     Example with :mod:`snakebite.client <client>`
 
     >>> from snakebite.minicluster import MiniCluster
     >>> from snakebite.client import Client
-    >>> cluster = Minicluster("/path/to/test/files")
+    >>> cluster = MiniCluster("/path/to/test/files")
     >>> client = Client('localhost', cluster.port)
     >>> ls_output = client.ls(["/"])
 
