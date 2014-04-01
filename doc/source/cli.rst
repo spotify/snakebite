@@ -34,10 +34,12 @@ Usage
     snakebite [general options] cmd [arguments]
     general options:
       -D --debug                     Show debug information
-      -V --version                   Hadoop protocol version (default:8)
+      -V --version                   Hadoop protocol version (default:9)
+      -h --help                      show help
       -j --json                      JSON output
       -n --namenode                  namenode host
-      -p --port                      namenode RPC port
+      -p --port                      namenode RPC port (default: 8020)
+      -v --ver                       Display snakebite version
 
     commands:
       cat [paths]                    copy source paths to stdout

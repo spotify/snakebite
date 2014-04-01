@@ -67,11 +67,11 @@ Also, make sure the ``JAVA_HOME`` environment variable is set.
 TODO
 ====
 * Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well
-* More tests. Currently only integration tests with a minicluster are available.
+* More tests.
 * Return correct exit codes from cli client.
 * Imrove speed of CRC verification. 
 * Improve methods:
-    * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f and -skipTrash)
+    * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f)
 
 * Implement more methods (those need interaction with DataNodes):
     * [-expunge]
@@ -81,7 +81,7 @@ TODO
 
 LICENSE
 =======
-Copyright (c) 2013 Spotify AB
+Copyright (c) 2013 - 2014 Spotify AB
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of

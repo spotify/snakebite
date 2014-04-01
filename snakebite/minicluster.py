@@ -61,6 +61,8 @@ class MiniCluster(object):
         '''
         :param testfiles_path: Local path where test files can be found. Mainly used for ``put()``
         :type testfiles_path: string
+        :param start_cluster: start a MiniCluster on initialization. If False, this class will act as an interface to the ``hadoop fs`` command
+        :type start_cluster: boolean
         '''
         self._testfiles_path = testfiles_path
         self._hadoop_home = os.environ['HADOOP_HOME']
