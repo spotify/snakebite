@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Minicluster &mdash; snakebite 2.2.4 documentation</title>
+    <title>Minicluster &mdash; snakebite 2.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2.2.4',
+        VERSION:     '2.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="snakebite 2.2.4 documentation" href="index.html" />
+    <link rel="top" title="snakebite 2.3.0 documentation" href="index.html" />
     <link rel="next" title="Hadoop RPC protocol description" href="hadoop_rpc.html" />
     <link rel="prev" title="CLI client" href="cli.html" /> 
   </head>
@@ -45,7 +45,7 @@
         <li class="right" >
           <a href="cli.html" title="CLI client"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">snakebite 2.2.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,7 +58,7 @@
 <span id="minicluster"></span><h1>Minicluster<a class="headerlink" href="#module-minicluster" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="minicluster.MiniCluster">
-<em class="property">class </em><tt class="descclassname">minicluster.</tt><tt class="descname">MiniCluster</tt><big>(</big><em>testfiles_path</em><big>)</big><a class="headerlink" href="#minicluster.MiniCluster" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">minicluster.</tt><tt class="descname">MiniCluster</tt><big>(</big><em>testfiles_path</em>, <em>start_cluster=True</em><big>)</big><a class="headerlink" href="#minicluster.MiniCluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class that spawns a hadoop mini cluster and wrap hadoop functionality</p>
 <p>This class requires the <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt> environment variable to be set to run the <tt class="docutils literal"><span class="pre">hadoop</span></tt> command.
 It will search <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt> for <tt class="docutils literal"><span class="pre">hadoop-mapreduce-client-jobclient&lt;version&gt;-tests.jar</span></tt>, but the
@@ -70,14 +70,14 @@ the snakebite client, since this is used for testing snakebite itself.</p>
 <p>All methods return a list of maps that are snakebite compatible.</p>
 <p>Example without <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.minicluster</span> <span class="kn">import</span> <span class="n">MiniCluster</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster</span> <span class="o">=</span> <span class="n">Minicluster</span><span class="p">(</span><span class="s">&quot;/path/to/test/files&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster</span> <span class="o">=</span> <span class="n">MiniCluster</span><span class="p">(</span><span class="s">&quot;/path/to/test/files&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ls_output</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Example with <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.minicluster</span> <span class="kn">import</span> <span class="n">MiniCluster</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.client</span> <span class="kn">import</span> <span class="n">Client</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster</span> <span class="o">=</span> <span class="n">Minicluster</span><span class="p">(</span><span class="s">&quot;/path/to/test/files&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster</span> <span class="o">=</span> <span class="n">MiniCluster</span><span class="p">(</span><span class="s">&quot;/path/to/test/files&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">cluster</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ls_output</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&quot;/&quot;</span><span class="p">])</span>
 </pre></div>
@@ -98,7 +98,11 @@ were necessary for testing the snakebite client, but please feel free to add the
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>testfiles_path</strong> (<em>string</em>) &#8211; Local path where test files can be found. Mainly used for <tt class="docutils literal"><span class="pre">put()</span></tt></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>testfiles_path</strong> (<em>string</em>) &#8211; Local path where test files can be found. Mainly used for <tt class="docutils literal"><span class="pre">put()</span></tt></li>
+<li><strong>start_cluster</strong> (<em>boolean</em>) &#8211; start a MiniCluster on initialization. If False, this class will act as an interface to the <tt class="docutils literal"><span class="pre">hadoop</span> <span class="pre">fs</span></tt> command</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -200,7 +204,7 @@ your program ends.</p>
         <li class="right" >
           <a href="cli.html" title="CLI client"
              >previous</a> |</li>
-        <li><a href="index.html">snakebite 2.2.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

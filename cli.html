@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>CLI client &mdash; snakebite 2.2.4 documentation</title>
+    <title>CLI client &mdash; snakebite 2.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2.2.4',
+        VERSION:     '2.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="snakebite 2.2.4 documentation" href="index.html" />
+    <link rel="top" title="snakebite 2.3.0 documentation" href="index.html" />
     <link rel="next" title="Minicluster" href="minicluster.html" />
     <link rel="prev" title="Client library" href="client.html" /> 
   </head>
@@ -45,7 +45,7 @@
         <li class="right" >
           <a href="client.html" title="Client library"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">snakebite 2.2.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -61,13 +61,15 @@
 <tt class="docutils literal"><span class="pre">hdfs://namenode:port/path</span></tt> it will use that configuration.
 Otherwise it will use -n and -p command line arguments.
 If the previous aren&#8217;t set it tries to read the config from <tt class="docutils literal"><span class="pre">~/.snakebiterc</span></tt> and
-if that doesn&#8217;t exist, it will check <tt class="docutils literal"><span class="pre">$HADOOP_HOME/core-site.xml</span></tt> and create a
-<tt class="docutils literal"><span class="pre">~/.snakebiterc</span></tt> from that.</p>
+if that doesn&#8217;t exist, it will check <tt class="docutils literal"><span class="pre">$HADOOP_HOME/core-site.xml</span></tt>.</p>
 <p>A config looks like</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-  <span class="s">&quot;namenode&quot;</span><span class="p">:</span> <span class="s">&quot;&lt;host/ip&gt;&quot;</span><span class="p">,</span>
-  <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="mi">54310</span><span class="p">,</span>
-  <span class="s">&quot;version&quot;</span><span class="p">:</span> <span class="mi">7</span>
+    <span class="s">&quot;config_version&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;skiptrash&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="s">&quot;namenodes&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;mynamenode1&quot;</span><span class="p">,</span> <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="mi">54310</span><span class="p">,</span> <span class="s">&quot;version&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;mynamenode2&quot;</span><span class="p">,</span> <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="mi">54310</span><span class="p">,</span> <span class="s">&quot;version&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">}</span>
+    <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -80,10 +82,12 @@ HDP 2.0 uses protocol 8. Snakebite defaults to 7.</p>
 <div class="highlight-python"><pre>snakebite [general options] cmd [arguments]
 general options:
   -D --debug                     Show debug information
-  -V --version                   Hadoop protocol version (default:8)
+  -V --version                   Hadoop protocol version (default:9)
+  -h --help                      show help
   -j --json                      JSON output
   -n --namenode                  namenode host
-  -p --port                      namenode RPC port
+  -p --port                      namenode RPC port (default: 8020)
+  -v --ver                       Display snakebite version
 
 commands:
   cat [paths]                    copy source paths to stdout
@@ -170,7 +174,7 @@ to see command-specific options use: snakebite [cmd] --help</pre>
         <li class="right" >
           <a href="client.html" title="Client library"
              >previous</a> |</li>
-        <li><a href="index.html">snakebite 2.2.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

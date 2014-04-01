@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Client library &mdash; snakebite 2.2.4 documentation</title>
+    <title>Client library &mdash; snakebite 2.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2.2.4',
+        VERSION:     '2.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="snakebite 2.2.4 documentation" href="index.html" />
+    <link rel="top" title="snakebite 2.3.0 documentation" href="index.html" />
     <link rel="next" title="CLI client" href="cli.html" />
     <link rel="prev" title="Snakebite documentation" href="index.html" /> 
   </head>
@@ -45,7 +45,7 @@
         <li class="right" >
           <a href="index.html" title="Snakebite documentation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">snakebite 2.2.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,11 +58,11 @@
 <span id="client-library"></span><h1>Client library<a class="headerlink" href="#module-client" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="client.Client">
-<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">Client</tt><big>(</big><em>host</em>, <em>port</em>, <em>hadoop_version=9</em><big>)</big><a class="headerlink" href="#client.Client" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">Client</tt><big>(</big><em>host</em>, <em>port</em>, <em>hadoop_version=9</em>, <em>use_trash=False</em><big>)</big><a class="headerlink" href="#client.Client" title="Permalink to this definition">¶</a></dt>
 <dd><p>A pure python HDFS client.</p>
 <p><strong>Example:</strong></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.client</span> <span class="kn">import</span> <span class="n">Client</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">,</span> <span class="n">use_trash</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">]):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="n">x</span>
 </pre></div>
@@ -95,6 +95,7 @@ in the <tt class="docutils literal"><span class="pre">hadoop_version</span></tt>
 <li><strong>host</strong> (<em>string</em>) &#8211; Hostname or IP address of the NameNode</li>
 <li><strong>port</strong> (<em>int</em>) &#8211; RPC Port of the NameNode</li>
 <li><strong>hadoop_version</strong> (<em>int</em>) &#8211; What hadoop protocol version should be used (default: 9)</li>
+<li><strong>use_trash</strong> (<em>boolean</em>) &#8211; Use a trash when removing files.</li>
 </ul>
 </td>
 </tr>
@@ -534,7 +535,7 @@ one file on local fs.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>path</strong> (<em>string</em>) &#8211; Path to test</li>
 <li><strong>exists</strong> (<em>boolean</em>) &#8211; Check if the path exists</li>
-<li><strong>directory</strong> &#8211; Check if the path exists</li>
+<li><strong>directory</strong> &#8211; Check if the path is a directory</li>
 <li><strong>zero_length</strong> (<em>boolean</em>) &#8211; Check if the path is zero-length</li>
 </ul>
 </td>
@@ -619,7 +620,7 @@ in the <tt class="docutils literal"><span class="pre">hadoop_version</span></tt>
 
 <dl class="class">
 <dt id="client.HAClient">
-<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">HAClient</tt><big>(</big><em>namenodes</em><big>)</big><a class="headerlink" href="#client.HAClient" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">client.</tt><tt class="descname">HAClient</tt><big>(</big><em>namenodes</em>, <em>use_trash=False</em><big>)</big><a class="headerlink" href="#client.HAClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Snakebite client with support for High Availability</p>
 <p>HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.</p>
 <p><strong>Example:</strong></p>
@@ -627,7 +628,7 @@ in the <tt class="docutils literal"><span class="pre">hadoop_version</span></tt>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">snakebite.namenode</span> <span class="kn">import</span> <span class="n">Namenode</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n1</span> <span class="o">=</span> <span class="n">Namenode</span><span class="p">(</span><span class="s">&quot;namenode1.mydomain&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n2</span> <span class="o">=</span> <span class="n">Namenode</span><span class="p">(</span><span class="s">&quot;namenode2.mydomain&quot;</span><span class="p">,</span> <span class="mi">54310</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">HAClient</span><span class="p">([</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">HAClient</span><span class="p">([</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">],</span> <span class="n">use_trash</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">ls</span><span class="p">([</span><span class="s">&#39;/&#39;</span><span class="p">]):</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="n">x</span>
 </pre></div>
@@ -690,7 +691,7 @@ in the <tt class="docutils literal"><span class="pre">version</span></tt> parame
         <li class="right" >
           <a href="index.html" title="Snakebite documentation"
              >previous</a> |</li>
-        <li><a href="index.html">snakebite 2.2.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">snakebite 2.3.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
