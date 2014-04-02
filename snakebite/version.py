@@ -1,4 +1,4 @@
-VERSION = "1.3.3"
+VERSION = "2.3.0"
 
 
 def version():

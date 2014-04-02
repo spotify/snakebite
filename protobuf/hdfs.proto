@@ -16,13 +16,22 @@
  * limitations under the License.
  */
 
+/**
+ * These .proto interfaces are private and stable.
+ * Please see http://wiki.apache.org/hadoop/Compatibility
+ * for what changes are allowed for a *stable* .proto interface.
+ */
+
 // This file contains protocol buffers that are used throughout HDFS -- i.e.
 // by the client, server, and data transfer protocols.
+
 
 option java_package = "org.apache.hadoop.hdfs.protocol.proto";
 option java_outer_classname = "HdfsProtos";
 option java_generate_equals_and_hash = true;
-option py_generic_services = true;
+package hadoop.hdfs;
+
+import "Security.proto";
 
 /**
  * Extended block idenfies a block
@@ -36,16 +45,6 @@ message ExtendedBlockProto {
 }
 
 /**
- * Block Token
- */
-message BlockTokenIdentifierProto {
-  required bytes identifier = 1;
-  required bytes password = 2;
-  required string kind = 3;
-  required string service = 4;
-}
-
-/**
  * Identifies a Datanode
  */
 message DatanodeIDProto {
@@ -53,8 +52,9 @@ message DatanodeIDProto {
   required string hostName = 2;  // hostname
   required string storageID = 3; // unique storage id
   required uint32 xferPort = 4;  // data streaming port
-  required uint32 infoPort = 5;  // info server port
+  required uint32 infoPort = 5;  // datanode http port
   required uint32 ipcPort = 6;   // ipc server port
+  optional uint32 infoSecurePort = 7 [default = 0]; // datanode https port
 }
 
 /**
@@ -126,7 +126,7 @@ message LocatedBlockProto {
                                         // If block has few corrupt replicas, they are filtered and 
                                         // their locations are not part of this object
 
-  required BlockTokenIdentifierProto blockToken = 5;
+  required hadoop.common.TokenProto blockToken = 5;
 }
 
 message DataEncryptionKeyProto {
@@ -152,7 +152,7 @@ message LocatedBlocksProto {
 
 
 /**
- * Status of a file, directory  or symlink
+ * Status of a file, directory or symlink
  * Optionally includes a file's block locations if requested by client on the rpc call.
  */
 message HdfsFileStatusProto {
@@ -177,6 +177,10 @@ message HdfsFileStatusProto {
   optional uint32 block_replication = 10 [default = 0]; // only 16bits used
   optional uint64 blocksize = 11 [default = 0];
   optional LocatedBlocksProto locations = 12;  // suppled only if asked by client
+
+  // Optional field for fileId
+  optional uint64 fileId = 13 [default = 0]; // default as an invalid id
+  optional int32 childrenNum = 14 [default = -1];
 } 
 
 /**
@@ -214,12 +218,43 @@ message DirectoryListingProto {
 }
 
 /**
- * Status of current cluster upgrade from one version to another
+ * Status of a snapshottable directory: besides the normal information for 
+ * a directory status, also include snapshot quota, number of snapshots, and
+ * the full path of the parent directory. 
  */
-message UpgradeStatusReportProto {
-  required uint32 version = 1;;
-  required uint32 upgradeStatus = 2; // % completed in range 0 & 100
-	required bool finalized = 3;
+message SnapshottableDirectoryStatusProto {
+  required HdfsFileStatusProto dirStatus = 1;
+
+  // Fields specific for snapshottable directory
+  required uint32 snapshot_quota = 2;
+  required uint32 snapshot_number = 3;
+  required bytes parent_fullpath = 4;
+}
+
+/**
+ * Snapshottable directory listing
+ */
+message SnapshottableDirectoryListingProto {
+  repeated SnapshottableDirectoryStatusProto snapshottableDirListing = 1;
+}
+
+/**
+ * Snapshot diff report entry
+ */
+message SnapshotDiffReportEntryProto {
+  required bytes fullpath = 1;
+  required string modificationLabel = 2;
+}
+
+/**
+ * Snapshot diff report
+ */
+message SnapshotDiffReportProto {
+  // full path of the directory where snapshots were taken
+  required string snapshotRoot = 1;
+  required string fromSnapshot = 2;
+  required string toSnapshot = 3;
+  repeated SnapshotDiffReportEntryProto diffReportEntries = 4;
 }
 
 /**
@@ -329,7 +364,7 @@ message RemoteEditLogManifestProto {
  */
 message NamespaceInfoProto {
   required string buildVersion = 1;         // Software revision version (e.g. an svn or git revision)
-  required uint32 distUpgradeVersion = 2;   // Distributed upgrade version
+  required uint32 unused = 2;               // Retained for backward compatibility
   required string blockPoolID = 3;          // block pool used by the namespace
   required StorageInfoProto storageInfo = 4;// Node information
   required string softwareVersion = 5;      // Software version number (e.g. 2.0.0)
@@ -385,5 +420,19 @@ message VersionRequestProto {
  */
 message VersionResponseProto {
   required NamespaceInfoProto info = 1;
+}
+
+/**
+ * Information related to a snapshot
+ * TODO: add more information
+ */
+message SnapshotInfoProto {
+  required string snapshotName = 1;
+  required string snapshotRoot = 2;
+  required FsPermissionProto permission = 3;
+  required string owner = 4;
+  required string group = 5;
+  required string createTime = 6;
+  // TODO: do we need access time?
 }
 

@@ -28,19 +28,13 @@ class ChmodTest(MiniClusterTestBase):
         list(self.client.chmod(['/dir1', '/zerofile'], 0700))
         client_output = self.client.ls(['/dir1', '/zerofile'], include_toplevel=True, include_children=False)
         for node in client_output:
-            if node["file_type"] == "d":
-                self.assertEqual(node["permission"], 448)
-            else:
-                self.assertEqual(node["permission"], 384)
+            self.assertEqual(node["permission"], 448)
 
     def test_recursive(self):
         list(self.client.chmod(['/'], 0770, recurse=True))
         expected_output = self.cluster.ls(["/"], ["-R"])
         for node in expected_output:
-            if node["file_type"] == "d":
-                self.assertEqual(node["permission"], 504)
-            else:
-                self.assertEqual(node["permission"], 432)
+            self.assertEqual(node["permission"], 504)
 
     def test_unknown_file(self):
         result = self.client.chmod(['/nonexistent'], 0777, recurse=True)

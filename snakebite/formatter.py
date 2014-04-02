@@ -43,7 +43,7 @@ def _octal_to_perm(octal):
 
 
 def _sizeof_fmt(num):
-    for x in ['', 'k', 'm', 'g', 't']:
+    for x in ['', 'k', 'M', 'G', 'T', 'P']:
         if num < 1024.0:
             if x == '':
                 return num
@@ -133,7 +133,10 @@ def format_results(results, json_output=False):
     else:
         for r in results:
             if r['result']:
-                yield "OK: %s" % r.get('path')
+                if r.get('message'):
+                    yield "OK: %s %s" % (r.get('path'), r.get('message'))
+                else:
+                    yield "OK: %s" % r.get('path')
             else:
                 yield "ERROR: %s (reason: %s)" % (r.get('path'), r.get('error', ''))
 
@@ -162,10 +165,11 @@ def format_fs_stats(result, json_output=False, human_readable=False):
         size = result['capacity']
         used = result['used']
         avail = result['remaining']
-        if avail == 0:
-            pct_used = 0
+        if size == 0:
+            pct_used = "0.00"
         else:
-            pct_used = str((used / avail) * 100)
+            pct_used = (float(used) / float(size)) * 100.0
+            pct_used = "%.2f" % pct_used
 
         if human_readable:
             size = _sizeof_fmt(int(size))
@@ -232,4 +236,5 @@ def format_stat(results, json_output=False):
 
 def format_bytes(bytes):
     ascii = binascii.b2a_hex(bytes)
-    return " ".join([ascii[i:i + 2] for i in range(0, len(ascii), 2)])
+    byte_array = [ascii[i:i + 2] for i in range(0, len(ascii), 2)]
+    return  "%s (len: %d)"% (" ".join(byte_array), len(byte_array))

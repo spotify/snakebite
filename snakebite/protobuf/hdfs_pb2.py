@@ -7,15 +7,16 @@ from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 
+import Security_pb2
 
 DESCRIPTOR = descriptor.FileDescriptor(
   name='hdfs.proto',
-  package='',
-  serialized_pb='\n\nhdfs.proto\"c\n\x12\x45xtendedBlockProto\x12\x0e\n\x06poolId\x18\x01 \x02(\t\x12\x0f\n\x07\x62lockId\x18\x02 \x02(\x04\x12\x17\n\x0fgenerationStamp\x18\x03 \x02(\x04\x12\x13\n\x08numBytes\x18\x04 \x01(\x04:\x01\x30\"`\n\x19\x42lockTokenIdentifierProto\x12\x12\n\nidentifier\x18\x01 \x02(\x0c\x12\x10\n\x08password\x18\x02 \x02(\x0c\x12\x0c\n\x04kind\x18\x03 \x02(\t\x12\x0f\n\x07service\x18\x04 \x02(\t\"{\n\x0f\x44\x61tanodeIDProto\x12\x0e\n\x06ipAddr\x18\x01 \x02(\t\x12\x10\n\x08hostName\x18\x02 \x02(\t\x12\x11\n\tstorageID\x18\x03 \x02(\t\x12\x10\n\x08xferPort\x18\x04 \x02(\r\x12\x10\n\x08infoPort\x18\x05 \x02(\r\x12\x0f\n\x07ipcPort\x18\x06 \x02(\r\";\n\x12\x44\x61tanodeInfosProto\x12%\n\tdatanodes\x18\x01 \x03(\x0b\x32\x12.DatanodeInfoProto\"\xd2\x02\n\x11\x44\x61tanodeInfoProto\x12\x1c\n\x02id\x18\x01 \x02(\x0b\x32\x10.DatanodeIDProto\x12\x13\n\x08\x63\x61pacity\x18\x02 \x01(\x04:\x01\x30\x12\x12\n\x07\x64\x66sUsed\x18\x03 \x01(\x04:\x01\x30\x12\x14\n\tremaining\x18\x04 \x01(\x04:\x01\x30\x12\x18\n\rblockPoolUsed\x18\x05 \x01(\x04:\x01\x30\x12\x15\n\nlastUpdate\x18\x06 \x01(\x04:\x01\x30\x12\x17\n\x0cxceiverCount\x18\x07 \x01(\r:\x01\x30\x12\x10\n\x08location\x18\x08 \x01(\t\x12\x39\n\nadminState\x18\n \x01(\x0e\x32\x1d.DatanodeInfoProto.AdminState:\x06NORMAL\"I\n\nAdminState\x12\n\n\x06NORMAL\x10\x00\x12\x1b\n\x17\x44\x45\x43OMMISSION_INPROGRESS\x10\x01\x12\x12\n\x0e\x44\x45\x43OMMISSIONED\x10\x02\"\x8a\x01\n\x13\x43ontentSummaryProto\x12\x0e\n\x06length\x18\x01 \x02(\x04\x12\x11\n\tfileCount\x18\x02 \x02(\x04\x12\x16\n\x0e\x64irectoryCount\x18\x03 \x02(\x04\x12\r\n\x05quota\x18\x04 \x02(\x04\x12\x15\n\rspaceConsumed\x18\x05 \x02(\x04\x12\x12\n\nspaceQuota\x18\x06 \x02(\x04\"7\n\x16\x43orruptFileBlocksProto\x12\r\n\x05\x66iles\x18\x01 \x03(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x02(\t\"!\n\x11\x46sPermissionProto\x12\x0c\n\x04perm\x18\x01 \x02(\r\"\xa6\x01\n\x11LocatedBlockProto\x12\x1e\n\x01\x62\x18\x01 \x02(\x0b\x32\x13.ExtendedBlockProto\x12\x0e\n\x06offset\x18\x02 \x02(\x04\x12 \n\x04locs\x18\x03 \x03(\x0b\x32\x12.DatanodeInfoProto\x12\x0f\n\x07\x63orrupt\x18\x04 \x02(\x08\x12.\n\nblockToken\x18\x05 \x02(\x0b\x32\x1a.BlockTokenIdentifierProto\"\x93\x01\n\x16\x44\x61taEncryptionKeyProto\x12\r\n\x05keyId\x18\x01 \x02(\r\x12\x13\n\x0b\x62lockPoolId\x18\x02 \x02(\t\x12\r\n\x05nonce\x18\x03 \x02(\x0c\x12\x15\n\rencryptionKey\x18\x04 \x02(\x0c\x12\x12\n\nexpiryDate\x18\x05 \x02(\x04\x12\x1b\n\x13\x65ncryptionAlgorithm\x18\x06 \x01(\t\"\xab\x01\n\x12LocatedBlocksProto\x12\x12\n\nfileLength\x18\x01 \x02(\x04\x12\"\n\x06\x62locks\x18\x02 \x03(\x0b\x32\x12.LocatedBlockProto\x12\x19\n\x11underConstruction\x18\x03 \x02(\x08\x12%\n\tlastBlock\x18\x04 \x01(\x0b\x32\x12.LocatedBlockProto\x12\x1b\n\x13isLastBlockComplete\x18\x05 \x02(\x08\"\xfc\x02\n\x13HdfsFileStatusProto\x12/\n\x08\x66ileType\x18\x01 \x02(\x0e\x32\x1d.HdfsFileStatusProto.FileType\x12\x0c\n\x04path\x18\x02 \x02(\x0c\x12\x0e\n\x06length\x18\x03 \x02(\x04\x12&\n\npermission\x18\x04 \x02(\x0b\x32\x12.FsPermissionProto\x12\r\n\x05owner\x18\x05 \x02(\t\x12\r\n\x05group\x18\x06 \x02(\t\x12\x19\n\x11modification_time\x18\x07 \x02(\x04\x12\x13\n\x0b\x61\x63\x63\x65ss_time\x18\x08 \x02(\x04\x12\x0f\n\x07symlink\x18\t \x01(\x0c\x12\x1c\n\x11\x62lock_replication\x18\n \x01(\r:\x01\x30\x12\x14\n\tblocksize\x18\x0b \x01(\x04:\x01\x30\x12&\n\tlocations\x18\x0c \x01(\x0b\x32\x13.LocatedBlocksProto\"3\n\x08\x46ileType\x12\n\n\x06IS_DIR\x10\x01\x12\x0b\n\x07IS_FILE\x10\x02\x12\x0e\n\nIS_SYMLINK\x10\x03\"\x82\x02\n\x15\x46sServerDefaultsProto\x12\x11\n\tblockSize\x18\x01 \x02(\x04\x12\x18\n\x10\x62ytesPerChecksum\x18\x02 \x02(\r\x12\x17\n\x0fwritePacketSize\x18\x03 \x02(\r\x12\x13\n\x0breplication\x18\x04 \x02(\r\x12\x16\n\x0e\x66ileBufferSize\x18\x05 \x02(\r\x12\"\n\x13\x65ncryptDataTransfer\x18\x06 \x01(\x08:\x05\x66\x61lse\x12\x18\n\rtrashInterval\x18\x07 \x01(\x04:\x01\x30\x12\x38\n\x0c\x63hecksumType\x18\x08 \x01(\x0e\x32\x12.ChecksumTypeProto:\x0e\x43HECKSUM_CRC32\"_\n\x15\x44irectoryListingProto\x12,\n\x0epartialListing\x18\x01 \x03(\x0b\x32\x14.HdfsFileStatusProto\x12\x18\n\x10remainingEntries\x18\x02 \x02(\r\"U\n\x18UpgradeStatusReportProto\x12\x0f\n\x07version\x18\x01 \x02(\r\x12\x15\n\rupgradeStatus\x18\x02 \x02(\r\x12\x11\n\tfinalized\x18\x03 \x02(\x08\"_\n\x10StorageInfoProto\x12\x15\n\rlayoutVersion\x18\x01 \x02(\r\x12\x12\n\nnamespceID\x18\x02 \x02(\r\x12\x11\n\tclusterID\x18\x03 \x02(\t\x12\r\n\x05\x63Time\x18\x04 \x02(\x04\"\xf1\x01\n\x19NamenodeRegistrationProto\x12\x12\n\nrpcAddress\x18\x01 \x02(\t\x12\x13\n\x0bhttpAddress\x18\x02 \x02(\t\x12&\n\x0bstorageInfo\x18\x03 \x02(\x0b\x32\x11.StorageInfoProto\x12\x44\n\x04role\x18\x04 \x01(\x0e\x32,.NamenodeRegistrationProto.NamenodeRoleProto:\x08NAMENODE\"=\n\x11NamenodeRoleProto\x12\x0c\n\x08NAMENODE\x10\x01\x12\n\n\x06\x42\x41\x43KUP\x10\x02\x12\x0e\n\nCHECKPOINT\x10\x03\"\x91\x01\n\x18\x43heckpointSignatureProto\x12\x13\n\x0b\x62lockPoolId\x18\x01 \x02(\t\x12 \n\x18mostRecentCheckpointTxId\x18\x02 \x02(\x04\x12\x16\n\x0e\x63urSegmentTxId\x18\x03 \x02(\x04\x12&\n\x0bstorageInfo\x18\x04 \x02(\x0b\x32\x11.StorageInfoProto\"\xb4\x01\n\x14NamenodeCommandProto\x12\x0e\n\x06\x61\x63tion\x18\x01 \x02(\r\x12(\n\x04type\x18\x02 \x02(\x0e\x32\x1a.NamenodeCommandProto.Type\x12.\n\rcheckpointCmd\x18\x03 \x01(\x0b\x32\x17.CheckpointCommandProto\"2\n\x04Type\x12\x13\n\x0fNamenodeCommand\x10\x00\x12\x15\n\x11\x43heckPointCommand\x10\x01\"a\n\x16\x43heckpointCommandProto\x12,\n\tsignature\x18\x01 \x02(\x0b\x32\x19.CheckpointSignatureProto\x12\x19\n\x11needToReturnImage\x18\x02 \x02(\x08\"D\n\nBlockProto\x12\x0f\n\x07\x62lockId\x18\x01 \x02(\x04\x12\x10\n\x08genStamp\x18\x02 \x02(\x04\x12\x13\n\x08numBytes\x18\x03 \x01(\x04:\x01\x30\"I\n\x17\x42lockWithLocationsProto\x12\x1a\n\x05\x62lock\x18\x01 \x02(\x0b\x32\x0b.BlockProto\x12\x12\n\nstorageIDs\x18\x02 \x03(\t\"D\n\x18\x42locksWithLocationsProto\x12(\n\x06\x62locks\x18\x01 \x03(\x0b\x32\x18.BlockWithLocationsProto\"U\n\x12RemoteEditLogProto\x12\x11\n\tstartTxId\x18\x01 \x02(\x04\x12\x0f\n\x07\x65ndTxId\x18\x02 \x02(\x04\x12\x1b\n\x0cisInProgress\x18\x03 \x01(\x08:\x05\x66\x61lse\"?\n\x1aRemoteEditLogManifestProto\x12!\n\x04logs\x18\x01 \x03(\x0b\x32\x13.RemoteEditLogProto\"\x9c\x01\n\x12NamespaceInfoProto\x12\x14\n\x0c\x62uildVersion\x18\x01 \x02(\t\x12\x1a\n\x12\x64istUpgradeVersion\x18\x02 \x02(\r\x12\x13\n\x0b\x62lockPoolID\x18\x03 \x02(\t\x12&\n\x0bstorageInfo\x18\x04 \x02(\x0b\x32\x11.StorageInfoProto\x12\x17\n\x0fsoftwareVersion\x18\x05 \x02(\t\"D\n\rBlockKeyProto\x12\r\n\x05keyId\x18\x01 \x02(\r\x12\x12\n\nexpiryDate\x18\x02 \x02(\x04\x12\x10\n\x08keyBytes\x18\x03 \x01(\x0c\"\xac\x01\n\x16\x45xportedBlockKeysProto\x12\x1b\n\x13isBlockTokenEnabled\x18\x01 \x02(\x08\x12\x19\n\x11keyUpdateInterval\x18\x02 \x02(\x04\x12\x15\n\rtokenLifeTime\x18\x03 \x02(\x04\x12\"\n\ncurrentKey\x18\x04 \x02(\x0b\x32\x0e.BlockKeyProto\x12\x1f\n\x07\x61llKeys\x18\x05 \x03(\x0b\x32\x0e.BlockKeyProto\"N\n\x14RecoveringBlockProto\x12\x13\n\x0bnewGenStamp\x18\x01 \x02(\x04\x12!\n\x05\x62lock\x18\x02 \x02(\x0b\x32\x12.LocatedBlockProto\"\x15\n\x13VersionRequestProto\"9\n\x14VersionResponseProto\x12!\n\x04info\x18\x01 \x02(\x0b\x32\x13.NamespaceInfoProto*O\n\x11\x43hecksumTypeProto\x12\x11\n\rCHECKSUM_NULL\x10\x00\x12\x12\n\x0e\x43HECKSUM_CRC32\x10\x01\x12\x13\n\x0f\x43HECKSUM_CRC32C\x10\x02*L\n\x11ReplicaStateProto\x12\r\n\tFINALIZED\x10\x00\x12\x07\n\x03RBW\x10\x01\x12\x07\n\x03RWR\x10\x02\x12\x07\n\x03RUR\x10\x03\x12\r\n\tTEMPORARY\x10\x04\x42\x39\n%org.apache.hadoop.hdfs.protocol.protoB\nHdfsProtos\x90\x01\x01\xa0\x01\x01')
+  package='hadoop.hdfs',
+  serialized_pb='\n\nhdfs.proto\x12\x0bhadoop.hdfs\x1a\x0eSecurity.proto\"c\n\x12\x45xtendedBlockProto\x12\x0e\n\x06poolId\x18\x01 \x02(\t\x12\x0f\n\x07\x62lockId\x18\x02 \x02(\x04\x12\x17\n\x0fgenerationStamp\x18\x03 \x02(\x04\x12\x13\n\x08numBytes\x18\x04 \x01(\x04:\x01\x30\"\x96\x01\n\x0f\x44\x61tanodeIDProto\x12\x0e\n\x06ipAddr\x18\x01 \x02(\t\x12\x10\n\x08hostName\x18\x02 \x02(\t\x12\x11\n\tstorageID\x18\x03 \x02(\t\x12\x10\n\x08xferPort\x18\x04 \x02(\r\x12\x10\n\x08infoPort\x18\x05 \x02(\r\x12\x0f\n\x07ipcPort\x18\x06 \x02(\r\x12\x19\n\x0einfoSecurePort\x18\x07 \x01(\r:\x01\x30\"G\n\x12\x44\x61tanodeInfosProto\x12\x31\n\tdatanodes\x18\x01 \x03(\x0b\x32\x1e.hadoop.hdfs.DatanodeInfoProto\"\xea\x02\n\x11\x44\x61tanodeInfoProto\x12(\n\x02id\x18\x01 \x02(\x0b\x32\x1c.hadoop.hdfs.DatanodeIDProto\x12\x13\n\x08\x63\x61pacity\x18\x02 \x01(\x04:\x01\x30\x12\x12\n\x07\x64\x66sUsed\x18\x03 \x01(\x04:\x01\x30\x12\x14\n\tremaining\x18\x04 \x01(\x04:\x01\x30\x12\x18\n\rblockPoolUsed\x18\x05 \x01(\x04:\x01\x30\x12\x15\n\nlastUpdate\x18\x06 \x01(\x04:\x01\x30\x12\x17\n\x0cxceiverCount\x18\x07 \x01(\r:\x01\x30\x12\x10\n\x08location\x18\x08 \x01(\t\x12\x45\n\nadminState\x18\n \x01(\x0e\x32).hadoop.hdfs.DatanodeInfoProto.AdminState:\x06NORMAL\"I\n\nAdminState\x12\n\n\x06NORMAL\x10\x00\x12\x1b\n\x17\x44\x45\x43OMMISSION_INPROGRESS\x10\x01\x12\x12\n\x0e\x44\x45\x43OMMISSIONED\x10\x02\"\x8a\x01\n\x13\x43ontentSummaryProto\x12\x0e\n\x06length\x18\x01 \x02(\x04\x12\x11\n\tfileCount\x18\x02 \x02(\x04\x12\x16\n\x0e\x64irectoryCount\x18\x03 \x02(\x04\x12\r\n\x05quota\x18\x04 \x02(\x04\x12\x15\n\rspaceConsumed\x18\x05 \x02(\x04\x12\x12\n\nspaceQuota\x18\x06 \x02(\x04\"7\n\x16\x43orruptFileBlocksProto\x12\r\n\x05\x66iles\x18\x01 \x03(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x02(\t\"!\n\x11\x46sPermissionProto\x12\x0c\n\x04perm\x18\x01 \x02(\r\"\xbd\x01\n\x11LocatedBlockProto\x12*\n\x01\x62\x18\x01 \x02(\x0b\x32\x1f.hadoop.hdfs.ExtendedBlockProto\x12\x0e\n\x06offset\x18\x02 \x02(\x04\x12,\n\x04locs\x18\x03 \x03(\x0b\x32\x1e.hadoop.hdfs.DatanodeInfoProto\x12\x0f\n\x07\x63orrupt\x18\x04 \x02(\x08\x12-\n\nblockToken\x18\x05 \x02(\x0b\x32\x19.hadoop.common.TokenProto\"\x93\x01\n\x16\x44\x61taEncryptionKeyProto\x12\r\n\x05keyId\x18\x01 \x02(\r\x12\x13\n\x0b\x62lockPoolId\x18\x02 \x02(\t\x12\r\n\x05nonce\x18\x03 \x02(\x0c\x12\x15\n\rencryptionKey\x18\x04 \x02(\x0c\x12\x12\n\nexpiryDate\x18\x05 \x02(\x04\x12\x1b\n\x13\x65ncryptionAlgorithm\x18\x06 \x01(\t\"\xc3\x01\n\x12LocatedBlocksProto\x12\x12\n\nfileLength\x18\x01 \x02(\x04\x12.\n\x06\x62locks\x18\x02 \x03(\x0b\x32\x1e.hadoop.hdfs.LocatedBlockProto\x12\x19\n\x11underConstruction\x18\x03 \x02(\x08\x12\x31\n\tlastBlock\x18\x04 \x01(\x0b\x32\x1e.hadoop.hdfs.LocatedBlockProto\x12\x1b\n\x13isLastBlockComplete\x18\x05 \x02(\x08\"\xcc\x03\n\x13HdfsFileStatusProto\x12;\n\x08\x66ileType\x18\x01 \x02(\x0e\x32).hadoop.hdfs.HdfsFileStatusProto.FileType\x12\x0c\n\x04path\x18\x02 \x02(\x0c\x12\x0e\n\x06length\x18\x03 \x02(\x04\x12\x32\n\npermission\x18\x04 \x02(\x0b\x32\x1e.hadoop.hdfs.FsPermissionProto\x12\r\n\x05owner\x18\x05 \x02(\t\x12\r\n\x05group\x18\x06 \x02(\t\x12\x19\n\x11modification_time\x18\x07 \x02(\x04\x12\x13\n\x0b\x61\x63\x63\x65ss_time\x18\x08 \x02(\x04\x12\x0f\n\x07symlink\x18\t \x01(\x0c\x12\x1c\n\x11\x62lock_replication\x18\n \x01(\r:\x01\x30\x12\x14\n\tblocksize\x18\x0b \x01(\x04:\x01\x30\x12\x32\n\tlocations\x18\x0c \x01(\x0b\x32\x1f.hadoop.hdfs.LocatedBlocksProto\x12\x11\n\x06\x66ileId\x18\r \x01(\x04:\x01\x30\x12\x17\n\x0b\x63hildrenNum\x18\x0e \x01(\x05:\x02-1\"3\n\x08\x46ileType\x12\n\n\x06IS_DIR\x10\x01\x12\x0b\n\x07IS_FILE\x10\x02\x12\x0e\n\nIS_SYMLINK\x10\x03\"\x8e\x02\n\x15\x46sServerDefaultsProto\x12\x11\n\tblockSize\x18\x01 \x02(\x04\x12\x18\n\x10\x62ytesPerChecksum\x18\x02 \x02(\r\x12\x17\n\x0fwritePacketSize\x18\x03 \x02(\r\x12\x13\n\x0breplication\x18\x04 \x02(\r\x12\x16\n\x0e\x66ileBufferSize\x18\x05 \x02(\r\x12\"\n\x13\x65ncryptDataTransfer\x18\x06 \x01(\x08:\x05\x66\x61lse\x12\x18\n\rtrashInterval\x18\x07 \x01(\x04:\x01\x30\x12\x44\n\x0c\x63hecksumType\x18\x08 \x01(\x0e\x32\x1e.hadoop.hdfs.ChecksumTypeProto:\x0e\x43HECKSUM_CRC32\"k\n\x15\x44irectoryListingProto\x12\x38\n\x0epartialListing\x18\x01 \x03(\x0b\x32 .hadoop.hdfs.HdfsFileStatusProto\x12\x18\n\x10remainingEntries\x18\x02 \x02(\r\"\xa2\x01\n!SnapshottableDirectoryStatusProto\x12\x33\n\tdirStatus\x18\x01 \x02(\x0b\x32 .hadoop.hdfs.HdfsFileStatusProto\x12\x16\n\x0esnapshot_quota\x18\x02 \x02(\r\x12\x17\n\x0fsnapshot_number\x18\x03 \x02(\r\x12\x17\n\x0fparent_fullpath\x18\x04 \x02(\x0c\"u\n\"SnapshottableDirectoryListingProto\x12O\n\x17snapshottableDirListing\x18\x01 \x03(\x0b\x32..hadoop.hdfs.SnapshottableDirectoryStatusProto\"K\n\x1cSnapshotDiffReportEntryProto\x12\x10\n\x08\x66ullpath\x18\x01 \x02(\x0c\x12\x19\n\x11modificationLabel\x18\x02 \x02(\t\"\x9f\x01\n\x17SnapshotDiffReportProto\x12\x14\n\x0csnapshotRoot\x18\x01 \x02(\t\x12\x14\n\x0c\x66romSnapshot\x18\x02 \x02(\t\x12\x12\n\ntoSnapshot\x18\x03 \x02(\t\x12\x44\n\x11\x64iffReportEntries\x18\x04 \x03(\x0b\x32).hadoop.hdfs.SnapshotDiffReportEntryProto\"_\n\x10StorageInfoProto\x12\x15\n\rlayoutVersion\x18\x01 \x02(\r\x12\x12\n\nnamespceID\x18\x02 \x02(\r\x12\x11\n\tclusterID\x18\x03 \x02(\t\x12\r\n\x05\x63Time\x18\x04 \x02(\x04\"\x89\x02\n\x19NamenodeRegistrationProto\x12\x12\n\nrpcAddress\x18\x01 \x02(\t\x12\x13\n\x0bhttpAddress\x18\x02 \x02(\t\x12\x32\n\x0bstorageInfo\x18\x03 \x02(\x0b\x32\x1d.hadoop.hdfs.StorageInfoProto\x12P\n\x04role\x18\x04 \x01(\x0e\x32\x38.hadoop.hdfs.NamenodeRegistrationProto.NamenodeRoleProto:\x08NAMENODE\"=\n\x11NamenodeRoleProto\x12\x0c\n\x08NAMENODE\x10\x01\x12\n\n\x06\x42\x41\x43KUP\x10\x02\x12\x0e\n\nCHECKPOINT\x10\x03\"\x9d\x01\n\x18\x43heckpointSignatureProto\x12\x13\n\x0b\x62lockPoolId\x18\x01 \x02(\t\x12 \n\x18mostRecentCheckpointTxId\x18\x02 \x02(\x04\x12\x16\n\x0e\x63urSegmentTxId\x18\x03 \x02(\x04\x12\x32\n\x0bstorageInfo\x18\x04 \x02(\x0b\x32\x1d.hadoop.hdfs.StorageInfoProto\"\xcc\x01\n\x14NamenodeCommandProto\x12\x0e\n\x06\x61\x63tion\x18\x01 \x02(\r\x12\x34\n\x04type\x18\x02 \x02(\x0e\x32&.hadoop.hdfs.NamenodeCommandProto.Type\x12:\n\rcheckpointCmd\x18\x03 \x01(\x0b\x32#.hadoop.hdfs.CheckpointCommandProto\"2\n\x04Type\x12\x13\n\x0fNamenodeCommand\x10\x00\x12\x15\n\x11\x43heckPointCommand\x10\x01\"m\n\x16\x43heckpointCommandProto\x12\x38\n\tsignature\x18\x01 \x02(\x0b\x32%.hadoop.hdfs.CheckpointSignatureProto\x12\x19\n\x11needToReturnImage\x18\x02 \x02(\x08\"D\n\nBlockProto\x12\x0f\n\x07\x62lockId\x18\x01 \x02(\x04\x12\x10\n\x08genStamp\x18\x02 \x02(\x04\x12\x13\n\x08numBytes\x18\x03 \x01(\x04:\x01\x30\"U\n\x17\x42lockWithLocationsProto\x12&\n\x05\x62lock\x18\x01 \x02(\x0b\x32\x17.hadoop.hdfs.BlockProto\x12\x12\n\nstorageIDs\x18\x02 \x03(\t\"P\n\x18\x42locksWithLocationsProto\x12\x34\n\x06\x62locks\x18\x01 \x03(\x0b\x32$.hadoop.hdfs.BlockWithLocationsProto\"U\n\x12RemoteEditLogProto\x12\x11\n\tstartTxId\x18\x01 \x02(\x04\x12\x0f\n\x07\x65ndTxId\x18\x02 \x02(\x04\x12\x1b\n\x0cisInProgress\x18\x03 \x01(\x08:\x05\x66\x61lse\"K\n\x1aRemoteEditLogManifestProto\x12-\n\x04logs\x18\x01 \x03(\x0b\x32\x1f.hadoop.hdfs.RemoteEditLogProto\"\x9c\x01\n\x12NamespaceInfoProto\x12\x14\n\x0c\x62uildVersion\x18\x01 \x02(\t\x12\x0e\n\x06unused\x18\x02 \x02(\r\x12\x13\n\x0b\x62lockPoolID\x18\x03 \x02(\t\x12\x32\n\x0bstorageInfo\x18\x04 \x02(\x0b\x32\x1d.hadoop.hdfs.StorageInfoProto\x12\x17\n\x0fsoftwareVersion\x18\x05 \x02(\t\"D\n\rBlockKeyProto\x12\r\n\x05keyId\x18\x01 \x02(\r\x12\x12\n\nexpiryDate\x18\x02 \x02(\x04\x12\x10\n\x08keyBytes\x18\x03 \x01(\x0c\"\xc4\x01\n\x16\x45xportedBlockKeysProto\x12\x1b\n\x13isBlockTokenEnabled\x18\x01 \x02(\x08\x12\x19\n\x11keyUpdateInterval\x18\x02 \x02(\x04\x12\x15\n\rtokenLifeTime\x18\x03 \x02(\x04\x12.\n\ncurrentKey\x18\x04 \x02(\x0b\x32\x1a.hadoop.hdfs.BlockKeyProto\x12+\n\x07\x61llKeys\x18\x05 \x03(\x0b\x32\x1a.hadoop.hdfs.BlockKeyProto\"Z\n\x14RecoveringBlockProto\x12\x13\n\x0bnewGenStamp\x18\x01 \x02(\x04\x12-\n\x05\x62lock\x18\x02 \x02(\x0b\x32\x1e.hadoop.hdfs.LocatedBlockProto\"\x15\n\x13VersionRequestProto\"E\n\x14VersionResponseProto\x12-\n\x04info\x18\x01 \x02(\x0b\x32\x1f.hadoop.hdfs.NamespaceInfoProto\"\xa5\x01\n\x11SnapshotInfoProto\x12\x14\n\x0csnapshotName\x18\x01 \x02(\t\x12\x14\n\x0csnapshotRoot\x18\x02 \x02(\t\x12\x32\n\npermission\x18\x03 \x02(\x0b\x32\x1e.hadoop.hdfs.FsPermissionProto\x12\r\n\x05owner\x18\x04 \x02(\t\x12\r\n\x05group\x18\x05 \x02(\t\x12\x12\n\ncreateTime\x18\x06 \x02(\t*O\n\x11\x43hecksumTypeProto\x12\x11\n\rCHECKSUM_NULL\x10\x00\x12\x12\n\x0e\x43HECKSUM_CRC32\x10\x01\x12\x13\n\x0f\x43HECKSUM_CRC32C\x10\x02*L\n\x11ReplicaStateProto\x12\r\n\tFINALIZED\x10\x00\x12\x07\n\x03RBW\x10\x01\x12\x07\n\x03RWR\x10\x02\x12\x07\n\x03RUR\x10\x03\x12\r\n\tTEMPORARY\x10\x04\x42\x36\n%org.apache.hadoop.hdfs.protocol.protoB\nHdfsProtos\xa0\x01\x01')
 
 _CHECKSUMTYPEPROTO = descriptor.EnumDescriptor(
   name='ChecksumTypeProto',
-  full_name='ChecksumTypeProto',
+  full_name='hadoop.hdfs.ChecksumTypeProto',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -34,14 +35,14 @@ _CHECKSUMTYPEPROTO = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3998,
-  serialized_end=4077,
+  serialized_start=4904,
+  serialized_end=4983,
 )
 
 
 _REPLICASTATEPROTO = descriptor.EnumDescriptor(
   name='ReplicaStateProto',
-  full_name='ReplicaStateProto',
+  full_name='hadoop.hdfs.ReplicaStateProto',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -68,8 +69,8 @@ _REPLICASTATEPROTO = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=4079,
-  serialized_end=4155,
+  serialized_start=4985,
+  serialized_end=5061,
 )
 
 
@@ -85,7 +86,7 @@ TEMPORARY = 4
 
 _DATANODEINFOPROTO_ADMINSTATE = descriptor.EnumDescriptor(
   name='AdminState',
-  full_name='DatanodeInfoProto.AdminState',
+  full_name='hadoop.hdfs.DatanodeInfoProto.AdminState',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -104,13 +105,13 @@ _DATANODEINFOPROTO_ADMINSTATE = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=665,
-  serialized_end=738,
+  serialized_start=660,
+  serialized_end=733,
 )
 
 _HDFSFILESTATUSPROTO_FILETYPE = descriptor.EnumDescriptor(
   name='FileType',
-  full_name='HdfsFileStatusProto.FileType',
+  full_name='hadoop.hdfs.HdfsFileStatusProto.FileType',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -129,13 +130,13 @@ _HDFSFILESTATUSPROTO_FILETYPE = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1796,
-  serialized_end=1847,
+  serialized_start=1918,
+  serialized_end=1969,
 )
 
 _NAMENODEREGISTRATIONPROTO_NAMENODEROLEPROTO = descriptor.EnumDescriptor(
   name='NamenodeRoleProto',
-  full_name='NamenodeRegistrationProto.NamenodeRoleProto',
+  full_name='hadoop.hdfs.NamenodeRegistrationProto.NamenodeRoleProto',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -154,13 +155,13 @@ _NAMENODEREGISTRATIONPROTO_NAMENODEROLEPROTO = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2572,
-  serialized_end=2633,
+  serialized_start=3178,
+  serialized_end=3239,
 )
 
 _NAMENODECOMMANDPROTO_TYPE = descriptor.EnumDescriptor(
   name='Type',
-  full_name='NamenodeCommandProto.Type',
+  full_name='hadoop.hdfs.NamenodeCommandProto.Type',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -175,41 +176,41 @@ _NAMENODECOMMANDPROTO_TYPE = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2914,
-  serialized_end=2964,
+  serialized_start=3556,
+  serialized_end=3606,
 )
 
 
 _EXTENDEDBLOCKPROTO = descriptor.Descriptor(
   name='ExtendedBlockProto',
-  full_name='ExtendedBlockProto',
+  full_name='hadoop.hdfs.ExtendedBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='poolId', full_name='ExtendedBlockProto.poolId', index=0,
+      name='poolId', full_name='hadoop.hdfs.ExtendedBlockProto.poolId', index=0,
       number=1, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='blockId', full_name='ExtendedBlockProto.blockId', index=1,
+      name='blockId', full_name='hadoop.hdfs.ExtendedBlockProto.blockId', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='generationStamp', full_name='ExtendedBlockProto.generationStamp', index=2,
+      name='generationStamp', full_name='hadoop.hdfs.ExtendedBlockProto.generationStamp', index=2,
       number=3, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='numBytes', full_name='ExtendedBlockProto.numBytes', index=3,
+      name='numBytes', full_name='hadoop.hdfs.ExtendedBlockProto.numBytes', index=3,
       number=4, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -224,106 +225,64 @@ _EXTENDEDBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=14,
-  serialized_end=113,
-)
-
-
-_BLOCKTOKENIDENTIFIERPROTO = descriptor.Descriptor(
-  name='BlockTokenIdentifierProto',
-  full_name='BlockTokenIdentifierProto',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    descriptor.FieldDescriptor(
-      name='identifier', full_name='BlockTokenIdentifierProto.identifier', index=0,
-      number=1, type=12, cpp_type=9, label=2,
-      has_default_value=False, default_value="",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='password', full_name='BlockTokenIdentifierProto.password', index=1,
-      number=2, type=12, cpp_type=9, label=2,
-      has_default_value=False, default_value="",
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='kind', full_name='BlockTokenIdentifierProto.kind', index=2,
-      number=3, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='service', full_name='BlockTokenIdentifierProto.service', index=3,
-      number=4, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=115,
-  serialized_end=211,
+  serialized_start=43,
+  serialized_end=142,
 )
 
 
 _DATANODEIDPROTO = descriptor.Descriptor(
   name='DatanodeIDProto',
-  full_name='DatanodeIDProto',
+  full_name='hadoop.hdfs.DatanodeIDProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='ipAddr', full_name='DatanodeIDProto.ipAddr', index=0,
+      name='ipAddr', full_name='hadoop.hdfs.DatanodeIDProto.ipAddr', index=0,
       number=1, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='hostName', full_name='DatanodeIDProto.hostName', index=1,
+      name='hostName', full_name='hadoop.hdfs.DatanodeIDProto.hostName', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='storageID', full_name='DatanodeIDProto.storageID', index=2,
+      name='storageID', full_name='hadoop.hdfs.DatanodeIDProto.storageID', index=2,
       number=3, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='xferPort', full_name='DatanodeIDProto.xferPort', index=3,
+      name='xferPort', full_name='hadoop.hdfs.DatanodeIDProto.xferPort', index=3,
       number=4, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='infoPort', full_name='DatanodeIDProto.infoPort', index=4,
+      name='infoPort', full_name='hadoop.hdfs.DatanodeIDProto.infoPort', index=4,
       number=5, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='ipcPort', full_name='DatanodeIDProto.ipcPort', index=5,
+      name='ipcPort', full_name='hadoop.hdfs.DatanodeIDProto.ipcPort', index=5,
       number=6, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='infoSecurePort', full_name='hadoop.hdfs.DatanodeIDProto.infoSecurePort', index=6,
+      number=7, type=13, cpp_type=3, label=1,
+      has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -336,20 +295,20 @@ _DATANODEIDPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=213,
-  serialized_end=336,
+  serialized_start=145,
+  serialized_end=295,
 )
 
 
 _DATANODEINFOSPROTO = descriptor.Descriptor(
   name='DatanodeInfosProto',
-  full_name='DatanodeInfosProto',
+  full_name='hadoop.hdfs.DatanodeInfosProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='datanodes', full_name='DatanodeInfosProto.datanodes', index=0,
+      name='datanodes', full_name='hadoop.hdfs.DatanodeInfosProto.datanodes', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -364,76 +323,76 @@ _DATANODEINFOSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=338,
-  serialized_end=397,
+  serialized_start=297,
+  serialized_end=368,
 )
 
 
 _DATANODEINFOPROTO = descriptor.Descriptor(
   name='DatanodeInfoProto',
-  full_name='DatanodeInfoProto',
+  full_name='hadoop.hdfs.DatanodeInfoProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='id', full_name='DatanodeInfoProto.id', index=0,
+      name='id', full_name='hadoop.hdfs.DatanodeInfoProto.id', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='capacity', full_name='DatanodeInfoProto.capacity', index=1,
+      name='capacity', full_name='hadoop.hdfs.DatanodeInfoProto.capacity', index=1,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='dfsUsed', full_name='DatanodeInfoProto.dfsUsed', index=2,
+      name='dfsUsed', full_name='hadoop.hdfs.DatanodeInfoProto.dfsUsed', index=2,
       number=3, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='remaining', full_name='DatanodeInfoProto.remaining', index=3,
+      name='remaining', full_name='hadoop.hdfs.DatanodeInfoProto.remaining', index=3,
       number=4, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='blockPoolUsed', full_name='DatanodeInfoProto.blockPoolUsed', index=4,
+      name='blockPoolUsed', full_name='hadoop.hdfs.DatanodeInfoProto.blockPoolUsed', index=4,
       number=5, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='lastUpdate', full_name='DatanodeInfoProto.lastUpdate', index=5,
+      name='lastUpdate', full_name='hadoop.hdfs.DatanodeInfoProto.lastUpdate', index=5,
       number=6, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='xceiverCount', full_name='DatanodeInfoProto.xceiverCount', index=6,
+      name='xceiverCount', full_name='hadoop.hdfs.DatanodeInfoProto.xceiverCount', index=6,
       number=7, type=13, cpp_type=3, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='location', full_name='DatanodeInfoProto.location', index=7,
+      name='location', full_name='hadoop.hdfs.DatanodeInfoProto.location', index=7,
       number=8, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='adminState', full_name='DatanodeInfoProto.adminState', index=8,
+      name='adminState', full_name='hadoop.hdfs.DatanodeInfoProto.adminState', index=8,
       number=10, type=14, cpp_type=8, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -449,55 +408,55 @@ _DATANODEINFOPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=400,
-  serialized_end=738,
+  serialized_start=371,
+  serialized_end=733,
 )
 
 
 _CONTENTSUMMARYPROTO = descriptor.Descriptor(
   name='ContentSummaryProto',
-  full_name='ContentSummaryProto',
+  full_name='hadoop.hdfs.ContentSummaryProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='length', full_name='ContentSummaryProto.length', index=0,
+      name='length', full_name='hadoop.hdfs.ContentSummaryProto.length', index=0,
       number=1, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='fileCount', full_name='ContentSummaryProto.fileCount', index=1,
+      name='fileCount', full_name='hadoop.hdfs.ContentSummaryProto.fileCount', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='directoryCount', full_name='ContentSummaryProto.directoryCount', index=2,
+      name='directoryCount', full_name='hadoop.hdfs.ContentSummaryProto.directoryCount', index=2,
       number=3, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='quota', full_name='ContentSummaryProto.quota', index=3,
+      name='quota', full_name='hadoop.hdfs.ContentSummaryProto.quota', index=3,
       number=4, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='spaceConsumed', full_name='ContentSummaryProto.spaceConsumed', index=4,
+      name='spaceConsumed', full_name='hadoop.hdfs.ContentSummaryProto.spaceConsumed', index=4,
       number=5, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='spaceQuota', full_name='ContentSummaryProto.spaceQuota', index=5,
+      name='spaceQuota', full_name='hadoop.hdfs.ContentSummaryProto.spaceQuota', index=5,
       number=6, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -512,27 +471,27 @@ _CONTENTSUMMARYPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=741,
-  serialized_end=879,
+  serialized_start=736,
+  serialized_end=874,
 )
 
 
 _CORRUPTFILEBLOCKSPROTO = descriptor.Descriptor(
   name='CorruptFileBlocksProto',
-  full_name='CorruptFileBlocksProto',
+  full_name='hadoop.hdfs.CorruptFileBlocksProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='files', full_name='CorruptFileBlocksProto.files', index=0,
+      name='files', full_name='hadoop.hdfs.CorruptFileBlocksProto.files', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='cookie', full_name='CorruptFileBlocksProto.cookie', index=1,
+      name='cookie', full_name='hadoop.hdfs.CorruptFileBlocksProto.cookie', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
@@ -547,20 +506,20 @@ _CORRUPTFILEBLOCKSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=881,
-  serialized_end=936,
+  serialized_start=876,
+  serialized_end=931,
 )
 
 
 _FSPERMISSIONPROTO = descriptor.Descriptor(
   name='FsPermissionProto',
-  full_name='FsPermissionProto',
+  full_name='hadoop.hdfs.FsPermissionProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='perm', full_name='FsPermissionProto.perm', index=0,
+      name='perm', full_name='hadoop.hdfs.FsPermissionProto.perm', index=0,
       number=1, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -575,48 +534,48 @@ _FSPERMISSIONPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=938,
-  serialized_end=971,
+  serialized_start=933,
+  serialized_end=966,
 )
 
 
 _LOCATEDBLOCKPROTO = descriptor.Descriptor(
   name='LocatedBlockProto',
-  full_name='LocatedBlockProto',
+  full_name='hadoop.hdfs.LocatedBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='b', full_name='LocatedBlockProto.b', index=0,
+      name='b', full_name='hadoop.hdfs.LocatedBlockProto.b', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='offset', full_name='LocatedBlockProto.offset', index=1,
+      name='offset', full_name='hadoop.hdfs.LocatedBlockProto.offset', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='locs', full_name='LocatedBlockProto.locs', index=2,
+      name='locs', full_name='hadoop.hdfs.LocatedBlockProto.locs', index=2,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='corrupt', full_name='LocatedBlockProto.corrupt', index=3,
+      name='corrupt', full_name='hadoop.hdfs.LocatedBlockProto.corrupt', index=3,
       number=4, type=8, cpp_type=7, label=2,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='blockToken', full_name='LocatedBlockProto.blockToken', index=4,
+      name='blockToken', full_name='hadoop.hdfs.LocatedBlockProto.blockToken', index=4,
       number=5, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -631,55 +590,55 @@ _LOCATEDBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=974,
-  serialized_end=1140,
+  serialized_start=969,
+  serialized_end=1158,
 )
 
 
 _DATAENCRYPTIONKEYPROTO = descriptor.Descriptor(
   name='DataEncryptionKeyProto',
-  full_name='DataEncryptionKeyProto',
+  full_name='hadoop.hdfs.DataEncryptionKeyProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='keyId', full_name='DataEncryptionKeyProto.keyId', index=0,
+      name='keyId', full_name='hadoop.hdfs.DataEncryptionKeyProto.keyId', index=0,
       number=1, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='blockPoolId', full_name='DataEncryptionKeyProto.blockPoolId', index=1,
+      name='blockPoolId', full_name='hadoop.hdfs.DataEncryptionKeyProto.blockPoolId', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='nonce', full_name='DataEncryptionKeyProto.nonce', index=2,
+      name='nonce', full_name='hadoop.hdfs.DataEncryptionKeyProto.nonce', index=2,
       number=3, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='encryptionKey', full_name='DataEncryptionKeyProto.encryptionKey', index=3,
+      name='encryptionKey', full_name='hadoop.hdfs.DataEncryptionKeyProto.encryptionKey', index=3,
       number=4, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='expiryDate', full_name='DataEncryptionKeyProto.expiryDate', index=4,
+      name='expiryDate', full_name='hadoop.hdfs.DataEncryptionKeyProto.expiryDate', index=4,
       number=5, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='encryptionAlgorithm', full_name='DataEncryptionKeyProto.encryptionAlgorithm', index=5,
+      name='encryptionAlgorithm', full_name='hadoop.hdfs.DataEncryptionKeyProto.encryptionAlgorithm', index=5,
       number=6, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
@@ -694,48 +653,48 @@ _DATAENCRYPTIONKEYPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1143,
-  serialized_end=1290,
+  serialized_start=1161,
+  serialized_end=1308,
 )
 
 
 _LOCATEDBLOCKSPROTO = descriptor.Descriptor(
   name='LocatedBlocksProto',
-  full_name='LocatedBlocksProto',
+  full_name='hadoop.hdfs.LocatedBlocksProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='fileLength', full_name='LocatedBlocksProto.fileLength', index=0,
+      name='fileLength', full_name='hadoop.hdfs.LocatedBlocksProto.fileLength', index=0,
       number=1, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='blocks', full_name='LocatedBlocksProto.blocks', index=1,
+      name='blocks', full_name='hadoop.hdfs.LocatedBlocksProto.blocks', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='underConstruction', full_name='LocatedBlocksProto.underConstruction', index=2,
+      name='underConstruction', full_name='hadoop.hdfs.LocatedBlocksProto.underConstruction', index=2,
       number=3, type=8, cpp_type=7, label=2,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='lastBlock', full_name='LocatedBlocksProto.lastBlock', index=3,
+      name='lastBlock', full_name='hadoop.hdfs.LocatedBlocksProto.lastBlock', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='isLastBlockComplete', full_name='LocatedBlocksProto.isLastBlockComplete', index=4,
+      name='isLastBlockComplete', full_name='hadoop.hdfs.LocatedBlocksProto.isLastBlockComplete', index=4,
       number=5, type=8, cpp_type=7, label=2,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -750,99 +709,113 @@ _LOCATEDBLOCKSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1293,
-  serialized_end=1464,
+  serialized_start=1311,
+  serialized_end=1506,
 )
 
 
 _HDFSFILESTATUSPROTO = descriptor.Descriptor(
   name='HdfsFileStatusProto',
-  full_name='HdfsFileStatusProto',
+  full_name='hadoop.hdfs.HdfsFileStatusProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='fileType', full_name='HdfsFileStatusProto.fileType', index=0,
+      name='fileType', full_name='hadoop.hdfs.HdfsFileStatusProto.fileType', index=0,
       number=1, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=1,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='path', full_name='HdfsFileStatusProto.path', index=1,
+      name='path', full_name='hadoop.hdfs.HdfsFileStatusProto.path', index=1,
       number=2, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='length', full_name='HdfsFileStatusProto.length', index=2,
+      name='length', full_name='hadoop.hdfs.HdfsFileStatusProto.length', index=2,
       number=3, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='permission', full_name='HdfsFileStatusProto.permission', index=3,
+      name='permission', full_name='hadoop.hdfs.HdfsFileStatusProto.permission', index=3,
       number=4, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='owner', full_name='HdfsFileStatusProto.owner', index=4,
+      name='owner', full_name='hadoop.hdfs.HdfsFileStatusProto.owner', index=4,
       number=5, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='group', full_name='HdfsFileStatusProto.group', index=5,
+      name='group', full_name='hadoop.hdfs.HdfsFileStatusProto.group', index=5,
       number=6, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='modification_time', full_name='HdfsFileStatusProto.modification_time', index=6,
+      name='modification_time', full_name='hadoop.hdfs.HdfsFileStatusProto.modification_time', index=6,
       number=7, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='access_time', full_name='HdfsFileStatusProto.access_time', index=7,
+      name='access_time', full_name='hadoop.hdfs.HdfsFileStatusProto.access_time', index=7,
       number=8, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='symlink', full_name='HdfsFileStatusProto.symlink', index=8,
+      name='symlink', full_name='hadoop.hdfs.HdfsFileStatusProto.symlink', index=8,
       number=9, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='block_replication', full_name='HdfsFileStatusProto.block_replication', index=9,
+      name='block_replication', full_name='hadoop.hdfs.HdfsFileStatusProto.block_replication', index=9,
       number=10, type=13, cpp_type=3, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='blocksize', full_name='HdfsFileStatusProto.blocksize', index=10,
+      name='blocksize', full_name='hadoop.hdfs.HdfsFileStatusProto.blocksize', index=10,
       number=11, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='locations', full_name='HdfsFileStatusProto.locations', index=11,
+      name='locations', full_name='hadoop.hdfs.HdfsFileStatusProto.locations', index=11,
       number=12, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='fileId', full_name='hadoop.hdfs.HdfsFileStatusProto.fileId', index=12,
+      number=13, type=4, cpp_type=4, label=1,
+      has_default_value=True, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='childrenNum', full_name='hadoop.hdfs.HdfsFileStatusProto.childrenNum', index=13,
+      number=14, type=5, cpp_type=1, label=1,
+      has_default_value=True, default_value=-1,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -856,69 +829,69 @@ _HDFSFILESTATUSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1467,
-  serialized_end=1847,
+  serialized_start=1509,
+  serialized_end=1969,
 )
 
 
 _FSSERVERDEFAULTSPROTO = descriptor.Descriptor(
   name='FsServerDefaultsProto',
-  full_name='FsServerDefaultsProto',
+  full_name='hadoop.hdfs.FsServerDefaultsProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='blockSize', full_name='FsServerDefaultsProto.blockSize', index=0,
+      name='blockSize', full_name='hadoop.hdfs.FsServerDefaultsProto.blockSize', index=0,
       number=1, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='bytesPerChecksum', full_name='FsServerDefaultsProto.bytesPerChecksum', index=1,
+      name='bytesPerChecksum', full_name='hadoop.hdfs.FsServerDefaultsProto.bytesPerChecksum', index=1,
       number=2, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='writePacketSize', full_name='FsServerDefaultsProto.writePacketSize', index=2,
+      name='writePacketSize', full_name='hadoop.hdfs.FsServerDefaultsProto.writePacketSize', index=2,
       number=3, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='replication', full_name='FsServerDefaultsProto.replication', index=3,
+      name='replication', full_name='hadoop.hdfs.FsServerDefaultsProto.replication', index=3,
       number=4, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='fileBufferSize', full_name='FsServerDefaultsProto.fileBufferSize', index=4,
+      name='fileBufferSize', full_name='hadoop.hdfs.FsServerDefaultsProto.fileBufferSize', index=4,
       number=5, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='encryptDataTransfer', full_name='FsServerDefaultsProto.encryptDataTransfer', index=5,
+      name='encryptDataTransfer', full_name='hadoop.hdfs.FsServerDefaultsProto.encryptDataTransfer', index=5,
       number=6, type=8, cpp_type=7, label=1,
       has_default_value=True, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='trashInterval', full_name='FsServerDefaultsProto.trashInterval', index=6,
+      name='trashInterval', full_name='hadoop.hdfs.FsServerDefaultsProto.trashInterval', index=6,
       number=7, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='checksumType', full_name='FsServerDefaultsProto.checksumType', index=7,
+      name='checksumType', full_name='hadoop.hdfs.FsServerDefaultsProto.checksumType', index=7,
       number=8, type=14, cpp_type=8, label=1,
       has_default_value=True, default_value=1,
       message_type=None, enum_type=None, containing_type=None,
@@ -933,27 +906,27 @@ _FSSERVERDEFAULTSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1850,
-  serialized_end=2108,
+  serialized_start=1972,
+  serialized_end=2242,
 )
 
 
 _DIRECTORYLISTINGPROTO = descriptor.Descriptor(
   name='DirectoryListingProto',
-  full_name='DirectoryListingProto',
+  full_name='hadoop.hdfs.DirectoryListingProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='partialListing', full_name='DirectoryListingProto.partialListing', index=0,
+      name='partialListing', full_name='hadoop.hdfs.DirectoryListingProto.partialListing', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='remainingEntries', full_name='DirectoryListingProto.remainingEntries', index=1,
+      name='remainingEntries', full_name='hadoop.hdfs.DirectoryListingProto.remainingEntries', index=1,
       number=2, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -968,36 +941,43 @@ _DIRECTORYLISTINGPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2110,
-  serialized_end=2205,
+  serialized_start=2244,
+  serialized_end=2351,
 )
 
 
-_UPGRADESTATUSREPORTPROTO = descriptor.Descriptor(
-  name='UpgradeStatusReportProto',
-  full_name='UpgradeStatusReportProto',
+_SNAPSHOTTABLEDIRECTORYSTATUSPROTO = descriptor.Descriptor(
+  name='SnapshottableDirectoryStatusProto',
+  full_name='hadoop.hdfs.SnapshottableDirectoryStatusProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='version', full_name='UpgradeStatusReportProto.version', index=0,
-      number=1, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
+      name='dirStatus', full_name='hadoop.hdfs.SnapshottableDirectoryStatusProto.dirStatus', index=0,
+      number=1, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='upgradeStatus', full_name='UpgradeStatusReportProto.upgradeStatus', index=1,
+      name='snapshot_quota', full_name='hadoop.hdfs.SnapshottableDirectoryStatusProto.snapshot_quota', index=1,
       number=2, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='finalized', full_name='UpgradeStatusReportProto.finalized', index=2,
-      number=3, type=8, cpp_type=7, label=2,
-      has_default_value=False, default_value=False,
+      name='snapshot_number', full_name='hadoop.hdfs.SnapshottableDirectoryStatusProto.snapshot_number', index=2,
+      number=3, type=13, cpp_type=3, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='parent_fullpath', full_name='hadoop.hdfs.SnapshottableDirectoryStatusProto.parent_fullpath', index=3,
+      number=4, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -1010,41 +990,153 @@ _UPGRADESTATUSREPORTPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2207,
-  serialized_end=2292,
+  serialized_start=2354,
+  serialized_end=2516,
 )
 
 
-_STORAGEINFOPROTO = descriptor.Descriptor(
-  name='StorageInfoProto',
-  full_name='StorageInfoProto',
+_SNAPSHOTTABLEDIRECTORYLISTINGPROTO = descriptor.Descriptor(
+  name='SnapshottableDirectoryListingProto',
+  full_name='hadoop.hdfs.SnapshottableDirectoryListingProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='layoutVersion', full_name='StorageInfoProto.layoutVersion', index=0,
-      number=1, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
+      name='snapshottableDirListing', full_name='hadoop.hdfs.SnapshottableDirectoryListingProto.snapshottableDirListing', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2518,
+  serialized_end=2635,
+)
+
+
+_SNAPSHOTDIFFREPORTENTRYPROTO = descriptor.Descriptor(
+  name='SnapshotDiffReportEntryProto',
+  full_name='hadoop.hdfs.SnapshotDiffReportEntryProto',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='fullpath', full_name='hadoop.hdfs.SnapshotDiffReportEntryProto.fullpath', index=0,
+      number=1, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='namespceID', full_name='StorageInfoProto.namespceID', index=1,
-      number=2, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
+      name='modificationLabel', full_name='hadoop.hdfs.SnapshotDiffReportEntryProto.modificationLabel', index=1,
+      number=2, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2637,
+  serialized_end=2712,
+)
+
+
+_SNAPSHOTDIFFREPORTPROTO = descriptor.Descriptor(
+  name='SnapshotDiffReportProto',
+  full_name='hadoop.hdfs.SnapshotDiffReportProto',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='snapshotRoot', full_name='hadoop.hdfs.SnapshotDiffReportProto.snapshotRoot', index=0,
+      number=1, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='clusterID', full_name='StorageInfoProto.clusterID', index=2,
+      name='fromSnapshot', full_name='hadoop.hdfs.SnapshotDiffReportProto.fromSnapshot', index=1,
+      number=2, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='toSnapshot', full_name='hadoop.hdfs.SnapshotDiffReportProto.toSnapshot', index=2,
       number=3, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='cTime', full_name='StorageInfoProto.cTime', index=3,
+      name='diffReportEntries', full_name='hadoop.hdfs.SnapshotDiffReportProto.diffReportEntries', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=2715,
+  serialized_end=2874,
+)
+
+
+_STORAGEINFOPROTO = descriptor.Descriptor(
+  name='StorageInfoProto',
+  full_name='hadoop.hdfs.StorageInfoProto',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='layoutVersion', full_name='hadoop.hdfs.StorageInfoProto.layoutVersion', index=0,
+      number=1, type=13, cpp_type=3, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='namespceID', full_name='hadoop.hdfs.StorageInfoProto.namespceID', index=1,
+      number=2, type=13, cpp_type=3, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='clusterID', full_name='hadoop.hdfs.StorageInfoProto.clusterID', index=2,
+      number=3, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='cTime', full_name='hadoop.hdfs.StorageInfoProto.cTime', index=3,
       number=4, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1059,41 +1151,41 @@ _STORAGEINFOPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2294,
-  serialized_end=2389,
+  serialized_start=2876,
+  serialized_end=2971,
 )
 
 
 _NAMENODEREGISTRATIONPROTO = descriptor.Descriptor(
   name='NamenodeRegistrationProto',
-  full_name='NamenodeRegistrationProto',
+  full_name='hadoop.hdfs.NamenodeRegistrationProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='rpcAddress', full_name='NamenodeRegistrationProto.rpcAddress', index=0,
+      name='rpcAddress', full_name='hadoop.hdfs.NamenodeRegistrationProto.rpcAddress', index=0,
       number=1, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='httpAddress', full_name='NamenodeRegistrationProto.httpAddress', index=1,
+      name='httpAddress', full_name='hadoop.hdfs.NamenodeRegistrationProto.httpAddress', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='storageInfo', full_name='NamenodeRegistrationProto.storageInfo', index=2,
+      name='storageInfo', full_name='hadoop.hdfs.NamenodeRegistrationProto.storageInfo', index=2,
       number=3, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='role', full_name='NamenodeRegistrationProto.role', index=3,
+      name='role', full_name='hadoop.hdfs.NamenodeRegistrationProto.role', index=3,
       number=4, type=14, cpp_type=8, label=1,
       has_default_value=True, default_value=1,
       message_type=None, enum_type=None, containing_type=None,
@@ -1109,41 +1201,41 @@ _NAMENODEREGISTRATIONPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2392,
-  serialized_end=2633,
+  serialized_start=2974,
+  serialized_end=3239,
 )
 
 
 _CHECKPOINTSIGNATUREPROTO = descriptor.Descriptor(
   name='CheckpointSignatureProto',
-  full_name='CheckpointSignatureProto',
+  full_name='hadoop.hdfs.CheckpointSignatureProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='blockPoolId', full_name='CheckpointSignatureProto.blockPoolId', index=0,
+      name='blockPoolId', full_name='hadoop.hdfs.CheckpointSignatureProto.blockPoolId', index=0,
       number=1, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='mostRecentCheckpointTxId', full_name='CheckpointSignatureProto.mostRecentCheckpointTxId', index=1,
+      name='mostRecentCheckpointTxId', full_name='hadoop.hdfs.CheckpointSignatureProto.mostRecentCheckpointTxId', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='curSegmentTxId', full_name='CheckpointSignatureProto.curSegmentTxId', index=2,
+      name='curSegmentTxId', full_name='hadoop.hdfs.CheckpointSignatureProto.curSegmentTxId', index=2,
       number=3, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='storageInfo', full_name='CheckpointSignatureProto.storageInfo', index=3,
+      name='storageInfo', full_name='hadoop.hdfs.CheckpointSignatureProto.storageInfo', index=3,
       number=4, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1158,34 +1250,34 @@ _CHECKPOINTSIGNATUREPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2636,
-  serialized_end=2781,
+  serialized_start=3242,
+  serialized_end=3399,
 )
 
 
 _NAMENODECOMMANDPROTO = descriptor.Descriptor(
   name='NamenodeCommandProto',
-  full_name='NamenodeCommandProto',
+  full_name='hadoop.hdfs.NamenodeCommandProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='action', full_name='NamenodeCommandProto.action', index=0,
+      name='action', full_name='hadoop.hdfs.NamenodeCommandProto.action', index=0,
       number=1, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='type', full_name='NamenodeCommandProto.type', index=1,
+      name='type', full_name='hadoop.hdfs.NamenodeCommandProto.type', index=1,
       number=2, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='checkpointCmd', full_name='NamenodeCommandProto.checkpointCmd', index=2,
+      name='checkpointCmd', full_name='hadoop.hdfs.NamenodeCommandProto.checkpointCmd', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1201,27 +1293,27 @@ _NAMENODECOMMANDPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2784,
-  serialized_end=2964,
+  serialized_start=3402,
+  serialized_end=3606,
 )
 
 
 _CHECKPOINTCOMMANDPROTO = descriptor.Descriptor(
   name='CheckpointCommandProto',
-  full_name='CheckpointCommandProto',
+  full_name='hadoop.hdfs.CheckpointCommandProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='signature', full_name='CheckpointCommandProto.signature', index=0,
+      name='signature', full_name='hadoop.hdfs.CheckpointCommandProto.signature', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='needToReturnImage', full_name='CheckpointCommandProto.needToReturnImage', index=1,
+      name='needToReturnImage', full_name='hadoop.hdfs.CheckpointCommandProto.needToReturnImage', index=1,
       number=2, type=8, cpp_type=7, label=2,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -1236,34 +1328,34 @@ _CHECKPOINTCOMMANDPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2966,
-  serialized_end=3063,
+  serialized_start=3608,
+  serialized_end=3717,
 )
 
 
 _BLOCKPROTO = descriptor.Descriptor(
   name='BlockProto',
-  full_name='BlockProto',
+  full_name='hadoop.hdfs.BlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='blockId', full_name='BlockProto.blockId', index=0,
+      name='blockId', full_name='hadoop.hdfs.BlockProto.blockId', index=0,
       number=1, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='genStamp', full_name='BlockProto.genStamp', index=1,
+      name='genStamp', full_name='hadoop.hdfs.BlockProto.genStamp', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='numBytes', full_name='BlockProto.numBytes', index=2,
+      name='numBytes', full_name='hadoop.hdfs.BlockProto.numBytes', index=2,
       number=3, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1278,27 +1370,27 @@ _BLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3065,
-  serialized_end=3133,
+  serialized_start=3719,
+  serialized_end=3787,
 )
 
 
 _BLOCKWITHLOCATIONSPROTO = descriptor.Descriptor(
   name='BlockWithLocationsProto',
-  full_name='BlockWithLocationsProto',
+  full_name='hadoop.hdfs.BlockWithLocationsProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='block', full_name='BlockWithLocationsProto.block', index=0,
+      name='block', full_name='hadoop.hdfs.BlockWithLocationsProto.block', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='storageIDs', full_name='BlockWithLocationsProto.storageIDs', index=1,
+      name='storageIDs', full_name='hadoop.hdfs.BlockWithLocationsProto.storageIDs', index=1,
       number=2, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1313,20 +1405,20 @@ _BLOCKWITHLOCATIONSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3135,
-  serialized_end=3208,
+  serialized_start=3789,
+  serialized_end=3874,
 )
 
 
 _BLOCKSWITHLOCATIONSPROTO = descriptor.Descriptor(
   name='BlocksWithLocationsProto',
-  full_name='BlocksWithLocationsProto',
+  full_name='hadoop.hdfs.BlocksWithLocationsProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='blocks', full_name='BlocksWithLocationsProto.blocks', index=0,
+      name='blocks', full_name='hadoop.hdfs.BlocksWithLocationsProto.blocks', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1341,34 +1433,34 @@ _BLOCKSWITHLOCATIONSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3210,
-  serialized_end=3278,
+  serialized_start=3876,
+  serialized_end=3956,
 )
 
 
 _REMOTEEDITLOGPROTO = descriptor.Descriptor(
   name='RemoteEditLogProto',
-  full_name='RemoteEditLogProto',
+  full_name='hadoop.hdfs.RemoteEditLogProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='startTxId', full_name='RemoteEditLogProto.startTxId', index=0,
+      name='startTxId', full_name='hadoop.hdfs.RemoteEditLogProto.startTxId', index=0,
       number=1, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='endTxId', full_name='RemoteEditLogProto.endTxId', index=1,
+      name='endTxId', full_name='hadoop.hdfs.RemoteEditLogProto.endTxId', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='isInProgress', full_name='RemoteEditLogProto.isInProgress', index=2,
+      name='isInProgress', full_name='hadoop.hdfs.RemoteEditLogProto.isInProgress', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=True, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -1383,20 +1475,20 @@ _REMOTEEDITLOGPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3280,
-  serialized_end=3365,
+  serialized_start=3958,
+  serialized_end=4043,
 )
 
 
 _REMOTEEDITLOGMANIFESTPROTO = descriptor.Descriptor(
   name='RemoteEditLogManifestProto',
-  full_name='RemoteEditLogManifestProto',
+  full_name='hadoop.hdfs.RemoteEditLogManifestProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='logs', full_name='RemoteEditLogManifestProto.logs', index=0,
+      name='logs', full_name='hadoop.hdfs.RemoteEditLogManifestProto.logs', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1411,48 +1503,48 @@ _REMOTEEDITLOGMANIFESTPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3367,
-  serialized_end=3430,
+  serialized_start=4045,
+  serialized_end=4120,
 )
 
 
 _NAMESPACEINFOPROTO = descriptor.Descriptor(
   name='NamespaceInfoProto',
-  full_name='NamespaceInfoProto',
+  full_name='hadoop.hdfs.NamespaceInfoProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='buildVersion', full_name='NamespaceInfoProto.buildVersion', index=0,
+      name='buildVersion', full_name='hadoop.hdfs.NamespaceInfoProto.buildVersion', index=0,
       number=1, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='distUpgradeVersion', full_name='NamespaceInfoProto.distUpgradeVersion', index=1,
+      name='unused', full_name='hadoop.hdfs.NamespaceInfoProto.unused', index=1,
       number=2, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='blockPoolID', full_name='NamespaceInfoProto.blockPoolID', index=2,
+      name='blockPoolID', full_name='hadoop.hdfs.NamespaceInfoProto.blockPoolID', index=2,
       number=3, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='storageInfo', full_name='NamespaceInfoProto.storageInfo', index=3,
+      name='storageInfo', full_name='hadoop.hdfs.NamespaceInfoProto.storageInfo', index=3,
       number=4, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='softwareVersion', full_name='NamespaceInfoProto.softwareVersion', index=4,
+      name='softwareVersion', full_name='hadoop.hdfs.NamespaceInfoProto.softwareVersion', index=4,
       number=5, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
@@ -1467,34 +1559,34 @@ _NAMESPACEINFOPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3433,
-  serialized_end=3589,
+  serialized_start=4123,
+  serialized_end=4279,
 )
 
 
 _BLOCKKEYPROTO = descriptor.Descriptor(
   name='BlockKeyProto',
-  full_name='BlockKeyProto',
+  full_name='hadoop.hdfs.BlockKeyProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='keyId', full_name='BlockKeyProto.keyId', index=0,
+      name='keyId', full_name='hadoop.hdfs.BlockKeyProto.keyId', index=0,
       number=1, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='expiryDate', full_name='BlockKeyProto.expiryDate', index=1,
+      name='expiryDate', full_name='hadoop.hdfs.BlockKeyProto.expiryDate', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='keyBytes', full_name='BlockKeyProto.keyBytes', index=2,
+      name='keyBytes', full_name='hadoop.hdfs.BlockKeyProto.keyBytes', index=2,
       number=3, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
@@ -1509,48 +1601,48 @@ _BLOCKKEYPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3591,
-  serialized_end=3659,
+  serialized_start=4281,
+  serialized_end=4349,
 )
 
 
 _EXPORTEDBLOCKKEYSPROTO = descriptor.Descriptor(
   name='ExportedBlockKeysProto',
-  full_name='ExportedBlockKeysProto',
+  full_name='hadoop.hdfs.ExportedBlockKeysProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='isBlockTokenEnabled', full_name='ExportedBlockKeysProto.isBlockTokenEnabled', index=0,
+      name='isBlockTokenEnabled', full_name='hadoop.hdfs.ExportedBlockKeysProto.isBlockTokenEnabled', index=0,
       number=1, type=8, cpp_type=7, label=2,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='keyUpdateInterval', full_name='ExportedBlockKeysProto.keyUpdateInterval', index=1,
+      name='keyUpdateInterval', full_name='hadoop.hdfs.ExportedBlockKeysProto.keyUpdateInterval', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='tokenLifeTime', full_name='ExportedBlockKeysProto.tokenLifeTime', index=2,
+      name='tokenLifeTime', full_name='hadoop.hdfs.ExportedBlockKeysProto.tokenLifeTime', index=2,
       number=3, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='currentKey', full_name='ExportedBlockKeysProto.currentKey', index=3,
+      name='currentKey', full_name='hadoop.hdfs.ExportedBlockKeysProto.currentKey', index=3,
       number=4, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='allKeys', full_name='ExportedBlockKeysProto.allKeys', index=4,
+      name='allKeys', full_name='hadoop.hdfs.ExportedBlockKeysProto.allKeys', index=4,
       number=5, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1565,27 +1657,27 @@ _EXPORTEDBLOCKKEYSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3662,
-  serialized_end=3834,
+  serialized_start=4352,
+  serialized_end=4548,
 )
 
 
 _RECOVERINGBLOCKPROTO = descriptor.Descriptor(
   name='RecoveringBlockProto',
-  full_name='RecoveringBlockProto',
+  full_name='hadoop.hdfs.RecoveringBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='newGenStamp', full_name='RecoveringBlockProto.newGenStamp', index=0,
+      name='newGenStamp', full_name='hadoop.hdfs.RecoveringBlockProto.newGenStamp', index=0,
       number=1, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='block', full_name='RecoveringBlockProto.block', index=1,
+      name='block', full_name='hadoop.hdfs.RecoveringBlockProto.block', index=1,
       number=2, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1600,14 +1692,14 @@ _RECOVERINGBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3836,
-  serialized_end=3914,
+  serialized_start=4550,
+  serialized_end=4640,
 )
 
 
 _VERSIONREQUESTPROTO = descriptor.Descriptor(
   name='VersionRequestProto',
-  full_name='VersionRequestProto',
+  full_name='hadoop.hdfs.VersionRequestProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1621,20 +1713,20 @@ _VERSIONREQUESTPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3916,
-  serialized_end=3937,
+  serialized_start=4642,
+  serialized_end=4663,
 )
 
 
 _VERSIONRESPONSEPROTO = descriptor.Descriptor(
   name='VersionResponseProto',
-  full_name='VersionResponseProto',
+  full_name='hadoop.hdfs.VersionResponseProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='info', full_name='VersionResponseProto.info', index=0,
+      name='info', full_name='hadoop.hdfs.VersionResponseProto.info', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1649,8 +1741,71 @@ _VERSIONRESPONSEPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3939,
-  serialized_end=3996,
+  serialized_start=4665,
+  serialized_end=4734,
+)
+
+
+_SNAPSHOTINFOPROTO = descriptor.Descriptor(
+  name='SnapshotInfoProto',
+  full_name='hadoop.hdfs.SnapshotInfoProto',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='snapshotName', full_name='hadoop.hdfs.SnapshotInfoProto.snapshotName', index=0,
+      number=1, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='snapshotRoot', full_name='hadoop.hdfs.SnapshotInfoProto.snapshotRoot', index=1,
+      number=2, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='permission', full_name='hadoop.hdfs.SnapshotInfoProto.permission', index=2,
+      number=3, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='owner', full_name='hadoop.hdfs.SnapshotInfoProto.owner', index=3,
+      number=4, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='group', full_name='hadoop.hdfs.SnapshotInfoProto.group', index=4,
+      number=5, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='createTime', full_name='hadoop.hdfs.SnapshotInfoProto.createTime', index=5,
+      number=6, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=4737,
+  serialized_end=4902,
 )
 
 _DATANODEINFOSPROTO.fields_by_name['datanodes'].message_type = _DATANODEINFOPROTO
@@ -1659,7 +1814,7 @@ _DATANODEINFOPROTO.fields_by_name['adminState'].enum_type = _DATANODEINFOPROTO_A
 _DATANODEINFOPROTO_ADMINSTATE.containing_type = _DATANODEINFOPROTO;
 _LOCATEDBLOCKPROTO.fields_by_name['b'].message_type = _EXTENDEDBLOCKPROTO
 _LOCATEDBLOCKPROTO.fields_by_name['locs'].message_type = _DATANODEINFOPROTO
-_LOCATEDBLOCKPROTO.fields_by_name['blockToken'].message_type = _BLOCKTOKENIDENTIFIERPROTO
+_LOCATEDBLOCKPROTO.fields_by_name['blockToken'].message_type = Security_pb2._TOKENPROTO
 _LOCATEDBLOCKSPROTO.fields_by_name['blocks'].message_type = _LOCATEDBLOCKPROTO
 _LOCATEDBLOCKSPROTO.fields_by_name['lastBlock'].message_type = _LOCATEDBLOCKPROTO
 _HDFSFILESTATUSPROTO.fields_by_name['fileType'].enum_type = _HDFSFILESTATUSPROTO_FILETYPE
@@ -1668,6 +1823,9 @@ _HDFSFILESTATUSPROTO.fields_by_name['locations'].message_type = _LOCATEDBLOCKSPR
 _HDFSFILESTATUSPROTO_FILETYPE.containing_type = _HDFSFILESTATUSPROTO;
 _FSSERVERDEFAULTSPROTO.fields_by_name['checksumType'].enum_type = _CHECKSUMTYPEPROTO
 _DIRECTORYLISTINGPROTO.fields_by_name['partialListing'].message_type = _HDFSFILESTATUSPROTO
+_SNAPSHOTTABLEDIRECTORYSTATUSPROTO.fields_by_name['dirStatus'].message_type = _HDFSFILESTATUSPROTO
+_SNAPSHOTTABLEDIRECTORYLISTINGPROTO.fields_by_name['snapshottableDirListing'].message_type = _SNAPSHOTTABLEDIRECTORYSTATUSPROTO
+_SNAPSHOTDIFFREPORTPROTO.fields_by_name['diffReportEntries'].message_type = _SNAPSHOTDIFFREPORTENTRYPROTO
 _NAMENODEREGISTRATIONPROTO.fields_by_name['storageInfo'].message_type = _STORAGEINFOPROTO
 _NAMENODEREGISTRATIONPROTO.fields_by_name['role'].enum_type = _NAMENODEREGISTRATIONPROTO_NAMENODEROLEPROTO
 _NAMENODEREGISTRATIONPROTO_NAMENODEROLEPROTO.containing_type = _NAMENODEREGISTRATIONPROTO;
@@ -1684,8 +1842,8 @@ _EXPORTEDBLOCKKEYSPROTO.fields_by_name['currentKey'].message_type = _BLOCKKEYPRO
 _EXPORTEDBLOCKKEYSPROTO.fields_by_name['allKeys'].message_type = _BLOCKKEYPROTO
 _RECOVERINGBLOCKPROTO.fields_by_name['block'].message_type = _LOCATEDBLOCKPROTO
 _VERSIONRESPONSEPROTO.fields_by_name['info'].message_type = _NAMESPACEINFOPROTO
+_SNAPSHOTINFOPROTO.fields_by_name['permission'].message_type = _FSPERMISSIONPROTO
 DESCRIPTOR.message_types_by_name['ExtendedBlockProto'] = _EXTENDEDBLOCKPROTO
-DESCRIPTOR.message_types_by_name['BlockTokenIdentifierProto'] = _BLOCKTOKENIDENTIFIERPROTO
 DESCRIPTOR.message_types_by_name['DatanodeIDProto'] = _DATANODEIDPROTO
 DESCRIPTOR.message_types_by_name['DatanodeInfosProto'] = _DATANODEINFOSPROTO
 DESCRIPTOR.message_types_by_name['DatanodeInfoProto'] = _DATANODEINFOPROTO
@@ -1698,7 +1856,10 @@ DESCRIPTOR.message_types_by_name['LocatedBlocksProto'] = _LOCATEDBLOCKSPROTO
 DESCRIPTOR.message_types_by_name['HdfsFileStatusProto'] = _HDFSFILESTATUSPROTO
 DESCRIPTOR.message_types_by_name['FsServerDefaultsProto'] = _FSSERVERDEFAULTSPROTO
 DESCRIPTOR.message_types_by_name['DirectoryListingProto'] = _DIRECTORYLISTINGPROTO
-DESCRIPTOR.message_types_by_name['UpgradeStatusReportProto'] = _UPGRADESTATUSREPORTPROTO
+DESCRIPTOR.message_types_by_name['SnapshottableDirectoryStatusProto'] = _SNAPSHOTTABLEDIRECTORYSTATUSPROTO
+DESCRIPTOR.message_types_by_name['SnapshottableDirectoryListingProto'] = _SNAPSHOTTABLEDIRECTORYLISTINGPROTO
+DESCRIPTOR.message_types_by_name['SnapshotDiffReportEntryProto'] = _SNAPSHOTDIFFREPORTENTRYPROTO
+DESCRIPTOR.message_types_by_name['SnapshotDiffReportProto'] = _SNAPSHOTDIFFREPORTPROTO
 DESCRIPTOR.message_types_by_name['StorageInfoProto'] = _STORAGEINFOPROTO
 DESCRIPTOR.message_types_by_name['NamenodeRegistrationProto'] = _NAMENODEREGISTRATIONPROTO
 DESCRIPTOR.message_types_by_name['CheckpointSignatureProto'] = _CHECKPOINTSIGNATUREPROTO
@@ -1715,191 +1876,210 @@ DESCRIPTOR.message_types_by_name['ExportedBlockKeysProto'] = _EXPORTEDBLOCKKEYSP
 DESCRIPTOR.message_types_by_name['RecoveringBlockProto'] = _RECOVERINGBLOCKPROTO
 DESCRIPTOR.message_types_by_name['VersionRequestProto'] = _VERSIONREQUESTPROTO
 DESCRIPTOR.message_types_by_name['VersionResponseProto'] = _VERSIONRESPONSEPROTO
+DESCRIPTOR.message_types_by_name['SnapshotInfoProto'] = _SNAPSHOTINFOPROTO
 
 class ExtendedBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _EXTENDEDBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:ExtendedBlockProto)
-
-class BlockTokenIdentifierProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _BLOCKTOKENIDENTIFIERPROTO
-  
-  # @@protoc_insertion_point(class_scope:BlockTokenIdentifierProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.ExtendedBlockProto)
 
 class DatanodeIDProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _DATANODEIDPROTO
   
-  # @@protoc_insertion_point(class_scope:DatanodeIDProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.DatanodeIDProto)
 
 class DatanodeInfosProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _DATANODEINFOSPROTO
   
-  # @@protoc_insertion_point(class_scope:DatanodeInfosProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.DatanodeInfosProto)
 
 class DatanodeInfoProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _DATANODEINFOPROTO
   
-  # @@protoc_insertion_point(class_scope:DatanodeInfoProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.DatanodeInfoProto)
 
 class ContentSummaryProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CONTENTSUMMARYPROTO
   
-  # @@protoc_insertion_point(class_scope:ContentSummaryProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.ContentSummaryProto)
 
 class CorruptFileBlocksProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CORRUPTFILEBLOCKSPROTO
   
-  # @@protoc_insertion_point(class_scope:CorruptFileBlocksProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.CorruptFileBlocksProto)
 
 class FsPermissionProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _FSPERMISSIONPROTO
   
-  # @@protoc_insertion_point(class_scope:FsPermissionProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.FsPermissionProto)
 
 class LocatedBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _LOCATEDBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:LocatedBlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.LocatedBlockProto)
 
 class DataEncryptionKeyProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _DATAENCRYPTIONKEYPROTO
   
-  # @@protoc_insertion_point(class_scope:DataEncryptionKeyProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.DataEncryptionKeyProto)
 
 class LocatedBlocksProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _LOCATEDBLOCKSPROTO
   
-  # @@protoc_insertion_point(class_scope:LocatedBlocksProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.LocatedBlocksProto)
 
 class HdfsFileStatusProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _HDFSFILESTATUSPROTO
   
-  # @@protoc_insertion_point(class_scope:HdfsFileStatusProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.HdfsFileStatusProto)
 
 class FsServerDefaultsProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _FSSERVERDEFAULTSPROTO
   
-  # @@protoc_insertion_point(class_scope:FsServerDefaultsProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.FsServerDefaultsProto)
 
 class DirectoryListingProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _DIRECTORYLISTINGPROTO
   
-  # @@protoc_insertion_point(class_scope:DirectoryListingProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.DirectoryListingProto)
 
-class UpgradeStatusReportProto(message.Message):
+class SnapshottableDirectoryStatusProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _UPGRADESTATUSREPORTPROTO
+  DESCRIPTOR = _SNAPSHOTTABLEDIRECTORYSTATUSPROTO
   
-  # @@protoc_insertion_point(class_scope:UpgradeStatusReportProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.SnapshottableDirectoryStatusProto)
+
+class SnapshottableDirectoryListingProto(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _SNAPSHOTTABLEDIRECTORYLISTINGPROTO
+  
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.SnapshottableDirectoryListingProto)
+
+class SnapshotDiffReportEntryProto(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _SNAPSHOTDIFFREPORTENTRYPROTO
+  
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.SnapshotDiffReportEntryProto)
+
+class SnapshotDiffReportProto(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _SNAPSHOTDIFFREPORTPROTO
+  
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.SnapshotDiffReportProto)
 
 class StorageInfoProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _STORAGEINFOPROTO
   
-  # @@protoc_insertion_point(class_scope:StorageInfoProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.StorageInfoProto)
 
 class NamenodeRegistrationProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _NAMENODEREGISTRATIONPROTO
   
-  # @@protoc_insertion_point(class_scope:NamenodeRegistrationProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.NamenodeRegistrationProto)
 
 class CheckpointSignatureProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CHECKPOINTSIGNATUREPROTO
   
-  # @@protoc_insertion_point(class_scope:CheckpointSignatureProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.CheckpointSignatureProto)
 
 class NamenodeCommandProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _NAMENODECOMMANDPROTO
   
-  # @@protoc_insertion_point(class_scope:NamenodeCommandProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.NamenodeCommandProto)
 
 class CheckpointCommandProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CHECKPOINTCOMMANDPROTO
   
-  # @@protoc_insertion_point(class_scope:CheckpointCommandProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.CheckpointCommandProto)
 
 class BlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _BLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:BlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.BlockProto)
 
 class BlockWithLocationsProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _BLOCKWITHLOCATIONSPROTO
   
-  # @@protoc_insertion_point(class_scope:BlockWithLocationsProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.BlockWithLocationsProto)
 
 class BlocksWithLocationsProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _BLOCKSWITHLOCATIONSPROTO
   
-  # @@protoc_insertion_point(class_scope:BlocksWithLocationsProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.BlocksWithLocationsProto)
 
 class RemoteEditLogProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _REMOTEEDITLOGPROTO
   
-  # @@protoc_insertion_point(class_scope:RemoteEditLogProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.RemoteEditLogProto)
 
 class RemoteEditLogManifestProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _REMOTEEDITLOGMANIFESTPROTO
   
-  # @@protoc_insertion_point(class_scope:RemoteEditLogManifestProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.RemoteEditLogManifestProto)
 
 class NamespaceInfoProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _NAMESPACEINFOPROTO
   
-  # @@protoc_insertion_point(class_scope:NamespaceInfoProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.NamespaceInfoProto)
 
 class BlockKeyProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _BLOCKKEYPROTO
   
-  # @@protoc_insertion_point(class_scope:BlockKeyProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.BlockKeyProto)
 
 class ExportedBlockKeysProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _EXPORTEDBLOCKKEYSPROTO
   
-  # @@protoc_insertion_point(class_scope:ExportedBlockKeysProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.ExportedBlockKeysProto)
 
 class RecoveringBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _RECOVERINGBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:RecoveringBlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.RecoveringBlockProto)
 
 class VersionRequestProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _VERSIONREQUESTPROTO
   
-  # @@protoc_insertion_point(class_scope:VersionRequestProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.VersionRequestProto)
 
 class VersionResponseProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _VERSIONRESPONSEPROTO
   
-  # @@protoc_insertion_point(class_scope:VersionResponseProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.VersionResponseProto)
+
+class SnapshotInfoProto(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _SNAPSHOTINFOPROTO
+  
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.SnapshotInfoProto)
 
 # @@protoc_insertion_point(module_scope)

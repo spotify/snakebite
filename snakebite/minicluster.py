@@ -37,14 +37,14 @@ class MiniCluster(object):
     Example without :mod:`snakebite.client <client>`
 
     >>> from snakebite.minicluster import MiniCluster
-    >>> cluster = Minicluster("/path/to/test/files")
+    >>> cluster = MiniCluster("/path/to/test/files")
     >>> ls_output = cluster.ls(["/"])
 
     Example with :mod:`snakebite.client <client>`
 
     >>> from snakebite.minicluster import MiniCluster
     >>> from snakebite.client import Client
-    >>> cluster = Minicluster("/path/to/test/files")
+    >>> cluster = MiniCluster("/path/to/test/files")
     >>> client = Client('localhost', cluster.port)
     >>> ls_output = client.ls(["/"])
 
@@ -57,19 +57,24 @@ class MiniCluster(object):
     .. note:: Not all hadoop commands have been implemented, only the ones that
               were necessary for testing the snakebite client, but please feel free to add them
     '''
-    def __init__(self, testfiles_path):
+    def __init__(self, testfiles_path, start_cluster=True):
         '''
         :param testfiles_path: Local path where test files can be found. Mainly used for ``put()``
         :type testfiles_path: string
+        :param start_cluster: start a MiniCluster on initialization. If False, this class will act as an interface to the ``hadoop fs`` command
+        :type start_cluster: boolean
         '''
         self._testfiles_path = testfiles_path
         self._hadoop_home = os.environ['HADOOP_HOME']
         self._jobclient_jar = os.environ.get('HADOOP_JOBCLIENT_JAR')
         self._hadoop_cmd = "%s/bin/hadoop" % self._hadoop_home
-        self._start_mini_cluster()
-        self.host = "localhost"
-        self.port = self._get_namenode_port()
-        self.hdfs_url = "hdfs://%s:%d" % (self.host, self.port)
+        if start_cluster:
+            self._start_mini_cluster()
+            self.host = "localhost"
+            self.port = self._get_namenode_port()
+            self.hdfs_url = "hdfs://%s:%d" % (self.host, self.port)
+        else:
+            self.hdfs_url = "hdfs://"
 
     def terminate(self):
         ''' Terminate the cluster

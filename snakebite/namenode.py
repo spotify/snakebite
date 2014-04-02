@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2013 Spotify AB
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -13,26 +13,20 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import logging
+class Namenode(object):
+    '''Namenode class - represents HDFS namenode'''
+    DEFAULT_PORT = 8020
+    DEFAULT_VERSION = 9
 
-from snakebite.commandlineparser import CommandLineParser
+    def __init__(self, host, port=DEFAULT_PORT, version=DEFAULT_VERSION):
+        self.host = host
+        self.port = port
+        self.version = version
 
-log = logging.getLogger(__name__)
+    def is_active(self):
+        return True
 
-
-class SnakebiteCli(object):
-    def __init__(self):
-        clparser = CommandLineParser()
-        self.args = clparser.parse()
-        self._setup_logging()
-        clparser.init()
-        clparser.execute()
-
-    def _setup_logging(self):
-        if self.args.debug:
-            loglevel = logging.DEBUG
-        else:
-            loglevel = logging.INFO
-        logging.basicConfig(level=loglevel)
-
-SnakebiteCli()
+    def toDict(self):
+        return {"namenode": self.host,
+                "port": self.port,
+                "version": self.version}

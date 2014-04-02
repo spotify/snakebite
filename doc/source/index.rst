@@ -55,21 +55,23 @@ by using the ``HADOOP_JOBCLIENT_JAR`` environment variable.
 
 Also, make sure the ``JAVA_HOME`` environment variable is set.
 
-.. note:: Different Hadoop distributions use different protocol versions. Snakebite
-   and the tests default to version 7 (CDH 4.1.3), but if you want to test with
-   different protocol versions (HDP 2.0 uses version 8), set the ``HADOOP_PROTOCOL_VER``
+.. note:: Different Hadoop distributions use different protocol versions. Snakebite 1.3.x
+   and the tests default to version 7 (CDH 4.1.3).
+   Snakebite 2.x **ONLY** supports Hadoop > 2.2.0 (protocol version >9, e.g. HDP2.0/CDH5)! I
+   If you want to test with different protocol versions, set the ``HADOOP_PROTOCOL_VER``
    environment variable to the apropriate version number.
+
 
 .. note:: A hadoop installation is only required for testing.
 
 TODO
 ====
 * Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well
-* More tests. Currently only integration tests with a minicluster are available.
+* More tests.
 * Return correct exit codes from cli client.
 * Imrove speed of CRC verification. 
 * Improve methods:
-    * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f and -skipTrash)
+    * [-rm [-f] [-r|-R] [-skipTrash] <src> ...] (implement -f)
 
 * Implement more methods (those need interaction with DataNodes):
     * [-expunge]
@@ -79,7 +81,7 @@ TODO
 
 LICENSE
 =======
-Copyright (c) 2013 Spotify AB
+Copyright (c) 2013 - 2014 Spotify AB
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of

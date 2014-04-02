@@ -7,16 +7,17 @@ from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 
+import Security_pb2
 import hdfs_pb2
 
 DESCRIPTOR = descriptor.FileDescriptor(
   name='datatransfer.proto',
-  package='',
-  serialized_pb='\n\x12\x64\x61tatransfer.proto\x1a\nhdfs.proto\"\xe3\x01\n!DataTransferEncryptorMessageProto\x12N\n\x06status\x18\x01 \x02(\x0e\x32>.DataTransferEncryptorMessageProto.DataTransferEncryptorStatus\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\x12\x0f\n\x07message\x18\x03 \x01(\t\"L\n\x1b\x44\x61taTransferEncryptorStatus\x12\x0b\n\x07SUCCESS\x10\x00\x12\x15\n\x11\x45RROR_UNKNOWN_KEY\x10\x01\x12\t\n\x05\x45RROR\x10\x02\"`\n\x0f\x42\x61seHeaderProto\x12\"\n\x05\x62lock\x18\x01 \x02(\x0b\x32\x13.ExtendedBlockProto\x12)\n\x05token\x18\x02 \x01(\x0b\x32\x1a.BlockTokenIdentifierProto\"V\n\x1a\x43lientOperationHeaderProto\x12$\n\nbaseHeader\x18\x01 \x02(\x0b\x32\x10.BaseHeaderProto\x12\x12\n\nclientName\x18\x02 \x02(\t\"\\\n\x10OpReadBlockProto\x12+\n\x06header\x18\x01 \x02(\x0b\x32\x1b.ClientOperationHeaderProto\x12\x0e\n\x06offset\x18\x02 \x02(\x04\x12\x0b\n\x03len\x18\x03 \x02(\x04\"\x85\x01\n\rChecksumProto\x12)\n\x04type\x18\x01 \x02(\x0e\x32\x1b.ChecksumProto.ChecksumType\x12\x18\n\x10\x62ytesPerChecksum\x18\x02 \x02(\r\"/\n\x0c\x43hecksumType\x12\x08\n\x04NULL\x10\x00\x12\t\n\x05\x43RC32\x10\x01\x12\n\n\x06\x43RC32C\x10\x02\"\xda\x04\n\x11OpWriteBlockProto\x12+\n\x06header\x18\x01 \x02(\x0b\x32\x1b.ClientOperationHeaderProto\x12#\n\x07targets\x18\x02 \x03(\x0b\x32\x12.DatanodeInfoProto\x12\"\n\x06source\x18\x03 \x01(\x0b\x32\x12.DatanodeInfoProto\x12\x38\n\x05stage\x18\x04 \x02(\x0e\x32).OpWriteBlockProto.BlockConstructionStage\x12\x14\n\x0cpipelineSize\x18\x05 \x02(\r\x12\x14\n\x0cminBytesRcvd\x18\x06 \x02(\x04\x12\x14\n\x0cmaxBytesRcvd\x18\x07 \x02(\x04\x12\x1d\n\x15latestGenerationStamp\x18\x08 \x02(\x04\x12)\n\x11requestedChecksum\x18\t \x02(\x0b\x32\x0e.ChecksumProto\"\x88\x02\n\x16\x42lockConstructionStage\x12\x19\n\x15PIPELINE_SETUP_APPEND\x10\x00\x12\"\n\x1ePIPELINE_SETUP_APPEND_RECOVERY\x10\x01\x12\x12\n\x0e\x44\x41TA_STREAMING\x10\x02\x12%\n!PIPELINE_SETUP_STREAMING_RECOVERY\x10\x03\x12\x12\n\x0ePIPELINE_CLOSE\x10\x04\x12\x1b\n\x17PIPELINE_CLOSE_RECOVERY\x10\x05\x12\x19\n\x15PIPELINE_SETUP_CREATE\x10\x06\x12\x10\n\x0cTRANSFER_RBW\x10\x07\x12\x16\n\x12TRANSFER_FINALIZED\x10\x08\"h\n\x14OpTransferBlockProto\x12+\n\x06header\x18\x01 \x02(\x0b\x32\x1b.ClientOperationHeaderProto\x12#\n\x07targets\x18\x02 \x03(\x0b\x32\x12.DatanodeInfoProto\"l\n\x13OpReplaceBlockProto\x12 \n\x06header\x18\x01 \x02(\x0b\x32\x10.BaseHeaderProto\x12\x0f\n\x07\x64\x65lHint\x18\x02 \x02(\t\x12\"\n\x06source\x18\x03 \x02(\x0b\x32\x12.DatanodeInfoProto\"4\n\x10OpCopyBlockProto\x12 \n\x06header\x18\x01 \x02(\x0b\x32\x10.BaseHeaderProto\"8\n\x14OpBlockChecksumProto\x12 \n\x06header\x18\x01 \x02(\x0b\x32\x10.BaseHeaderProto\"\x7f\n\x11PacketHeaderProto\x12\x15\n\roffsetInBlock\x18\x01 \x02(\x10\x12\r\n\x05seqno\x18\x02 \x02(\x10\x12\x19\n\x11lastPacketInBlock\x18\x03 \x02(\x08\x12\x0f\n\x07\x64\x61taLen\x18\x04 \x02(\x0f\x12\x18\n\tsyncBlock\x18\x05 \x01(\x08:\x05\x66\x61lse\"]\n\x10PipelineAckProto\x12\r\n\x05seqno\x18\x01 \x02(\x12\x12\x17\n\x06status\x18\x02 \x03(\x0e\x32\x07.Status\x12!\n\x16\x64ownstreamAckTimeNanos\x18\x03 \x01(\x04:\x01\x30\"P\n\x17ReadOpChecksumInfoProto\x12 \n\x08\x63hecksum\x18\x01 \x02(\x0b\x32\x0e.ChecksumProto\x12\x13\n\x0b\x63hunkOffset\x18\x02 \x02(\x04\"\xc5\x01\n\x14\x42lockOpResponseProto\x12\x17\n\x06status\x18\x01 \x02(\x0e\x32\x07.Status\x12\x14\n\x0c\x66irstBadLink\x18\x02 \x01(\t\x12\x37\n\x10\x63hecksumResponse\x18\x03 \x01(\x0b\x32\x1d.OpBlockChecksumResponseProto\x12\x34\n\x12readOpChecksumInfo\x18\x04 \x01(\x0b\x32\x18.ReadOpChecksumInfoProto\x12\x0f\n\x07message\x18\x05 \x01(\t\"0\n\x15\x43lientReadStatusProto\x12\x17\n\x06status\x18\x01 \x02(\x0e\x32\x07.Status\"-\n\x12\x44NTransferAckProto\x12\x17\n\x06status\x18\x01 \x02(\x0e\x32\x07.Status\"U\n\x1cOpBlockChecksumResponseProto\x12\x13\n\x0b\x62ytesPerCrc\x18\x01 \x02(\r\x12\x13\n\x0b\x63rcPerBlock\x18\x02 \x02(\x04\x12\x0b\n\x03md5\x18\x03 \x02(\x0c*\x82\x01\n\x06Status\x12\x0b\n\x07SUCCESS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x12\n\x0e\x45RROR_CHECKSUM\x10\x02\x12\x11\n\rERROR_INVALID\x10\x03\x12\x10\n\x0c\x45RROR_EXISTS\x10\x04\x12\x16\n\x12\x45RROR_ACCESS_TOKEN\x10\x05\x12\x0f\n\x0b\x43HECKSUM_OK\x10\x06\x42>\n%org.apache.hadoop.hdfs.protocol.protoB\x12\x44\x61taTransferProtos\xa0\x01\x01')
+  package='hadoop.hdfs',
+  serialized_pb='\n\x12\x64\x61tatransfer.proto\x12\x0bhadoop.hdfs\x1a\x0eSecurity.proto\x1a\nhdfs.proto\"\xef\x01\n!DataTransferEncryptorMessageProto\x12Z\n\x06status\x18\x01 \x02(\x0e\x32J.hadoop.hdfs.DataTransferEncryptorMessageProto.DataTransferEncryptorStatus\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\x12\x0f\n\x07message\x18\x03 \x01(\t\"L\n\x1b\x44\x61taTransferEncryptorStatus\x12\x0b\n\x07SUCCESS\x10\x00\x12\x15\n\x11\x45RROR_UNKNOWN_KEY\x10\x01\x12\t\n\x05\x45RROR\x10\x02\"k\n\x0f\x42\x61seHeaderProto\x12.\n\x05\x62lock\x18\x01 \x02(\x0b\x32\x1f.hadoop.hdfs.ExtendedBlockProto\x12(\n\x05token\x18\x02 \x01(\x0b\x32\x19.hadoop.common.TokenProto\"b\n\x1a\x43lientOperationHeaderProto\x12\x30\n\nbaseHeader\x18\x01 \x02(\x0b\x32\x1c.hadoop.hdfs.BaseHeaderProto\x12\x12\n\nclientName\x18\x02 \x02(\t\"=\n\x14\x43\x61\x63hingStrategyProto\x12\x12\n\ndropBehind\x18\x01 \x01(\x08\x12\x11\n\treadahead\x18\x02 \x01(\x03\"\xc1\x01\n\x10OpReadBlockProto\x12\x37\n\x06header\x18\x01 \x02(\x0b\x32\'.hadoop.hdfs.ClientOperationHeaderProto\x12\x0e\n\x06offset\x18\x02 \x02(\x04\x12\x0b\n\x03len\x18\x03 \x02(\x04\x12\x1b\n\rsendChecksums\x18\x04 \x01(\x08:\x04true\x12:\n\x0f\x63\x61\x63hingStrategy\x18\x05 \x01(\x0b\x32!.hadoop.hdfs.CachingStrategyProto\"W\n\rChecksumProto\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.hadoop.hdfs.ChecksumTypeProto\x12\x18\n\x10\x62ytesPerChecksum\x18\x02 \x02(\r\"\xd2\x05\n\x11OpWriteBlockProto\x12\x37\n\x06header\x18\x01 \x02(\x0b\x32\'.hadoop.hdfs.ClientOperationHeaderProto\x12/\n\x07targets\x18\x02 \x03(\x0b\x32\x1e.hadoop.hdfs.DatanodeInfoProto\x12.\n\x06source\x18\x03 \x01(\x0b\x32\x1e.hadoop.hdfs.DatanodeInfoProto\x12\x44\n\x05stage\x18\x04 \x02(\x0e\x32\x35.hadoop.hdfs.OpWriteBlockProto.BlockConstructionStage\x12\x14\n\x0cpipelineSize\x18\x05 \x02(\r\x12\x14\n\x0cminBytesRcvd\x18\x06 \x02(\x04\x12\x14\n\x0cmaxBytesRcvd\x18\x07 \x02(\x04\x12\x1d\n\x15latestGenerationStamp\x18\x08 \x02(\x04\x12\x35\n\x11requestedChecksum\x18\t \x02(\x0b\x32\x1a.hadoop.hdfs.ChecksumProto\x12:\n\x0f\x63\x61\x63hingStrategy\x18\n \x01(\x0b\x32!.hadoop.hdfs.CachingStrategyProto\"\x88\x02\n\x16\x42lockConstructionStage\x12\x19\n\x15PIPELINE_SETUP_APPEND\x10\x00\x12\"\n\x1ePIPELINE_SETUP_APPEND_RECOVERY\x10\x01\x12\x12\n\x0e\x44\x41TA_STREAMING\x10\x02\x12%\n!PIPELINE_SETUP_STREAMING_RECOVERY\x10\x03\x12\x12\n\x0ePIPELINE_CLOSE\x10\x04\x12\x1b\n\x17PIPELINE_CLOSE_RECOVERY\x10\x05\x12\x19\n\x15PIPELINE_SETUP_CREATE\x10\x06\x12\x10\n\x0cTRANSFER_RBW\x10\x07\x12\x16\n\x12TRANSFER_FINALIZED\x10\x08\"\x80\x01\n\x14OpTransferBlockProto\x12\x37\n\x06header\x18\x01 \x02(\x0b\x32\'.hadoop.hdfs.ClientOperationHeaderProto\x12/\n\x07targets\x18\x02 \x03(\x0b\x32\x1e.hadoop.hdfs.DatanodeInfoProto\"\x84\x01\n\x13OpReplaceBlockProto\x12,\n\x06header\x18\x01 \x02(\x0b\x32\x1c.hadoop.hdfs.BaseHeaderProto\x12\x0f\n\x07\x64\x65lHint\x18\x02 \x02(\t\x12.\n\x06source\x18\x03 \x02(\x0b\x32\x1e.hadoop.hdfs.DatanodeInfoProto\"@\n\x10OpCopyBlockProto\x12,\n\x06header\x18\x01 \x02(\x0b\x32\x1c.hadoop.hdfs.BaseHeaderProto\"D\n\x14OpBlockChecksumProto\x12,\n\x06header\x18\x01 \x02(\x0b\x32\x1c.hadoop.hdfs.BaseHeaderProto\"d\n OpRequestShortCircuitAccessProto\x12,\n\x06header\x18\x01 \x02(\x0b\x32\x1c.hadoop.hdfs.BaseHeaderProto\x12\x12\n\nmaxVersion\x18\x02 \x02(\r\"\x7f\n\x11PacketHeaderProto\x12\x15\n\roffsetInBlock\x18\x01 \x02(\x10\x12\r\n\x05seqno\x18\x02 \x02(\x10\x12\x19\n\x11lastPacketInBlock\x18\x03 \x02(\x08\x12\x0f\n\x07\x64\x61taLen\x18\x04 \x02(\x0f\x12\x18\n\tsyncBlock\x18\x05 \x01(\x08:\x05\x66\x61lse\"i\n\x10PipelineAckProto\x12\r\n\x05seqno\x18\x01 \x02(\x12\x12#\n\x06status\x18\x02 \x03(\x0e\x32\x13.hadoop.hdfs.Status\x12!\n\x16\x64ownstreamAckTimeNanos\x18\x03 \x01(\x04:\x01\x30\"\\\n\x17ReadOpChecksumInfoProto\x12,\n\x08\x63hecksum\x18\x01 \x02(\x0b\x32\x1a.hadoop.hdfs.ChecksumProto\x12\x13\n\x0b\x63hunkOffset\x18\x02 \x02(\x04\"\x8c\x02\n\x14\x42lockOpResponseProto\x12#\n\x06status\x18\x01 \x02(\x0e\x32\x13.hadoop.hdfs.Status\x12\x14\n\x0c\x66irstBadLink\x18\x02 \x01(\t\x12\x43\n\x10\x63hecksumResponse\x18\x03 \x01(\x0b\x32).hadoop.hdfs.OpBlockChecksumResponseProto\x12@\n\x12readOpChecksumInfo\x18\x04 \x01(\x0b\x32$.hadoop.hdfs.ReadOpChecksumInfoProto\x12\x0f\n\x07message\x18\x05 \x01(\t\x12!\n\x19shortCircuitAccessVersion\x18\x06 \x01(\r\"<\n\x15\x43lientReadStatusProto\x12#\n\x06status\x18\x01 \x02(\x0e\x32\x13.hadoop.hdfs.Status\"9\n\x12\x44NTransferAckProto\x12#\n\x06status\x18\x01 \x02(\x0e\x32\x13.hadoop.hdfs.Status\"\x86\x01\n\x1cOpBlockChecksumResponseProto\x12\x13\n\x0b\x62ytesPerCrc\x18\x01 \x02(\r\x12\x13\n\x0b\x63rcPerBlock\x18\x02 \x02(\x04\x12\x0b\n\x03md5\x18\x03 \x02(\x0c\x12/\n\x07\x63rcType\x18\x04 \x01(\x0e\x32\x1e.hadoop.hdfs.ChecksumTypeProto*\x99\x01\n\x06Status\x12\x0b\n\x07SUCCESS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x12\n\x0e\x45RROR_CHECKSUM\x10\x02\x12\x11\n\rERROR_INVALID\x10\x03\x12\x10\n\x0c\x45RROR_EXISTS\x10\x04\x12\x16\n\x12\x45RROR_ACCESS_TOKEN\x10\x05\x12\x0f\n\x0b\x43HECKSUM_OK\x10\x06\x12\x15\n\x11\x45RROR_UNSUPPORTED\x10\x07\x42>\n%org.apache.hadoop.hdfs.protocol.protoB\x12\x44\x61taTransferProtos\xa0\x01\x01')
 
 _STATUS = descriptor.EnumDescriptor(
   name='Status',
-  full_name='Status',
+  full_name='hadoop.hdfs.Status',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -48,11 +49,15 @@ _STATUS = descriptor.EnumDescriptor(
       name='CHECKSUM_OK', index=6, number=6,
       options=None,
       type=None),
+    descriptor.EnumValueDescriptor(
+      name='ERROR_UNSUPPORTED', index=7, number=7,
+      options=None,
+      type=None),
   ],
   containing_type=None,
   options=None,
-  serialized_start=2304,
-  serialized_end=2434,
+  serialized_start=2951,
+  serialized_end=3104,
 )
 
 
@@ -63,11 +68,12 @@ ERROR_INVALID = 3
 ERROR_EXISTS = 4
 ERROR_ACCESS_TOKEN = 5
 CHECKSUM_OK = 6
+ERROR_UNSUPPORTED = 7
 
 
 _DATATRANSFERENCRYPTORMESSAGEPROTO_DATATRANSFERENCRYPTORSTATUS = descriptor.EnumDescriptor(
   name='DataTransferEncryptorStatus',
-  full_name='DataTransferEncryptorMessageProto.DataTransferEncryptorStatus',
+  full_name='hadoop.hdfs.DataTransferEncryptorMessageProto.DataTransferEncryptorStatus',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -86,38 +92,13 @@ _DATATRANSFERENCRYPTORMESSAGEPROTO_DATATRANSFERENCRYPTORSTATUS = descriptor.Enum
   ],
   containing_type=None,
   options=None,
-  serialized_start=186,
-  serialized_end=262,
-)
-
-_CHECKSUMPROTO_CHECKSUMTYPE = descriptor.EnumDescriptor(
-  name='ChecksumType',
-  full_name='ChecksumProto.ChecksumType',
-  filename=None,
-  file=DESCRIPTOR,
-  values=[
-    descriptor.EnumValueDescriptor(
-      name='NULL', index=0, number=0,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='CRC32', index=1, number=1,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='CRC32C', index=2, number=2,
-      options=None,
-      type=None),
-  ],
-  containing_type=None,
-  options=None,
-  serialized_start=631,
-  serialized_end=678,
+  serialized_start=227,
+  serialized_end=303,
 )
 
 _OPWRITEBLOCKPROTO_BLOCKCONSTRUCTIONSTAGE = descriptor.EnumDescriptor(
   name='BlockConstructionStage',
-  full_name='OpWriteBlockProto.BlockConstructionStage',
+  full_name='hadoop.hdfs.OpWriteBlockProto.BlockConstructionStage',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -160,34 +141,34 @@ _OPWRITEBLOCKPROTO_BLOCKCONSTRUCTIONSTAGE = descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1019,
-  serialized_end=1283,
+  serialized_start=1321,
+  serialized_end=1585,
 )
 
 
 _DATATRANSFERENCRYPTORMESSAGEPROTO = descriptor.Descriptor(
   name='DataTransferEncryptorMessageProto',
-  full_name='DataTransferEncryptorMessageProto',
+  full_name='hadoop.hdfs.DataTransferEncryptorMessageProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='status', full_name='DataTransferEncryptorMessageProto.status', index=0,
+      name='status', full_name='hadoop.hdfs.DataTransferEncryptorMessageProto.status', index=0,
       number=1, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='payload', full_name='DataTransferEncryptorMessageProto.payload', index=1,
+      name='payload', full_name='hadoop.hdfs.DataTransferEncryptorMessageProto.payload', index=1,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value="",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='message', full_name='DataTransferEncryptorMessageProto.message', index=2,
+      name='message', full_name='hadoop.hdfs.DataTransferEncryptorMessageProto.message', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
@@ -203,27 +184,27 @@ _DATATRANSFERENCRYPTORMESSAGEPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=35,
-  serialized_end=262,
+  serialized_start=64,
+  serialized_end=303,
 )
 
 
 _BASEHEADERPROTO = descriptor.Descriptor(
   name='BaseHeaderProto',
-  full_name='BaseHeaderProto',
+  full_name='hadoop.hdfs.BaseHeaderProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='block', full_name='BaseHeaderProto.block', index=0,
+      name='block', full_name='hadoop.hdfs.BaseHeaderProto.block', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='token', full_name='BaseHeaderProto.token', index=1,
+      name='token', full_name='hadoop.hdfs.BaseHeaderProto.token', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -238,27 +219,27 @@ _BASEHEADERPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=264,
-  serialized_end=360,
+  serialized_start=305,
+  serialized_end=412,
 )
 
 
 _CLIENTOPERATIONHEADERPROTO = descriptor.Descriptor(
   name='ClientOperationHeaderProto',
-  full_name='ClientOperationHeaderProto',
+  full_name='hadoop.hdfs.ClientOperationHeaderProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='baseHeader', full_name='ClientOperationHeaderProto.baseHeader', index=0,
+      name='baseHeader', full_name='hadoop.hdfs.ClientOperationHeaderProto.baseHeader', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='clientName', full_name='ClientOperationHeaderProto.clientName', index=1,
+      name='clientName', full_name='hadoop.hdfs.ClientOperationHeaderProto.clientName', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
@@ -273,35 +254,28 @@ _CLIENTOPERATIONHEADERPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=362,
-  serialized_end=448,
+  serialized_start=414,
+  serialized_end=512,
 )
 
 
-_OPREADBLOCKPROTO = descriptor.Descriptor(
-  name='OpReadBlockProto',
-  full_name='OpReadBlockProto',
+_CACHINGSTRATEGYPROTO = descriptor.Descriptor(
+  name='CachingStrategyProto',
+  full_name='hadoop.hdfs.CachingStrategyProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='header', full_name='OpReadBlockProto.header', index=0,
-      number=1, type=11, cpp_type=10, label=2,
-      has_default_value=False, default_value=None,
+      name='dropBehind', full_name='hadoop.hdfs.CachingStrategyProto.dropBehind', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='offset', full_name='OpReadBlockProto.offset', index=1,
-      number=2, type=4, cpp_type=4, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='len', full_name='OpReadBlockProto.len', index=2,
-      number=3, type=4, cpp_type=4, label=2,
+      name='readahead', full_name='hadoop.hdfs.CachingStrategyProto.readahead', index=1,
+      number=2, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -315,27 +289,83 @@ _OPREADBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=450,
-  serialized_end=542,
+  serialized_start=514,
+  serialized_end=575,
 )
 
 
-_CHECKSUMPROTO = descriptor.Descriptor(
-  name='ChecksumProto',
-  full_name='ChecksumProto',
+_OPREADBLOCKPROTO = descriptor.Descriptor(
+  name='OpReadBlockProto',
+  full_name='hadoop.hdfs.OpReadBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='type', full_name='ChecksumProto.type', index=0,
+      name='header', full_name='hadoop.hdfs.OpReadBlockProto.header', index=0,
+      number=1, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='offset', full_name='hadoop.hdfs.OpReadBlockProto.offset', index=1,
+      number=2, type=4, cpp_type=4, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='len', full_name='hadoop.hdfs.OpReadBlockProto.len', index=2,
+      number=3, type=4, cpp_type=4, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='sendChecksums', full_name='hadoop.hdfs.OpReadBlockProto.sendChecksums', index=3,
+      number=4, type=8, cpp_type=7, label=1,
+      has_default_value=True, default_value=True,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='cachingStrategy', full_name='hadoop.hdfs.OpReadBlockProto.cachingStrategy', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=578,
+  serialized_end=771,
+)
+
+
+_CHECKSUMPROTO = descriptor.Descriptor(
+  name='ChecksumProto',
+  full_name='hadoop.hdfs.ChecksumProto',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='type', full_name='hadoop.hdfs.ChecksumProto.type', index=0,
       number=1, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='bytesPerChecksum', full_name='ChecksumProto.bytesPerChecksum', index=1,
+      name='bytesPerChecksum', full_name='hadoop.hdfs.ChecksumProto.bytesPerChecksum', index=1,
       number=2, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -346,82 +376,88 @@ _CHECKSUMPROTO = descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
-    _CHECKSUMPROTO_CHECKSUMTYPE,
   ],
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=545,
-  serialized_end=678,
+  serialized_start=773,
+  serialized_end=860,
 )
 
 
 _OPWRITEBLOCKPROTO = descriptor.Descriptor(
   name='OpWriteBlockProto',
-  full_name='OpWriteBlockProto',
+  full_name='hadoop.hdfs.OpWriteBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='header', full_name='OpWriteBlockProto.header', index=0,
+      name='header', full_name='hadoop.hdfs.OpWriteBlockProto.header', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='targets', full_name='OpWriteBlockProto.targets', index=1,
+      name='targets', full_name='hadoop.hdfs.OpWriteBlockProto.targets', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='source', full_name='OpWriteBlockProto.source', index=2,
+      name='source', full_name='hadoop.hdfs.OpWriteBlockProto.source', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='stage', full_name='OpWriteBlockProto.stage', index=3,
+      name='stage', full_name='hadoop.hdfs.OpWriteBlockProto.stage', index=3,
       number=4, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='pipelineSize', full_name='OpWriteBlockProto.pipelineSize', index=4,
+      name='pipelineSize', full_name='hadoop.hdfs.OpWriteBlockProto.pipelineSize', index=4,
       number=5, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='minBytesRcvd', full_name='OpWriteBlockProto.minBytesRcvd', index=5,
+      name='minBytesRcvd', full_name='hadoop.hdfs.OpWriteBlockProto.minBytesRcvd', index=5,
       number=6, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='maxBytesRcvd', full_name='OpWriteBlockProto.maxBytesRcvd', index=6,
+      name='maxBytesRcvd', full_name='hadoop.hdfs.OpWriteBlockProto.maxBytesRcvd', index=6,
       number=7, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='latestGenerationStamp', full_name='OpWriteBlockProto.latestGenerationStamp', index=7,
+      name='latestGenerationStamp', full_name='hadoop.hdfs.OpWriteBlockProto.latestGenerationStamp', index=7,
       number=8, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='requestedChecksum', full_name='OpWriteBlockProto.requestedChecksum', index=8,
+      name='requestedChecksum', full_name='hadoop.hdfs.OpWriteBlockProto.requestedChecksum', index=8,
       number=9, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='cachingStrategy', full_name='hadoop.hdfs.OpWriteBlockProto.cachingStrategy', index=9,
+      number=10, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -436,27 +472,27 @@ _OPWRITEBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=681,
-  serialized_end=1283,
+  serialized_start=863,
+  serialized_end=1585,
 )
 
 
 _OPTRANSFERBLOCKPROTO = descriptor.Descriptor(
   name='OpTransferBlockProto',
-  full_name='OpTransferBlockProto',
+  full_name='hadoop.hdfs.OpTransferBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='header', full_name='OpTransferBlockProto.header', index=0,
+      name='header', full_name='hadoop.hdfs.OpTransferBlockProto.header', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='targets', full_name='OpTransferBlockProto.targets', index=1,
+      name='targets', full_name='hadoop.hdfs.OpTransferBlockProto.targets', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -471,34 +507,34 @@ _OPTRANSFERBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1285,
-  serialized_end=1389,
+  serialized_start=1588,
+  serialized_end=1716,
 )
 
 
 _OPREPLACEBLOCKPROTO = descriptor.Descriptor(
   name='OpReplaceBlockProto',
-  full_name='OpReplaceBlockProto',
+  full_name='hadoop.hdfs.OpReplaceBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='header', full_name='OpReplaceBlockProto.header', index=0,
+      name='header', full_name='hadoop.hdfs.OpReplaceBlockProto.header', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='delHint', full_name='OpReplaceBlockProto.delHint', index=1,
+      name='delHint', full_name='hadoop.hdfs.OpReplaceBlockProto.delHint', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='source', full_name='OpReplaceBlockProto.source', index=2,
+      name='source', full_name='hadoop.hdfs.OpReplaceBlockProto.source', index=2,
       number=3, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -513,20 +549,20 @@ _OPREPLACEBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1391,
-  serialized_end=1499,
+  serialized_start=1719,
+  serialized_end=1851,
 )
 
 
 _OPCOPYBLOCKPROTO = descriptor.Descriptor(
   name='OpCopyBlockProto',
-  full_name='OpCopyBlockProto',
+  full_name='hadoop.hdfs.OpCopyBlockProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='header', full_name='OpCopyBlockProto.header', index=0,
+      name='header', full_name='hadoop.hdfs.OpCopyBlockProto.header', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -541,20 +577,20 @@ _OPCOPYBLOCKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1501,
-  serialized_end=1553,
+  serialized_start=1853,
+  serialized_end=1917,
 )
 
 
 _OPBLOCKCHECKSUMPROTO = descriptor.Descriptor(
   name='OpBlockChecksumProto',
-  full_name='OpBlockChecksumProto',
+  full_name='hadoop.hdfs.OpBlockChecksumProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='header', full_name='OpBlockChecksumProto.header', index=0,
+      name='header', full_name='hadoop.hdfs.OpBlockChecksumProto.header', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -569,48 +605,83 @@ _OPBLOCKCHECKSUMPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1555,
-  serialized_end=1611,
+  serialized_start=1919,
+  serialized_end=1987,
 )
 
 
-_PACKETHEADERPROTO = descriptor.Descriptor(
-  name='PacketHeaderProto',
-  full_name='PacketHeaderProto',
+_OPREQUESTSHORTCIRCUITACCESSPROTO = descriptor.Descriptor(
+  name='OpRequestShortCircuitAccessProto',
+  full_name='hadoop.hdfs.OpRequestShortCircuitAccessProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='offsetInBlock', full_name='PacketHeaderProto.offsetInBlock', index=0,
+      name='header', full_name='hadoop.hdfs.OpRequestShortCircuitAccessProto.header', index=0,
+      number=1, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='maxVersion', full_name='hadoop.hdfs.OpRequestShortCircuitAccessProto.maxVersion', index=1,
+      number=2, type=13, cpp_type=3, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  extension_ranges=[],
+  serialized_start=1989,
+  serialized_end=2089,
+)
+
+
+_PACKETHEADERPROTO = descriptor.Descriptor(
+  name='PacketHeaderProto',
+  full_name='hadoop.hdfs.PacketHeaderProto',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    descriptor.FieldDescriptor(
+      name='offsetInBlock', full_name='hadoop.hdfs.PacketHeaderProto.offsetInBlock', index=0,
       number=1, type=16, cpp_type=2, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='seqno', full_name='PacketHeaderProto.seqno', index=1,
+      name='seqno', full_name='hadoop.hdfs.PacketHeaderProto.seqno', index=1,
       number=2, type=16, cpp_type=2, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='lastPacketInBlock', full_name='PacketHeaderProto.lastPacketInBlock', index=2,
+      name='lastPacketInBlock', full_name='hadoop.hdfs.PacketHeaderProto.lastPacketInBlock', index=2,
       number=3, type=8, cpp_type=7, label=2,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='dataLen', full_name='PacketHeaderProto.dataLen', index=3,
+      name='dataLen', full_name='hadoop.hdfs.PacketHeaderProto.dataLen', index=3,
       number=4, type=15, cpp_type=1, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='syncBlock', full_name='PacketHeaderProto.syncBlock', index=4,
+      name='syncBlock', full_name='hadoop.hdfs.PacketHeaderProto.syncBlock', index=4,
       number=5, type=8, cpp_type=7, label=1,
       has_default_value=True, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -625,34 +696,34 @@ _PACKETHEADERPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1613,
-  serialized_end=1740,
+  serialized_start=2091,
+  serialized_end=2218,
 )
 
 
 _PIPELINEACKPROTO = descriptor.Descriptor(
   name='PipelineAckProto',
-  full_name='PipelineAckProto',
+  full_name='hadoop.hdfs.PipelineAckProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='seqno', full_name='PipelineAckProto.seqno', index=0,
+      name='seqno', full_name='hadoop.hdfs.PipelineAckProto.seqno', index=0,
       number=1, type=18, cpp_type=2, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='status', full_name='PipelineAckProto.status', index=1,
+      name='status', full_name='hadoop.hdfs.PipelineAckProto.status', index=1,
       number=2, type=14, cpp_type=8, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='downstreamAckTimeNanos', full_name='PipelineAckProto.downstreamAckTimeNanos', index=2,
+      name='downstreamAckTimeNanos', full_name='hadoop.hdfs.PipelineAckProto.downstreamAckTimeNanos', index=2,
       number=3, type=4, cpp_type=4, label=1,
       has_default_value=True, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -667,27 +738,27 @@ _PIPELINEACKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1742,
-  serialized_end=1835,
+  serialized_start=2220,
+  serialized_end=2325,
 )
 
 
 _READOPCHECKSUMINFOPROTO = descriptor.Descriptor(
   name='ReadOpChecksumInfoProto',
-  full_name='ReadOpChecksumInfoProto',
+  full_name='hadoop.hdfs.ReadOpChecksumInfoProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='checksum', full_name='ReadOpChecksumInfoProto.checksum', index=0,
+      name='checksum', full_name='hadoop.hdfs.ReadOpChecksumInfoProto.checksum', index=0,
       number=1, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='chunkOffset', full_name='ReadOpChecksumInfoProto.chunkOffset', index=1,
+      name='chunkOffset', full_name='hadoop.hdfs.ReadOpChecksumInfoProto.chunkOffset', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -702,53 +773,60 @@ _READOPCHECKSUMINFOPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1837,
-  serialized_end=1917,
+  serialized_start=2327,
+  serialized_end=2419,
 )
 
 
 _BLOCKOPRESPONSEPROTO = descriptor.Descriptor(
   name='BlockOpResponseProto',
-  full_name='BlockOpResponseProto',
+  full_name='hadoop.hdfs.BlockOpResponseProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='status', full_name='BlockOpResponseProto.status', index=0,
+      name='status', full_name='hadoop.hdfs.BlockOpResponseProto.status', index=0,
       number=1, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='firstBadLink', full_name='BlockOpResponseProto.firstBadLink', index=1,
+      name='firstBadLink', full_name='hadoop.hdfs.BlockOpResponseProto.firstBadLink', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='checksumResponse', full_name='BlockOpResponseProto.checksumResponse', index=2,
+      name='checksumResponse', full_name='hadoop.hdfs.BlockOpResponseProto.checksumResponse', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='readOpChecksumInfo', full_name='BlockOpResponseProto.readOpChecksumInfo', index=3,
+      name='readOpChecksumInfo', full_name='hadoop.hdfs.BlockOpResponseProto.readOpChecksumInfo', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='message', full_name='BlockOpResponseProto.message', index=4,
+      name='message', full_name='hadoop.hdfs.BlockOpResponseProto.message', index=4,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    descriptor.FieldDescriptor(
+      name='shortCircuitAccessVersion', full_name='hadoop.hdfs.BlockOpResponseProto.shortCircuitAccessVersion', index=5,
+      number=6, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -758,20 +836,20 @@ _BLOCKOPRESPONSEPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1920,
-  serialized_end=2117,
+  serialized_start=2422,
+  serialized_end=2690,
 )
 
 
 _CLIENTREADSTATUSPROTO = descriptor.Descriptor(
   name='ClientReadStatusProto',
-  full_name='ClientReadStatusProto',
+  full_name='hadoop.hdfs.ClientReadStatusProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='status', full_name='ClientReadStatusProto.status', index=0,
+      name='status', full_name='hadoop.hdfs.ClientReadStatusProto.status', index=0,
       number=1, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -786,20 +864,20 @@ _CLIENTREADSTATUSPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2119,
-  serialized_end=2167,
+  serialized_start=2692,
+  serialized_end=2752,
 )
 
 
 _DNTRANSFERACKPROTO = descriptor.Descriptor(
   name='DNTransferAckProto',
-  full_name='DNTransferAckProto',
+  full_name='hadoop.hdfs.DNTransferAckProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='status', full_name='DNTransferAckProto.status', index=0,
+      name='status', full_name='hadoop.hdfs.DNTransferAckProto.status', index=0,
       number=1, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -814,36 +892,43 @@ _DNTRANSFERACKPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2169,
-  serialized_end=2214,
+  serialized_start=2754,
+  serialized_end=2811,
 )
 
 
 _OPBLOCKCHECKSUMRESPONSEPROTO = descriptor.Descriptor(
   name='OpBlockChecksumResponseProto',
-  full_name='OpBlockChecksumResponseProto',
+  full_name='hadoop.hdfs.OpBlockChecksumResponseProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     descriptor.FieldDescriptor(
-      name='bytesPerCrc', full_name='OpBlockChecksumResponseProto.bytesPerCrc', index=0,
+      name='bytesPerCrc', full_name='hadoop.hdfs.OpBlockChecksumResponseProto.bytesPerCrc', index=0,
       number=1, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='crcPerBlock', full_name='OpBlockChecksumResponseProto.crcPerBlock', index=1,
+      name='crcPerBlock', full_name='hadoop.hdfs.OpBlockChecksumResponseProto.crcPerBlock', index=1,
       number=2, type=4, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
-      name='md5', full_name='OpBlockChecksumResponseProto.md5', index=2,
+      name='md5', full_name='hadoop.hdfs.OpBlockChecksumResponseProto.md5', index=2,
       number=3, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value="",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    descriptor.FieldDescriptor(
+      name='crcType', full_name='hadoop.hdfs.OpBlockChecksumResponseProto.crcType', index=3,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -856,23 +941,24 @@ _OPBLOCKCHECKSUMRESPONSEPROTO = descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2216,
-  serialized_end=2301,
+  serialized_start=2814,
+  serialized_end=2948,
 )
 
 _DATATRANSFERENCRYPTORMESSAGEPROTO.fields_by_name['status'].enum_type = _DATATRANSFERENCRYPTORMESSAGEPROTO_DATATRANSFERENCRYPTORSTATUS
 _DATATRANSFERENCRYPTORMESSAGEPROTO_DATATRANSFERENCRYPTORSTATUS.containing_type = _DATATRANSFERENCRYPTORMESSAGEPROTO;
 _BASEHEADERPROTO.fields_by_name['block'].message_type = hdfs_pb2._EXTENDEDBLOCKPROTO
-_BASEHEADERPROTO.fields_by_name['token'].message_type = hdfs_pb2._BLOCKTOKENIDENTIFIERPROTO
+_BASEHEADERPROTO.fields_by_name['token'].message_type = Security_pb2._TOKENPROTO
 _CLIENTOPERATIONHEADERPROTO.fields_by_name['baseHeader'].message_type = _BASEHEADERPROTO
 _OPREADBLOCKPROTO.fields_by_name['header'].message_type = _CLIENTOPERATIONHEADERPROTO
-_CHECKSUMPROTO.fields_by_name['type'].enum_type = _CHECKSUMPROTO_CHECKSUMTYPE
-_CHECKSUMPROTO_CHECKSUMTYPE.containing_type = _CHECKSUMPROTO;
+_OPREADBLOCKPROTO.fields_by_name['cachingStrategy'].message_type = _CACHINGSTRATEGYPROTO
+_CHECKSUMPROTO.fields_by_name['type'].enum_type = hdfs_pb2._CHECKSUMTYPEPROTO
 _OPWRITEBLOCKPROTO.fields_by_name['header'].message_type = _CLIENTOPERATIONHEADERPROTO
 _OPWRITEBLOCKPROTO.fields_by_name['targets'].message_type = hdfs_pb2._DATANODEINFOPROTO
 _OPWRITEBLOCKPROTO.fields_by_name['source'].message_type = hdfs_pb2._DATANODEINFOPROTO
 _OPWRITEBLOCKPROTO.fields_by_name['stage'].enum_type = _OPWRITEBLOCKPROTO_BLOCKCONSTRUCTIONSTAGE
 _OPWRITEBLOCKPROTO.fields_by_name['requestedChecksum'].message_type = _CHECKSUMPROTO
+_OPWRITEBLOCKPROTO.fields_by_name['cachingStrategy'].message_type = _CACHINGSTRATEGYPROTO
 _OPWRITEBLOCKPROTO_BLOCKCONSTRUCTIONSTAGE.containing_type = _OPWRITEBLOCKPROTO;
 _OPTRANSFERBLOCKPROTO.fields_by_name['header'].message_type = _CLIENTOPERATIONHEADERPROTO
 _OPTRANSFERBLOCKPROTO.fields_by_name['targets'].message_type = hdfs_pb2._DATANODEINFOPROTO
@@ -880,6 +966,7 @@ _OPREPLACEBLOCKPROTO.fields_by_name['header'].message_type = _BASEHEADERPROTO
 _OPREPLACEBLOCKPROTO.fields_by_name['source'].message_type = hdfs_pb2._DATANODEINFOPROTO
 _OPCOPYBLOCKPROTO.fields_by_name['header'].message_type = _BASEHEADERPROTO
 _OPBLOCKCHECKSUMPROTO.fields_by_name['header'].message_type = _BASEHEADERPROTO
+_OPREQUESTSHORTCIRCUITACCESSPROTO.fields_by_name['header'].message_type = _BASEHEADERPROTO
 _PIPELINEACKPROTO.fields_by_name['status'].enum_type = _STATUS
 _READOPCHECKSUMINFOPROTO.fields_by_name['checksum'].message_type = _CHECKSUMPROTO
 _BLOCKOPRESPONSEPROTO.fields_by_name['status'].enum_type = _STATUS
@@ -887,9 +974,11 @@ _BLOCKOPRESPONSEPROTO.fields_by_name['checksumResponse'].message_type = _OPBLOCK
 _BLOCKOPRESPONSEPROTO.fields_by_name['readOpChecksumInfo'].message_type = _READOPCHECKSUMINFOPROTO
 _CLIENTREADSTATUSPROTO.fields_by_name['status'].enum_type = _STATUS
 _DNTRANSFERACKPROTO.fields_by_name['status'].enum_type = _STATUS
+_OPBLOCKCHECKSUMRESPONSEPROTO.fields_by_name['crcType'].enum_type = hdfs_pb2._CHECKSUMTYPEPROTO
 DESCRIPTOR.message_types_by_name['DataTransferEncryptorMessageProto'] = _DATATRANSFERENCRYPTORMESSAGEPROTO
 DESCRIPTOR.message_types_by_name['BaseHeaderProto'] = _BASEHEADERPROTO
 DESCRIPTOR.message_types_by_name['ClientOperationHeaderProto'] = _CLIENTOPERATIONHEADERPROTO
+DESCRIPTOR.message_types_by_name['CachingStrategyProto'] = _CACHINGSTRATEGYPROTO
 DESCRIPTOR.message_types_by_name['OpReadBlockProto'] = _OPREADBLOCKPROTO
 DESCRIPTOR.message_types_by_name['ChecksumProto'] = _CHECKSUMPROTO
 DESCRIPTOR.message_types_by_name['OpWriteBlockProto'] = _OPWRITEBLOCKPROTO
@@ -897,6 +986,7 @@ DESCRIPTOR.message_types_by_name['OpTransferBlockProto'] = _OPTRANSFERBLOCKPROTO
 DESCRIPTOR.message_types_by_name['OpReplaceBlockProto'] = _OPREPLACEBLOCKPROTO
 DESCRIPTOR.message_types_by_name['OpCopyBlockProto'] = _OPCOPYBLOCKPROTO
 DESCRIPTOR.message_types_by_name['OpBlockChecksumProto'] = _OPBLOCKCHECKSUMPROTO
+DESCRIPTOR.message_types_by_name['OpRequestShortCircuitAccessProto'] = _OPREQUESTSHORTCIRCUITACCESSPROTO
 DESCRIPTOR.message_types_by_name['PacketHeaderProto'] = _PACKETHEADERPROTO
 DESCRIPTOR.message_types_by_name['PipelineAckProto'] = _PIPELINEACKPROTO
 DESCRIPTOR.message_types_by_name['ReadOpChecksumInfoProto'] = _READOPCHECKSUMINFOPROTO
@@ -909,102 +999,114 @@ class DataTransferEncryptorMessageProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _DATATRANSFERENCRYPTORMESSAGEPROTO
   
-  # @@protoc_insertion_point(class_scope:DataTransferEncryptorMessageProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.DataTransferEncryptorMessageProto)
 
 class BaseHeaderProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _BASEHEADERPROTO
   
-  # @@protoc_insertion_point(class_scope:BaseHeaderProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.BaseHeaderProto)
 
 class ClientOperationHeaderProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CLIENTOPERATIONHEADERPROTO
   
-  # @@protoc_insertion_point(class_scope:ClientOperationHeaderProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.ClientOperationHeaderProto)
+
+class CachingStrategyProto(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _CACHINGSTRATEGYPROTO
+  
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.CachingStrategyProto)
 
 class OpReadBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _OPREADBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:OpReadBlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpReadBlockProto)
 
 class ChecksumProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CHECKSUMPROTO
   
-  # @@protoc_insertion_point(class_scope:ChecksumProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.ChecksumProto)
 
 class OpWriteBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _OPWRITEBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:OpWriteBlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpWriteBlockProto)
 
 class OpTransferBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _OPTRANSFERBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:OpTransferBlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpTransferBlockProto)
 
 class OpReplaceBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _OPREPLACEBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:OpReplaceBlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpReplaceBlockProto)
 
 class OpCopyBlockProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _OPCOPYBLOCKPROTO
   
-  # @@protoc_insertion_point(class_scope:OpCopyBlockProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpCopyBlockProto)
 
 class OpBlockChecksumProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _OPBLOCKCHECKSUMPROTO
   
-  # @@protoc_insertion_point(class_scope:OpBlockChecksumProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpBlockChecksumProto)
+
+class OpRequestShortCircuitAccessProto(message.Message):
+  __metaclass__ = reflection.GeneratedProtocolMessageType
+  DESCRIPTOR = _OPREQUESTSHORTCIRCUITACCESSPROTO
+  
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpRequestShortCircuitAccessProto)
 
 class PacketHeaderProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _PACKETHEADERPROTO
   
-  # @@protoc_insertion_point(class_scope:PacketHeaderProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.PacketHeaderProto)
 
 class PipelineAckProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _PIPELINEACKPROTO
   
-  # @@protoc_insertion_point(class_scope:PipelineAckProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.PipelineAckProto)
 
 class ReadOpChecksumInfoProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _READOPCHECKSUMINFOPROTO
   
-  # @@protoc_insertion_point(class_scope:ReadOpChecksumInfoProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.ReadOpChecksumInfoProto)
 
 class BlockOpResponseProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _BLOCKOPRESPONSEPROTO
   
-  # @@protoc_insertion_point(class_scope:BlockOpResponseProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.BlockOpResponseProto)
 
 class ClientReadStatusProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CLIENTREADSTATUSPROTO
   
-  # @@protoc_insertion_point(class_scope:ClientReadStatusProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.ClientReadStatusProto)
 
 class DNTransferAckProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _DNTRANSFERACKPROTO
   
-  # @@protoc_insertion_point(class_scope:DNTransferAckProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.DNTransferAckProto)
 
 class OpBlockChecksumResponseProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _OPBLOCKCHECKSUMRESPONSEPROTO
   
-  # @@protoc_insertion_point(class_scope:OpBlockChecksumResponseProto)
+  # @@protoc_insertion_point(class_scope:hadoop.hdfs.OpBlockChecksumResponseProto)
 
 # @@protoc_insertion_point(module_scope)

@@ -21,7 +21,10 @@ from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
 from snakebite.errors import InvalidInputException
+from snakebite.errors import OutOfNNException
 from snakebite.channel import DataXceiverChannel
+from snakebite.config import HDFSConfig
+from snakebite.namenode import Namenode
 
 import Queue
 import zlib
@@ -31,6 +34,10 @@ import os
 import os.path
 import pwd
 import fnmatch
+import inspect
+import socket
+import errno
+import time
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +48,7 @@ class Client(object):
     **Example:**
 
     >>> from snakebite.client import Client
-    >>> client = Client("localhost", 54310)
+    >>> client = Client("localhost", 54310, use_trash=False)
     >>> for x in client.ls(['/']):
     ...     print x
 
@@ -59,7 +66,7 @@ class Client(object):
         when paths contain globs.
 
     .. note::
-        Different Hadoop distributions use different protocol versions. Snakebite defaults to 7, but this can be set by passing
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``hadoop_version`` parameter to the constructor.
     '''
     FILETYPES = {
@@ -68,22 +75,28 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=7):
+    def __init__(self, host, port, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
         :param port: RPC Port of the NameNode
         :type port: int
-        :param hadoop_version: What hadoop protocol version should be used (default: 7)
+        :param hadoop_version: What hadoop protocol version should be used (default: 9)
         :type hadoop_version: int
+        :param use_trash: Use a trash when removing files.
+        :type use_trash: boolean
         '''
-        if hadoop_version not in [7, 8]:
-            raise Exception("Only protocol versions 7 and 8 are supported")
+        if hadoop_version < 9:
+            raise Exception("Only protocol versions >= 9 supported")
 
         self.host = host
         self.port = port
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
         self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version)
+        self.use_trash = use_trash
+        self.trash = self._join_user_path(".Trash")
+
+        log.debug("Created client for %s:%s with trash=%s" % (host, port, use_trash))
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
         ''' Issues 'ls' command and returns a list of maps that contain fileinfo
@@ -404,11 +417,51 @@ class Client(object):
         if not recurse:
             recurse = False
 
-        request = client_proto.DeleteRequestProto()
-        request.src = path
-        request.recursive = recurse
-        response = self.service.delete(request)
-        return {"path": path, "result": response.result}
+        if self.__should_move_to_trash(path):
+            if path.endswith("/"):
+                suffix_path = path[1:-1]
+            else:
+                suffix_path = path[1:]
+
+            trash_path = os.path.join(self.trash, "Current", suffix_path)
+            if trash_path.endswith("/"):
+                trash_path = trash_path[:-1]
+
+            base_trash_path = os.path.join(self.trash, "Current", os.path.dirname(suffix_path))
+            if base_trash_path.endswith("/"):
+                base_trash_path = base_trash_path[:-1]
+
+            # Try twice, in case checkpoint between mkdir() and rename()
+            for i in range(0, 2):
+                list(self.mkdir([base_trash_path], create_parent=True, mode=0700))
+
+                original_path = trash_path
+
+                while self.test(trash_path, exists=True):
+                    unix_timestamp = str(int(time.time() * 1000))
+                    trash_path = "%s%s" % (original_path, unix_timestamp)
+
+                result = self._handle_rename(path, node, trash_path)
+                if result['result']:
+                    result['message'] = ". Moved %s to %s" % (path, trash_path)
+                    return result
+            raise Exception("Failed to move to trash: %s" % path)
+        else:
+            request = client_proto.DeleteRequestProto()
+            request.src = path
+            request.recursive = recurse
+            response = self.service.delete(request)
+            return {"path": path, "result": response.result}
+
+    def __should_move_to_trash(self, path):
+        if not self.use_trash:
+            return False
+        if path.startswith(self.trash):
+            return False  # Path already in trash
+        if os.path.dirname(self.trash).startswith(path):
+            raise Exception("Cannot move %s to the trash, as it contains the trash" % path)
+
+        return True
 
     def rmdir(self, paths):
         ''' Delete a directory
@@ -750,7 +803,7 @@ class Client(object):
         :type path: string
         :param exists: Check if the path exists
         :type exists: boolean
-        :param directory: Check if the path exists
+        :param directory: Check if the path is a directory
         :type exists: boolean
         :param zero_length: Check if the path is zero-length
         :type zero_length: boolean
@@ -765,7 +818,10 @@ class Client(object):
 
         processor = lambda path, node, exists=exists, directory=directory, zero_length=zero_length: self._handle_test(path, node, exists, directory, zero_length)
         try:
-            return all(self._find_items([path], processor, include_toplevel=True))
+            items = list(self._find_items([path], processor, include_toplevel=True))
+            if len(items) == 0:
+                return False
+            return all(items)
         except FileNotFoundException, e:
             if exists:
                 return False
@@ -1149,3 +1205,121 @@ class Client(object):
     def _remove_user_path(self, path):
         dir_to_remove = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
         return path.replace(dir_to_remove+'/', "", 1)
+
+
+class HAClient(Client):
+    ''' Snakebite client with support for High Availability
+    
+    HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.
+
+    **Example:**
+
+    >>> from snakebite.client import HAClient
+    >>> from snakebite.namenode import Namenode
+    >>> n1 = Namenode("namenode1.mydomain", 54310)
+    >>> n2 = Namenode("namenode2.mydomain", 54310)
+    >>> client = HAClient([n1, n2], use_trash=True)
+    >>> for x in client.ls(['/']):
+    ...     print x
+
+    .. note::
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
+        in the ``version`` parameter to the Namenode class constructor.
+     '''
+    def __init__(self, namenodes, use_trash=False):
+        self.use_trash = use_trash
+        self.namenode = self._switch_namenode(namenodes)
+        self.namenode.next()
+
+        # Add HA support to all public Client methods
+        for name, meth in inspect.getmembers(HAClient, inspect.ismethod):
+            if not name.startswith("_"): # Only public methods
+                if inspect.isgeneratorfunction(meth):
+                    setattr(HAClient, name, HAClient._ha_gen_method(meth))
+                else:
+                    setattr(HAClient, name, HAClient._ha_return_method(meth))
+
+
+    def _switch_namenode(self, namenodes):
+        for namenode in namenodes:
+            log.debug("Switch to namenode: %s:%d" % (namenode.host, namenode.port))
+
+            yield super(HAClient, self).__init__(namenode.host,
+                                                 namenode.port,
+                                                 namenode.version,
+                                                 self.use_trash)
+        else:
+            msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
+            for namenode in namenodes:
+                msg += "\n\t* %s:%d" % (namenode.host, namenode.port)
+            msg += "\nLook into debug messages - add -D flag!"
+            raise OutOfNNException(msg)
+
+    def __handle_request_error(self, exception):
+	log.debug("Request failed with %s" % exception)
+        if exception.args[0].startswith("org.apache.hadoop.ipc.StandbyException"):
+            self.namenode.next()
+        else:
+            # There's a valid NN in active state, but there's still request error - raise
+            raise
+
+    def __handle_socket_error(self, exception):
+	log.debug("Request failed with %s" % exception)
+        if exception.errno == errno.ECONNREFUSED:
+            # if NN is down or machine is not available, get next NN:
+            self.namenode.next()
+        else:
+            raise
+
+    @staticmethod
+    def _ha_return_method(func):
+        ''' Method decorator for 'return type' methods '''
+        def wrapped(self, *args, **kw):
+            while(True): # switch between all namenodes
+                try:
+                     return func(self, *args, **kw)
+                except RequestError as e:
+                    self.__handle_request_error(e)
+                except socket.error as e:
+                    self.__handle_socket_error(e)
+        return wrapped
+
+    @staticmethod
+    def _ha_gen_method(func):
+        ''' Method decorator for 'generator type' methods '''
+        def wrapped(self, *args, **kw):
+            while(True): # switch between all namenodes
+                try:
+                    results = func(self, *args, **kw)
+                    while(True): # yield all results
+                        yield results.next()
+                except RequestError as e:
+                    self.__handle_request_error(e)
+                except socket.error as e:
+                    self.__handle_socket_error(e)
+        return wrapped
+
+
+class AutoConfigClient(HAClient):
+    ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_PATH`` environment variable.
+
+    HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.
+    This client tries to read ``${HADOOP_PATH}/conf/hdfs-site.xml`` to get the address of the namenode.
+    The behaviour is the same as Client.
+
+    **Example:**
+
+    >>> from snakebite.client import AutoConfigClient
+    >>> client = AutoConfigClient()
+    >>> for x in client.ls(['/']):
+    ...     print x
+
+    .. note::
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
+        in the ``hadoop_version`` parameter to the constructor.
+    '''
+    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
+        configs = HDFSConfig.get_external_config()
+        nns = [Namenode(c['namenode'], c['port'], hadoop_version, c['use_trash']) for c in configs]
+        use_trash = any([c['use_trash'] for c in configs])
+        super(AutoConfigClient, self).__init__(nns, use_trash)
