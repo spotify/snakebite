@@ -12,17 +12,6 @@ class MiniClusterTestBase(unittest2.TestCase):
     @classmethod
     def setupClass(cls):
         if not cls.cluster:
-            # Prevent running tests if a hadoop cluster is reachable. This guard
-            # is in place because the MiniCluster java class can break things on
-            # a production cluster. The MiniCluster python class is used, but doesn't
-            # start an actual cluster. We only use convenience methods to call java
-            # hadoop.
-
-            c = MiniCluster(None, start_cluster=False)
-            result = c.ls("/")
-            if result:
-                raise Exception("An active Hadoop cluster is found! Not running tests!")
-
             testfiles_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testfiles")
             cls.cluster = MiniCluster(testfiles_path)
             cls.cluster.put("/test1", "/test1")
