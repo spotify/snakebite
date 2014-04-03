@@ -1320,6 +1320,5 @@ class AutoConfigClient(HAClient):
     '''
     def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
         configs = HDFSConfig.get_external_config()
-        nns = [Namenode(c['namenode'], c['port'], hadoop_version, c['use_trash']) for c in configs]
-        use_trash = any([c['use_trash'] for c in configs])
-        super(AutoConfigClient, self).__init__(nns, use_trash)
+        nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
+        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash)
