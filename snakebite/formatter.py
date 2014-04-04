@@ -230,6 +230,8 @@ def format_stat(results, json_output=False):
     if json_output:
         return json.dumps(results)
     for k, v in sorted(results.iteritems()):
+        if k == "permission":
+            v = oct(v)
         ret.append("%-20s\t%s" % (k, v))
     return "\n".join(ret)
 
