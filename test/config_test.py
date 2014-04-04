@@ -5,6 +5,7 @@ import time
 import os.path
 import snakebite
 from snakebite.config import HDFSConfig
+from snakebite.client import AutoConfigClient
 from mock import patch, mock_open
 
 class ConfigTest(unittest2.TestCase):
@@ -101,3 +102,19 @@ class ConfigTest(unittest2.TestCase):
 
         self._verify_hdfs_noport_settings(config)
         self.assertTrue(HDFSConfig.use_trash)
+
+    @patch('os.environ.get')
+    def test_autoconfig_client_trash_true(self, environ_get):
+        environ_get.return_value = False
+        HDFSConfig.core_try_paths = (self.get_config_path('ha-core-site.xml'),)
+        HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-noport-trash-hdfs-site.xml'),)
+        client = AutoConfigClient()
+        self.assertTrue(client.use_trash)
+
+    @patch('os.environ.get')
+    def test_autoconfig_client_trash_false(self, environ_get):
+        environ_get.return_value = False
+        HDFSConfig.core_try_paths = (self.get_config_path('ha-core-site.xml'),)
+        HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-noport-hdfs-site.xml'),)
+        client = AutoConfigClient()
+        self.assertFalse(client.use_trash)
