@@ -14,5 +14,5 @@ mv -fv html/* ..
 pushd ..
 rm -rf ${GH_PAGES_SOURCES} doc/html
 git add -A
-git ci -m "Generated gh-pages for ${NEW_COMMIT_MESSAGE}" && git push github gh-pages 
+git ci -m "Generated gh-pages for ${NEW_COMMIT_MESSAGE}" && git push origin gh-pages 
 git checkout ${CURRENT_BRANCH}
