@@ -1,8 +1,14 @@
+snakebite (2.3.2) unstable; urgency=low
+
+  Fix in stat output
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 4 Apr 2014 12:01:12 +0000
+
 snakebite (2.3.1) unstable; urgency=low
 
   Fix use_trash missing in external configs
 
- -- Rafal Wojdyla <rav@spotify.com>  Tue, 14 Apr 2014 12:01:12 +0000
+ -- Rafal Wojdyla <rav@spotify.com>  Tue, 4 Apr 2014 12:01:12 +0000
 
 snakebite (2.3.0) unstable; urgency=low
 
