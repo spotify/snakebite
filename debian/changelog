@@ -1,3 +1,9 @@
+snakebite (2.3.3) unstable; urgency=low
+
+  Add socket timeout and NN handling
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 9 Apr 2014 12:01:12 +0000
+
 snakebite (2.3.2) unstable; urgency=low
 
   Fix in stat output
