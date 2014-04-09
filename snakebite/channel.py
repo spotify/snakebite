@@ -204,7 +204,7 @@ class SocketRpcChannel(RpcChannel):
         # Open socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-
+        self.sock.settimeout(10)
         # Connect socket to server - defined by host and port arguments
         self.sock.connect((host, port))
 
