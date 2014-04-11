@@ -1258,18 +1258,23 @@ class HAClient(Client):
     def __handle_request_error(self, exception):
         log.debug("Request failed with %s" % exception)
         if exception.args[0].startswith("org.apache.hadoop.ipc.StandbyException"):
-            self.namenode.next()
+            pass
         else:
             # There's a valid NN in active state, but there's still request error - raise
             raise
+        self.namenode.next()
 
     def __handle_socket_error(self, exception):
         log.debug("Request failed with %s" % exception)
-        if exception.errno == errno.ECONNREFUSED or exception.message == "timed out":
-            # if NN is down or machine is not available, get next NN:
-            self.namenode.next()
+        if exception.errno == errno.ECONNREFUSED:
+            # if NN is down or machine is not available, pass it:
+            pass
+        elif isinstance(exception, socket.timeout):
+            # if there's communication/socket timeout, pass it:
+            pass
         else:
             raise
+        self.namenode.next()
 
     @staticmethod
     def _ha_return_method(func):
