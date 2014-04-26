@@ -797,7 +797,7 @@ class Client(object):
         return data[max(0, len(data)-1024):len(data)]
 
     def test(self, path, exists=False, directory=False, zero_length=False):
-        '''Test if a paht exist, is a directory or has zero length
+        '''Test if a path exist, is a directory or has zero length
 
         :param path: Path to test
         :type path: string
