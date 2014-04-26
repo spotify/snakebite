@@ -75,7 +75,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False):
+    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
