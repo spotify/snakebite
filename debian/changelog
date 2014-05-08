@@ -1,3 +1,16 @@
+snakebite (2.4.0) unstable; urgency=low
+
+  Add effective_user support for snakebite.client
+
+  Add parameter to support effective_user from client all the way to the
+  channel. It is now possible to overwrite local user with given user. If
+  there's no user specified we keep old behavior - use user that executed
+  snakebite as the effective user.
+  Effective user is the user that will make the actual changes on the
+  HDFS.
+
+ -- Rafal Wojdyla <rav@spotify.com>  Tue, 8 May 2014 12:01:12 +0000
+
 snakebite (2.3.4) unstable; urgency=low
 
   Fix timeout exception handling
