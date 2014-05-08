@@ -75,7 +75,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False):
+    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False, effective_user=None):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -85,6 +85,8 @@ class Client(object):
         :type hadoop_version: int
         :param use_trash: Use a trash when removing files.
         :type use_trash: boolean
+        :param effective_user: Effective user for the HDFS operations (default: None - current user)
+        :type effective_user: string
         '''
         if hadoop_version < 9:
             raise Exception("Only protocol versions >= 9 supported")
@@ -92,7 +94,7 @@ class Client(object):
         self.host = host
         self.port = port
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
-        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version)
+        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, effective_user)
         self.use_trash = use_trash
         self.trash = self._join_user_path(".Trash")
 
@@ -1209,7 +1211,7 @@ class Client(object):
 
 class HAClient(Client):
     ''' Snakebite client with support for High Availability
-    
+
     HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.
 
     **Example:**
@@ -1225,9 +1227,18 @@ class HAClient(Client):
     .. note::
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``version`` parameter to the Namenode class constructor.
-     '''
-    def __init__(self, namenodes, use_trash=False):
+    '''
+    def __init__(self, namenodes, use_trash=False, effective_user=None):
+        '''
+        :param namenodes: Set of namenodes for HA setup
+        :type namenodes: list
+        :param use_trash: Use a trash when removing files.
+        :type use_trash: boolean
+        :param effective_user: Effective user for the HDFS operations (default: None - current user)
+        :type effective_user: string
+        '''
         self.use_trash = use_trash
+        self.effective_user = effective_user
         self.namenode = self._switch_namenode(namenodes)
         self.namenode.next()
 
@@ -1247,7 +1258,8 @@ class HAClient(Client):
             yield super(HAClient, self).__init__(namenode.host,
                                                  namenode.port,
                                                  namenode.version,
-                                                 self.use_trash)
+                                                 self.use_trash,
+                                                 self.effective_user)
         else:
             msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
             for namenode in namenodes:
@@ -1323,7 +1335,14 @@ class AutoConfigClient(HAClient):
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``hadoop_version`` parameter to the constructor.
     '''
-    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
+    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION, effective_user=None):
+        '''
+        :param hadoop_version: What hadoop protocol version should be used (default: 9)
+        :type hadoop_version: int
+        :param effective_user: Effective user for the HDFS operations (default: None - current user)
+        :type effective_user: string
+        '''
+
         configs = HDFSConfig.get_external_config()
         nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
-        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash)
+        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash, effective_user)
