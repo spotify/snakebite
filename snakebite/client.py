@@ -1228,6 +1228,17 @@ class HAClient(Client):
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``version`` parameter to the Namenode class constructor.
     '''
+
+    @classmethod
+    def _wrap_methods(cls):
+        # Add HA support to all public Client methods, but only do this when we haven't done this before
+        for name, meth in inspect.getmembers(cls, inspect.ismethod):
+            if not name.startswith("_"): # Only public methods
+                if inspect.isgeneratorfunction(meth):
+                    setattr(cls, name, cls._ha_gen_method(meth))
+                else:
+                    setattr(cls, name, cls._ha_return_method(meth))
+
     def __init__(self, namenodes, use_trash=False, effective_user=None):
         '''
         :param namenodes: Set of namenodes for HA setup
@@ -1241,15 +1252,6 @@ class HAClient(Client):
         self.effective_user = effective_user
         self.namenode = self._switch_namenode(namenodes)
         self.namenode.next()
-
-        # Add HA support to all public Client methods
-        for name, meth in inspect.getmembers(HAClient, inspect.ismethod):
-            if not name.startswith("_"): # Only public methods
-                if inspect.isgeneratorfunction(meth):
-                    setattr(HAClient, name, HAClient._ha_gen_method(meth))
-                else:
-                    setattr(HAClient, name, HAClient._ha_return_method(meth))
-
 
     def _switch_namenode(self, namenodes):
         for namenode in namenodes:
@@ -1294,7 +1296,7 @@ class HAClient(Client):
         def wrapped(self, *args, **kw):
             while(True): # switch between all namenodes
                 try:
-                     return func(self, *args, **kw)
+                    return func(self, *args, **kw)
                 except RequestError as e:
                     self.__handle_request_error(e)
                 except socket.error as e:
@@ -1316,6 +1318,7 @@ class HAClient(Client):
                     self.__handle_socket_error(e)
         return wrapped
 
+HAClient._wrap_methods()
 
 class AutoConfigClient(HAClient):
     ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_PATH`` environment variable.
