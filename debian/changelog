@@ -1,5 +1,17 @@
 snakebite (2.4.0) unstable; urgency=low
 
+  Fixes bug with HA client in multi threading environments
+
+  HAClient would wrap Client methods with HA functionality, but did
+  this in the constructor. This caused wrapped methods to be wrapped
+  again when client.py was included multiple times.
+  This functionality has been moved to a classmethod that only
+  is called once on module load time.
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 13 May 2014 12:01:12 +0000
+
+snakebite (2.4.0) unstable; urgency=low
+
   Add effective_user support for snakebite.client
 
   Add parameter to support effective_user from client all the way to the
