@@ -1,4 +1,4 @@
-snakebite (2.4.0) unstable; urgency=low
+snakebite (2.4.1) unstable; urgency=low
 
   Fixes bug with HA client in multi threading environments
 
