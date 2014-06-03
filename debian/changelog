@@ -1,3 +1,9 @@
+snakebite (2.4.2) unstable; urgency=low
+
+  Handle errors gracefully (config parse error, empty namenodes list)
+
+ -- Rafal Wojdyla <rav@spotify.com>  Tue, 3 Jun 2014 12:01:12 +0000
+
 snakebite (2.4.1) unstable; urgency=low
 
   Fixes bug with HA client in multi threading environments
