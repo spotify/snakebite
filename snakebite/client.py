@@ -1250,6 +1250,9 @@ class HAClient(Client):
         '''
         self.use_trash = use_trash
         self.effective_user = effective_user
+
+        if not namenodes:
+            raise OutOfNNException("List of namenodes is empty - couldn't create the client")
         self.namenode = self._switch_namenode(namenodes)
         self.namenode.next()
 
@@ -1348,4 +1351,6 @@ class AutoConfigClient(HAClient):
 
         configs = HDFSConfig.get_external_config()
         nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
+        if not nns:
+            raise OutOfNNException("Tried and failed to find namenodes - couldn't created the client!")
         super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash, effective_user)

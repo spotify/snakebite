@@ -36,7 +36,11 @@ class HDFSConfig(object):
     @staticmethod
     def read_hadoop_config(hdfs_conf_path):
         if os.path.exists(hdfs_conf_path):
-            tree = ET.parse(hdfs_conf_path)
+            try:
+                tree = ET.parse(hdfs_conf_path)
+            except:
+                log.error("Unable to parse %s" % hdfs_conf_path)
+                return
             root = tree.getroot()
             for p in root.findall("./property"):
                 yield p
