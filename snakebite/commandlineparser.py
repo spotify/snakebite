@@ -304,6 +304,7 @@ class CommandLineParser(object):
             print '{'
             print '  "config_version": 2,'
             print '  "use_trash": true,'
+            print '  "effective_user": "hdfs",'
             print '  "namenodes": ['
             print '    {"host": "namenode-ha1", "port": %d, "version": %d},' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
             print '    {"host": "namenode-ha2", "port": %d, "version": %d}' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
@@ -356,6 +357,8 @@ class CommandLineParser(object):
                     self.args.usetrash = HDFSConfig.use_trash
         else:
             print_error_exit("Config retrieved from ~/.snakebiterc is corrupted! Remove it!")
+
+        self.args.effective_user = configs.get("effective_user", HDFSConfig.effective_user)
 
     def __get_all_directories(self):
         if self.args and 'dir' in self.args:
@@ -433,7 +436,7 @@ class CommandLineParser(object):
             use_trash = self.args.usetrash and not self.args.skiptrash
         else:
             use_trash = self.args.usetrash
-        self.client = HAClient(self.namenodes, use_trash)
+        self.client = HAClient(self.namenodes, use_trash, self.args.effective_user)
 
     def execute(self):
         if self.args.help:
