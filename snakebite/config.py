@@ -10,6 +10,7 @@ log = logging.getLogger(__name__)
 
 class HDFSConfig(object):
     use_trash = False
+    effective_user = None
 
     @classmethod
     def get_config_from_env(cls):

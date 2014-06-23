@@ -304,6 +304,7 @@ class CommandLineParser(object):
             print '{'
             print '  "config_version": 2,'
             print '  "use_trash": true,'
+            print '  "effective_user": "hdfs",'
             print '  "namenodes": ['
             print '    {"host": "namenode-ha1", "port": %d, "version": %d},' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
             print '    {"host": "namenode-ha2", "port": %d, "version": %d}' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
@@ -330,6 +331,7 @@ class CommandLineParser(object):
                 print_info(old_version_info)
                 # There's no info about Trash in version 1, use default policy:
                 self.args.usetrash = HDFSConfig.use_trash
+            self.args.effective_user = HDFSConfig.effective_user
         elif isinstance(configs, dict):
             # Version 2: {}
             # Can be either new configuration or just one namenode
@@ -354,6 +356,7 @@ class CommandLineParser(object):
                     # commandline setting has higher priority
                     print_info(old_version_info)
                     self.args.usetrash = HDFSConfig.use_trash
+            self.args.effective_user = configs.get("effective_user", HDFSConfig.effective_user)
         else:
             print_error_exit("Config retrieved from ~/.snakebiterc is corrupted! Remove it!")
 
@@ -433,7 +436,7 @@ class CommandLineParser(object):
             use_trash = self.args.usetrash and not self.args.skiptrash
         else:
             use_trash = self.args.usetrash
-        self.client = HAClient(self.namenodes, use_trash)
+        self.client = HAClient(self.namenodes, use_trash, self.args.effective_user)
 
     def execute(self):
         if self.args.help:
