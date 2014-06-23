@@ -639,7 +639,8 @@ class MockParseArgs(object):
                 namenode=None,
                 port=None,
                 usetrash=False,
-                skiptrash=False):
+                skiptrash=False,
+                effective_user=None):
         self.dir = dir
         self.single_arg = single_arg
         self.command = command
@@ -647,6 +648,7 @@ class MockParseArgs(object):
         self.port = port
         self.usetrash = usetrash
         self.skiptrash = skiptrash
+        self.effective_user = effective_user
 
     def __contains__(self, b):
         return b in self.__dict__

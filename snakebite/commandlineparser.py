@@ -331,6 +331,7 @@ class CommandLineParser(object):
                 print_info(old_version_info)
                 # There's no info about Trash in version 1, use default policy:
                 self.args.usetrash = HDFSConfig.use_trash
+            self.args.effective_user = HDFSConfig.effective_user
         elif isinstance(configs, dict):
             # Version 2: {}
             # Can be either new configuration or just one namenode
@@ -355,10 +356,9 @@ class CommandLineParser(object):
                     # commandline setting has higher priority
                     print_info(old_version_info)
                     self.args.usetrash = HDFSConfig.use_trash
+            self.args.effective_user = configs.get("effective_user", HDFSConfig.effective_user)
         else:
             print_error_exit("Config retrieved from ~/.snakebiterc is corrupted! Remove it!")
-
-        self.args.effective_user = configs.get("effective_user", HDFSConfig.effective_user)
 
     def __get_all_directories(self):
         if self.args and 'dir' in self.args:
