@@ -20,18 +20,26 @@ import itertools
 def expand_paths(paths):
     ''' Expand paths like /foo/{bar,baz} becomes /foo/bar, /foo/bar'''
     result = []
-    exp = re.compile("{(.*?)}")
     for path in paths:
-        m = exp.findall(path)
-        if not m:
-            result.append(path)
-        else:
-            x = [item.split(",") for item in m]
-            template = re.sub("{.*?}", "%s", path)
-            product = list(itertools.product(*x))
-            for s in product:
-                result.append(template % s)
+        result += expand_path(path)
     return result
+
+
+exp = re.compile("{(.*?)}")
+
+
+def expand_path(path):
+    m = exp.findall(path)
+    if not m:
+        return [path]
+    else:
+        firstClose = path.index("}")
+        lastOpen = path[:firstClose].rfind("{") + 1
+        opts = path[lastOpen:firstClose].split(",")
+        template = path[:lastOpen-1]+"%s"+path[firstClose+1:]
+        results = [template % s for s in opts]
+        return expand_paths(results)
+
 
 magick_check = re.compile('[*?[{}]')
 
