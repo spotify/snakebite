@@ -33,10 +33,10 @@ def expand_path(path):
     if not m:
         return [path]
     else:
-        firstClose = path.index("}")
-        lastOpen = path[:firstClose].rfind("{") + 1
-        opts = path[lastOpen:firstClose].split(",")
-        template = path[:lastOpen-1]+"%s"+path[firstClose+1:]
+        first_close = path.index("}")
+        last_open = path[:first_close].rfind("{") + 1
+        opts = path[last_open:first_close].split(",")
+        template = path[:last_open-1]+"%s"+path[first_close+1:]
         results = [template % s for s in opts]
         return expand_paths(results)
 
