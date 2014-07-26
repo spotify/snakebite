@@ -477,7 +477,7 @@ class DataXceiverChannel(object):
         self.write(encoder._VarintBytes(len(data)))
         self.write(data)
 
-    def readBlock(self, length, pool_id, block_id, generation_stamp, offset, check_crc):
+    def readBlock(self, length, pool_id, block_id, generation_stamp, offset, block_token, check_crc):
         '''Send a read request to given block. If we receive a successful response,
         we start reading packets.
 
@@ -523,6 +523,13 @@ class DataXceiverChannel(object):
         header = request.header
         header.clientName = "snakebite"
         base_header = header.baseHeader
+        # TokenProto
+        token = base_header.token
+        token.identifier = block_token.identifier
+        token.password = block_token.password
+        token.kind = block_token.kind
+        token.service = block_token.service
+        # ExtendedBlockProto
         block = base_header.block
         block.poolId = pool_id
         block.blockId = block_id

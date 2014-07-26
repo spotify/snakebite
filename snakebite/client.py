@@ -992,6 +992,7 @@ class Client(object):
             length = block.b.numBytes
             pool_id = block.b.poolId
             offset_in_block = 0
+            block_token = block.blockToken
             if tail_only:
                 if num_blocks_tail == 2 and block.b.blockId != lastblock.b.blockId:
                     offset_in_block = block.b.numBytes - (1024 - lastblock.b.numBytes)
@@ -1015,7 +1016,7 @@ class Client(object):
                 data_xciever = DataXceiverChannel(host, port)
                 if data_xciever.connect():
                     try:
-                        for load in data_xciever.readBlock(length, pool_id, block.b.blockId, block.b.generationStamp, offset_in_block, check_crc):
+                        for load in data_xciever.readBlock(length, pool_id, block.b.blockId, block.b.generationStamp, offset_in_block, block_token, check_crc):
                             offset_in_block += len(load)
                             total_bytes_read += len(load)
                             successful_read = True
