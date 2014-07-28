@@ -268,16 +268,19 @@ class CommandLineParser(object):
         # Try to retrieve namenode config from within CL arguments
         if self._read_config_cl():
             return
-
-        ''' Try to read the config from ~/.snakebiterc and if that doesn't exist,
-        check $HADOOP_HOME/core-site.xml and $HADOOP_HOME/hdfs-site.xml
-        and create a ~/.snakebiterc from that.
+        
+        ''' Try to read the config from ~/.snakebiterc and if that doesn't
+        exist, check /etc/snakebiterc and finally if that doesn't exist, check
+        $HADOOP_HOME/core-site.xml and $HADOOP_HOME/hdfs-site.xml and create
+        ~/.snakebiterc.
         '''
         config_file = os.path.join(os.path.expanduser('~'), '.snakebiterc')
 
         if os.path.exists(config_file):
             #if ~/.snakebiterc exists - read config from it
             self._read_config_snakebiterc()
+        elif os.path.exists('/etc/snakebiterc'):
+            self._read_config_snakebiterc('/etc/snakebiterc')
         else:
             # Try to read the configuration for HDFS configuration files
             configs = HDFSConfig.get_external_config()
@@ -312,9 +315,9 @@ class CommandLineParser(object):
 
             sys.exit(1)
 
-    def _read_config_snakebiterc(self):
-        old_version_info = "You're are using snakebite %s with Trash support together with old snakebiterc, please update/remove your ~/.snakebiterc file. By default Trash is %s." % (version(), 'disabled' if not HDFSConfig.use_trash else 'enabled')
-        with open(os.path.join(os.path.expanduser('~'), '.snakebiterc')) as config_file:
+    def _read_config_snakebiterc(self, path = os.path.join(os.path.expanduser('~'), '.snakebiterc')):
+        old_version_info = "You're are using snakebite %s with Trash support together with old snakebiterc, please update/remove your %s file. By default Trash is %s." % (path, version(), 'disabled' if not HDFSConfig.use_trash else 'enabled')
+        with open(path) as config_file:
             configs = json.load(config_file)
 
         if isinstance(configs, list):
@@ -355,7 +358,7 @@ class CommandLineParser(object):
                     print_info(old_version_info)
                     self.args.usetrash = HDFSConfig.use_trash
         else:
-            print_error_exit("Config retrieved from ~/.snakebiterc is corrupted! Remove it!")
+            print_error_exit("Config retrieved from %s is corrupted! Remove it!" % path)
 
     def __get_all_directories(self):
         if self.args and 'dir' in self.args:
