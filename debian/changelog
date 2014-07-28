@@ -1,3 +1,9 @@
+snakebite (2.4.4) unstable; urgency=low
+
+  Pass block token from NN to DN
+
+ -- Wouter de Bie <wouter@spotify.com>  Mon, 28 Jul 2014 12:02:12 +0000
+
 snakebite (2.4.3) unstable; urgency=low
 
   - Better glob handling
