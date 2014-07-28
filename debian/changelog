@@ -1,3 +1,10 @@
+snakebite (2.4.3) unstable; urgency=low
+
+  - Better glob handling
+  - Fallback to /etc/snakebite
+
+ -- Wouter de Bie <wouter@spotify.com>  Mon, 28 Jul 2014 12:01:12 +0000
+
 snakebite (2.4.2) unstable; urgency=low
 
   Handle errors gracefully (config parse error, empty namenodes list)
