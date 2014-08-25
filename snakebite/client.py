@@ -381,6 +381,11 @@ class Client(object):
     def _handle_rename(self, path, node, dst):
         if not dst.startswith("/"):
             dst = self._join_user_path(dst)
+
+        # Strip the last / if there is one. Hadoop doesn't like this
+        if dst.endswith("/"):
+            dst = dst[:-1]
+
         request = client_proto.RenameRequestProto()
         request.src = path
         request.dst = dst

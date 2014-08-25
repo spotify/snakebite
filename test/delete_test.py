@@ -158,3 +158,4 @@ class DeleteWithTrashTest(MiniClusterTestBase):
 
         with self.assertRaises(Exception):
             list(self.client.delete(try_path))
+

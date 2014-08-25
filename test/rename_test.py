@@ -40,3 +40,10 @@ class RenameTest(MiniClusterTestBase):
     def test_invalid_input(self):
         result = self.client.rename('/stringpath', '777')
         self.assertRaises(InvalidInputException, result.next)
+
+    def test_rename_multi_with_trailing_slash(self):
+       list(self.client.rename(['/test3', '/test4'], '/dir1/'))
+       expected_output = self.client.ls(['/dir1'])
+       paths = set([node["path"] for node in expected_output])
+       for path in ['/dir1/test3', '/dir1/test4']:
+           self.assertTrue(path in paths)
