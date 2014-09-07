@@ -1,20 +1,13 @@
 language: python
-python:
-  - "2.7"
-  - "2.6"
-jdk:
-  - oraclejdk6
-before_install:
-  - source ./scripts/ci/setup_env.sh
-  - sudo apt-get update -qq
-install: 
-  - pip install protobuf --use-mirrors
-  - pip install unittest2 --use-mirrors
-  - pip install argparse --use-mirrors
-script: nosetests -v
-env:
-  - HADOOP_DISTRO=cdh
-  - HADOOP_DISTRO=hdp
+python: 2.7
+jdk: oraclejdk6
 branches:
-  except:
-  - gh-pages
+    except:
+        - gh-pages
+env:
+    - TOX_ENV=py26-cdh
+    - TOX_ENV=py27-cdh
+    - TOX_ENV=py26-hdp
+    - TOX_ENV=py27-hdp
+install: pip install -r requirements-dev.txt
+script: python setup.py test --tox-args="-e $TOX_ENV"

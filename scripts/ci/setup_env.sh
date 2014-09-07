@@ -1,28 +1,31 @@
 #!/usr/bin/env bash
-export HADOOP_HOME=/tmp/hadoop
 
-# Fix /etc/hosts so Java will not break
-echo "Fixing /etc/hosts"
-sudo sed -e "s/^127.0.0.1.*/127.0.0.1 localhost $(hostname)/" --in-place /etc/hosts
+HADOOP_DISTRO=${HADOOP_DISTRO:-"hdp"}
+HADOOP_HOME=/tmp/hadoop-${HADOOP_DISTRO}
 
-mkdir $HADOOP_HOME
+mkdir -p $HADOOP_HOME
 
 if [ $HADOOP_DISTRO = "cdh" ]; then
     URL="http://archive.cloudera.com/cdh5/cdh/5/hadoop-latest.tar.gz"
-    export HADOOP_PROTOCOL_VER=9
 elif [ $HADOOP_DISTRO = "hdp" ]; then
     URL="http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.0.6.0/tars/hadoop-2.2.0.2.0.6.0-76.tar.gz"
-    export HADOOP_PROTOCOL_VER=9
 else
     echo "No HADOOP_DISTRO specified"
     exit 1
 fi
 
-echo "Downloading Hadoop from $URL"
-wget $URL -O hadoop.tar.gz
+echo "Downloading Hadoop from $URL to ${HADOOP_HOME}/hadoop.tar.gz"
+curl -z ${HADOOP_HOME}/hadoop.tar.gz -o ${HADOOP_HOME}/hadoop.tar.gz -L $URL
 
-echo "Extracting hadoop into $HADOOP_HOME"
-tar zxf hadoop.tar.gz --strip-components 1 -C $HADOOP_HOME
+if [ $? != 0 ]; then
+    echo "Failed to download Hadoop from $URL - abort" >&2
+    exit 1
+fi
 
-echo "Running apt-get update"
-sudo apt-get update -qq
+echo "Extracting ${HADOOP_HOME}/hadoop.tar.gz into $HADOOP_HOME"
+tar zxf ${HADOOP_HOME}/hadoop.tar.gz --strip-components 1 -C $HADOOP_HOME
+
+if [ $? != 0 ]; then
+    echo "Failed to extract Hadoop from ${HADOOP_HOME}/hadoop.tar.gz to ${HADOOP_HOME} - abort" >&2
+    exit 1
+fi
