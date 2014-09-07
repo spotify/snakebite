@@ -1,0 +1,10 @@
+include scripts/snakebite-completion.bash
+include LICENSE
+include *.rst
+include requirements.txt
+include requirements-dev.txt
+include tox.ini
+recursive-exclude test *
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.un~
