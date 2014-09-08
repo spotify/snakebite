@@ -8,3 +8,5 @@ build/
 snakebite.egg-info/
 MANIFEST
 dist/
+.tox
+*.swp

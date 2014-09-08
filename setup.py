@@ -14,8 +14,39 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-from distutils.core import setup
+try:
+    from setuptools import setup
+    from setuptools.command.test import test as TestCommand
+except ImportError:
+    from distutils.core import setup
+    from distutils.cmd import Command as TestCommand
+
 from snakebite.version import version
+
+import sys
+
+class Tox(TestCommand):
+    user_options = [('tox-args=', None, "Arguments to pass to tox")]
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.tox_args = ''
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import tox
+        errno = tox.cmdline(args=self.tox_args.split())
+        sys.exit(errno)
+
+install_requires = [
+    'protobuf>2.4.1',
+    'argparse']
+
+tests_require = [
+    'tox',
+    'virtualenv>=1.11.2']
 
 setup(
     name='snakebite',
@@ -40,8 +71,7 @@ setup(
         ('/etc/bash_completion.d', ['scripts/snakebite-completion.bash']),
         ('', ['LICENSE'])
     ],
-    install_requires=[
-        'protobuf>2.4.1',
-        'argparse'
-    ]
+    install_requires=install_requires,
+    tests_require=tests_require,
+    cmdclass={'test': Tox}
 )
