@@ -68,7 +68,7 @@ setup(
         'Environment :: Other Environment'
     ],
     data_files=[
-        ('/etc/bash_completion.d', ['scripts/snakebite-completion.bash']),
+        ('etc/bash_completion.d', ['scripts/snakebite-completion.bash']),
         ('', ['LICENSE'])
     ],
     install_requires=install_requires,
