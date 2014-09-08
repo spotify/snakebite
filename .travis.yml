@@ -1,6 +1,6 @@
 language: python
 python: 2.7
-jdk: oraclejdk6
+jdk: oraclejdk7
 branches:
     except:
         - gh-pages
