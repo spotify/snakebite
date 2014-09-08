@@ -1,0 +1,34 @@
+dirty:
+    build: .
+
+testPy27cdh:
+    image: snakebite_dirty
+    working_dir: /snakebite
+    environment:
+        - JAVA_HOME=/usr
+        - ONLY_EXTRACT=true
+    command: python2.7 setup.py test --tox-args='-e py27-cdh --recreate'
+
+testPy27hdp:
+    image: snakebite_dirty
+    working_dir: /snakebite
+    environment:
+        - JAVA_HOME=/usr
+        - ONLY_EXTRACT=true
+    command: python2.7 setup.py test --tox-args='-e py27-hdp --recreate'
+
+testPy26hdp:
+    image: snakebite_dirty
+    working_dir: /snakebite
+    environment:
+        - JAVA_HOME=/usr
+        - ONLY_EXTRACT=true
+    command: python2.7 setup.py test --tox-args='-e py26-hdp --recreate'
+
+testPy26cdh:
+    image: snakebite_dirty
+    working_dir: /snakebite
+    environment:
+        - JAVA_HOME=/usr
+        - ONLY_EXTRACT=true
+    command: python2.7 setup.py test --tox-args='-e py26-cdh --recreate'
