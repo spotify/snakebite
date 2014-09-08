@@ -1,3 +1,10 @@
+snakebite (2.4.7) unstable; urgency=low
+
+  Bump jdk to jdk7, revert absolut path in data_files
+
+ -- Rafal Wojdyla <rav@spotify.com>  Mon, 8 Sep 2014 12:02:12 +0000
+
+
 snakebite (2.4.6) unstable; urgency=low
 
   Add manifest template
