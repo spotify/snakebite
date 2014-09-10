@@ -43,15 +43,16 @@ def print_error_exit(msg, fd=sys.stderr):
 def print_info(msg, fd=sys.stderr):
     print >> fd, "Info: %s" % msg
 
-def exitError(error):
-    if isinstance(error, FileNotFoundException) or \
-       isinstance(error, DirectoryException) or \
-       isinstance(error, FileException):
-        print str(error)
-    elif isinstance(error, RequestError):
-        print "Request error: %s" % str(error)
+def exitError(exc_info):
+    exc_type, exc_value, exc_traceback = exc_info
+    if isinstance(
+        exc_value, (FileNotFoundException, DirectoryException, FileException),
+    ):
+        print str(exc_value)
+    elif isinstance(exc_value, RequestError):
+        print "Request error: %s" % str(exc_value)
     else:
-        raise error
+        raise exc_type, exc_value, exc_traceback
     sys.exit(-1)
 
 
@@ -448,8 +449,8 @@ class CommandLineParser(object):
             sys.exit(-1)
         try:
             return Commands.methods[self.cmd]['method'](self)
-        except Exception, e:
-            exitError(e)
+        except Exception:
+            exitError(sys.exc_info())
 
     def command(args="", descr="", allowed_opts="", visible=True, req_args=None):
         def wrap(f):
@@ -522,8 +523,8 @@ class CommandLineParser(object):
             mods = self.client.chown(self.args.dir, owner, recurse=self.args.recurse)
             for line in format_results(mods, json_output=self.args.json):
                 print line
-        except FileNotFoundException, e:
-            exitError(e)
+        except FileNotFoundException:
+            exitError(sys.exc_info())
 
     @command(args="<mode> [paths]", descr="change file mode (octal)", allowed_opts=["R"], req_args=['(int) arg', 'dir [dirs]'])
     def chmod(self):

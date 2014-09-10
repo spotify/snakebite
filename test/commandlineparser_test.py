@@ -16,11 +16,13 @@ import unittest2
 import os
 import pwd
 import json
+import sys
+import traceback
 
-from mock import patch, mock_open
+from mock import MagicMock, patch, mock_open
 
 from snakebite.config import HDFSConfig
-from snakebite.commandlineparser import CommandLineParser
+from snakebite.commandlineparser import Commands, CommandLineParser
 from snakebite.namenode import Namenode
 
 from config_test import ConfigTest
@@ -1011,3 +1013,29 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.assertFalse(self.parser.client.use_trash)
         finally:
             self._revert_hdfs_try_paths()
+
+
+
+class CommandLineParserExecuteTest(unittest2.TestCase):
+    def test_execute_does_not_swallow_tracebacks(self):
+        with patch.dict(Commands.methods, clear=True):
+            @CommandLineParser.command.im_func()
+            def boom(*args, **kwargs):
+                def subboom():
+                    raise IndexError("Boom!")
+                subboom()
+
+            parser = CommandLineParser()
+            parser.parse(["boom"])
+
+            try:
+                parser.execute()
+            except IndexError:
+                _, _, exc_traceback = sys.exc_info()
+                self.assertIn(
+                    "subboom()\n",
+                    traceback.format_exc(),
+                    msg="Lost some stack frames when re-raising!",
+                )
+            else:
+                self.fail("execute() should have raised an IndexError!")
