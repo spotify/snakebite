@@ -4,3 +4,4 @@ unittest2
 mock
 virtualenv>=1.11.2
 tox>=1.7.2
+sphinx
