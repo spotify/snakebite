@@ -147,13 +147,14 @@ def format_counts(results, json_output=False, human_readable=False):
             yield json.dumps(result)
     else:
         for result in results:
-            space_consumed = result.get('spaceConsumed')
+            # lenght is space before replication
+            length = result.get('length')
             if human_readable:
-                space_consumed = _sizeof_fmt(int(result.get('spaceConsumed')))
+                length = _sizeof_fmt(int(length))
 
             yield "%12s %12s %18s %s" % (result.get('directoryCount'),
                                                 result.get('fileCount'),
-                                                space_consumed,
+                                                length,
                                                 result.get('path'))
 
 
