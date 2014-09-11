@@ -43,3 +43,7 @@ class TestTest(MiniClusterTestBase):
     def test_zero(self):
         result = self.client.test('/zerofile', exists=True, zero_length=True)
         self.assertTrue(result)
+
+    def test_unicode(self):
+        result = self.client.test(u'/zerofile', exists=True)
+        self.assertTrue(result)

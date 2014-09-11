@@ -818,7 +818,7 @@ class Client(object):
 
         .. note:: directory and zero length are AND'd.
         '''
-        if not isinstance(path, str):
+        if not isinstance(path, (str, unicode)):
             raise InvalidInputException("Path should be a string")
         if not path:
             raise InvalidInputException("test: no path given")
