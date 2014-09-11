@@ -10,3 +10,4 @@ MANIFEST
 dist/
 .tox
 *.swp
+.DS_Store
