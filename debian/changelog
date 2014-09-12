@@ -1,3 +1,9 @@
+snakebite (2.4.9) unstable; urgency=low
+
+  Fixes #71 - Client.test() only accepts type str
+
+ -- Wouter de Bie <wouter@spotify.com>  Fri, 12 Sep 2014 12:02:12 +0000
+
 snakebite (2.4.8) unstable; urgency=low
 
   - [#77] Introduce Fig - isolated snakebite testing
