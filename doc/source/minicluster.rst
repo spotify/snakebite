@@ -1,5 +1,6 @@
+***********
 Minicluster
-===========
+***********
 .. automodule:: minicluster
 
 .. autoclass:: MiniCluster
