@@ -3,7 +3,7 @@ nose
 unittest2
 mock
 virtualenv>=1.11.2
-tox>=1.7.2
+tox>=1.8.0
 sphinx
 sphinx_rtd_theme
 fig
