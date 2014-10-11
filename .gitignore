@@ -11,3 +11,5 @@ dist/
 .tox
 *.swp
 .DS_Store
+doc/html
+doc/doctrees

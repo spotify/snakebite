@@ -1,14 +1,31 @@
+**********
 CLI client
-==========
+**********
 A command line interface for HDFS using :mod:`snakebite.client <client>`.
 
-The CLI client first tries parse the path and in case it's in the form
-``hdfs://namenode:port/path`` it will use that configuration.
-Otherwise it will use -n and -p command line arguments.
-If the previous aren't set it tries to read the config from ``~/.snakebiterc`` and
-if that doesn't exist, it will check ``$HADOOP_HOME/core-site.xml``.
+Config
+======
 
-A config looks like
+Snakebite CLI can accept configuration in a couple of different ways,
+but there's strict priority for each of them.
+List of methods, in priority order:
+
+1. via path in command line - eg: ``hdfs://namenode_host:port/path``
+2. via ``-n``, ``-p``, ``-V`` flags in command line
+3. via ``~/.snakebiterc`` file
+4. via ``/etc/snakebiterc`` file
+5. via ``$HADOOP_HOME/core-site.xml`` and/or ``$HADOOP_HOME/hdfs-site.xml`` files
+6. via ``core-site.xml`` and/or ``hdfs-site.xml`` in default locations
+
+More about methods from 3 to 6 below.
+
+Config files
+^^^^^^^^^^^^
+
+Snakebite config can exist in ``~/.snakebiterc`` - per system user, or in
+``/etc/snakebiterc`` - system wide config.
+
+A config looks like:
 
 ::
 
@@ -22,10 +39,31 @@ A config looks like
   }
 
 
-The version property denotes the protocol version used. CDH 4.1.3 uses protocol 7, while 
-HDP 2.0 uses protocol 8. Snakebite defaults to 7.
+The version property denotes the protocol version used. CDH 4.1.3 uses protocol 7, while
+HDP 2.0 uses protocol 9. Snakebite defaults to 9. Default port of namenode is 8020.
+Default value of ``skiptrash`` is ``true``.
 
-Snakebite cli comes with bash completion inf /scripts.
+Hadoop config files
+^^^^^^^^^^^^^^^^^^^
+
+Last two methods of providing config for snakebite is through hadoop config files.
+If ``HADOOP_HOME`` environment variable is set, snakebite will try to find ``core-site.xml``
+and/or ``hdfs-site.xml`` files in ``$HADOOP_HOME`` directory. If ``HADOOP_HOME`` is not set,
+snakebite will try to find those files in a couple of default hadoop config locations:
+ * /etc/hadoop/conf/core-site.xml
+ * /usr/local/etc/hadoop/conf/core-site.xml
+ * /usr/local/hadoop/conf/core-site.xml
+ * /etc/hadoop/conf/hdfs-site.xml
+ * /usr/local/etc/hadoop/conf/hdfs-site.xml
+ * /usr/local/hadoop/conf/hdfs-site.xml
+
+Bash completion
+===============
+
+Snakebite CLI comes with bash completion file in /scripts. If snakebite is installed
+via debian package it will install completion file automatically. But if snakebite
+is installed via pip/setup.py it will not do that, as it would requite write access
+in /etc (usually root), in that case it's required to install completion script manually.
 
 Usage
 =====

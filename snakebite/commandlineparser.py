@@ -269,12 +269,7 @@ class CommandLineParser(object):
         # Try to retrieve namenode config from within CL arguments
         if self._read_config_cl():
             return
-        
-        ''' Try to read the config from ~/.snakebiterc and if that doesn't
-        exist, check /etc/snakebiterc and finally if that doesn't exist, check
-        $HADOOP_HOME/core-site.xml and $HADOOP_HOME/hdfs-site.xml and create
-        ~/.snakebiterc.
-        '''
+
         config_file = os.path.join(os.path.expanduser('~'), '.snakebiterc')
 
         if os.path.exists(config_file):
