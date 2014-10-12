@@ -1,68 +1,143 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CLI client &mdash; snakebite 2.4.9 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="snakebite 2.4.9 documentation" href="index.html"/>
+        <link rel="next" title="Development" href="development.html"/>
+        <link rel="prev" title="Client library" href="client.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> snakebite</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client library</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">CLI client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#config">Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bash-completion">Bash completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development.html#how-to-start">How to start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#open-issues">Open issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#id1">Tox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#fig">Fig</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="minicluster.html">Minicluster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hadoop_rpc.html">Hadoop RPC protocol description</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hadoop_rpc.html#connection">Connection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hadoop_rpc.html#sending-messages">Sending messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hadoop_rpc.html#receiving-messages">Receiving messages</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">snakebite</a>
+      </nav>
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>CLI client &mdash; snakebite 2.4.9 documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '2.4.9',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="snakebite 2.4.9 documentation" href="index.html" />
-    <link rel="next" title="Minicluster" href="minicluster.html" />
-    <link rel="prev" title="Client library" href="client.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="minicluster.html" title="Minicluster"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="client.html" title="Client library"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">snakebite 2.4.9 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>CLI client</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/cli.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
             
   <div class="section" id="cli-client">
 <h1>CLI client<a class="headerlink" href="#cli-client" title="Permalink to this headline">¶</a></h1>
 <p>A command line interface for HDFS using <a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a>.</p>
-<p>The CLI client first tries parse the path and in case it&#8217;s in the form
-<tt class="docutils literal"><span class="pre">hdfs://namenode:port/path</span></tt> it will use that configuration.
-Otherwise it will use -n and -p command line arguments.
-If the previous aren&#8217;t set it tries to read the config from <tt class="docutils literal"><span class="pre">~/.snakebiterc</span></tt> and
-if that doesn&#8217;t exist, it will check <tt class="docutils literal"><span class="pre">$HADOOP_HOME/core-site.xml</span></tt>.</p>
-<p>A config looks like</p>
+<div class="section" id="config">
+<h2>Config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h2>
+<p>Snakebite CLI can accept configuration in a couple of different ways,
+but there&#8217;s strict priority for each of them.
+List of methods, in priority order:</p>
+<ol class="arabic simple">
+<li>via path in command line - eg: <tt class="docutils literal"><span class="pre">hdfs://namenode_host:port/path</span></tt></li>
+<li>via <tt class="docutils literal"><span class="pre">-n</span></tt>, <tt class="docutils literal"><span class="pre">-p</span></tt>, <tt class="docutils literal"><span class="pre">-V</span></tt> flags in command line</li>
+<li>via <tt class="docutils literal"><span class="pre">~/.snakebiterc</span></tt> file</li>
+<li>via <tt class="docutils literal"><span class="pre">/etc/snakebiterc</span></tt> file</li>
+<li>via <tt class="docutils literal"><span class="pre">$HADOOP_HOME/core-site.xml</span></tt> and/or <tt class="docutils literal"><span class="pre">$HADOOP_HOME/hdfs-site.xml</span></tt> files</li>
+<li>via <tt class="docutils literal"><span class="pre">core-site.xml</span></tt> and/or <tt class="docutils literal"><span class="pre">hdfs-site.xml</span></tt> in default locations</li>
+</ol>
+<p>More about methods from 3 to 6 below.</p>
+<div class="section" id="config-files">
+<h3>Config files<a class="headerlink" href="#config-files" title="Permalink to this headline">¶</a></h3>
+<p>Snakebite config can exist in <tt class="docutils literal"><span class="pre">~/.snakebiterc</span></tt> - per system user, or in
+<tt class="docutils literal"><span class="pre">/etc/snakebiterc</span></tt> - system wide config.</p>
+<p>A config looks like:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
     <span class="s">&quot;config_version&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
     <span class="s">&quot;skiptrash&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
@@ -74,12 +149,37 @@ if that doesn&#8217;t exist, it will check <tt class="docutils literal"><span cl
 </pre></div>
 </div>
 <p>The version property denotes the protocol version used. CDH 4.1.3 uses protocol 7, while
-HDP 2.0 uses protocol 8. Snakebite defaults to 7.</p>
-<p>Snakebite cli comes with bash completion inf /scripts.</p>
+HDP 2.0 uses protocol 9. Snakebite defaults to 9. Default port of namenode is 8020.
+Default value of <tt class="docutils literal"><span class="pre">skiptrash</span></tt> is <tt class="docutils literal"><span class="pre">true</span></tt>.</p>
+</div>
+<div class="section" id="hadoop-config-files">
+<h3>Hadoop config files<a class="headerlink" href="#hadoop-config-files" title="Permalink to this headline">¶</a></h3>
+<p>Last two methods of providing config for snakebite is through hadoop config files.
+If <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt> environment variable is set, snakebite will try to find <tt class="docutils literal"><span class="pre">core-site.xml</span></tt>
+and/or <tt class="docutils literal"><span class="pre">hdfs-site.xml</span></tt> files in <tt class="docutils literal"><span class="pre">$HADOOP_HOME</span></tt> directory. If <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt> is not set,
+snakebite will try to find those files in a couple of default hadoop config locations:</p>
+<blockquote>
+<div><ul class="simple">
+<li>/etc/hadoop/conf/core-site.xml</li>
+<li>/usr/local/etc/hadoop/conf/core-site.xml</li>
+<li>/usr/local/hadoop/conf/core-site.xml</li>
+<li>/etc/hadoop/conf/hdfs-site.xml</li>
+<li>/usr/local/etc/hadoop/conf/hdfs-site.xml</li>
+<li>/usr/local/hadoop/conf/hdfs-site.xml</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="bash-completion">
+<h2>Bash completion<a class="headerlink" href="#bash-completion" title="Permalink to this headline">¶</a></h2>
+<p>Snakebite CLI comes with bash completion file in /scripts. If snakebite is installed
+via debian package it will install completion file automatically. But if snakebite
+is installed via pip/setup.py it will not do that, as it would requite write access
+in /etc (usually root), in that case it&#8217;s required to install completion script manually.</p>
 </div>
 <div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-python"><pre>snakebite [general options] cmd [arguments]
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>snakebite [general options] cmd [arguments]
 general options:
   -D --debug                     Show debug information
   -V --version                   Hadoop protocol version (default:9)
@@ -115,71 +215,75 @@ commands:
   touchz [paths]                 creates a file of zero length
   usage &lt;cmd&gt;                    show cmd usage
 
-to see command-specific options use: snakebite [cmd] --help</pre>
+to see command-specific options use: snakebite [cmd] --help
+</pre></div>
+</div>
 </div>
 </div>
 
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">CLI client</a></li>
-<li><a class="reference internal" href="#usage">Usage</a></li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="development.html" class="btn btn-neutral float-right" title="Development"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="client.html" class="btn btn-neutral" title="Client library"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="client.html"
-                        title="previous chapter">Client library</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="minicluster.html"
-                        title="next chapter">Minicluster</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/cli.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013 - 2014, Spotify AB.
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="minicluster.html" title="Minicluster"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="client.html" title="Client library"
-             >previous</a> |</li>
-        <li><a href="index.html">snakebite 2.4.9 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2013 - 2014, Spotify AB.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.4.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

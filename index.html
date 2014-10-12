@@ -1,54 +1,119 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Snakebite documentation &mdash; snakebite 2.4.9 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="snakebite 2.4.9 documentation" href="#"/>
+        <link rel="next" title="Client library" href="client.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="#" class="fa fa-home"> snakebite</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#config">Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#bash-completion">Bash completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development.html#how-to-start">How to start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#open-issues">Open issues</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#id1">Tox</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#fig">Fig</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="minicluster.html">Minicluster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hadoop_rpc.html">Hadoop RPC protocol description</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hadoop_rpc.html#connection">Connection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hadoop_rpc.html#sending-messages">Sending messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hadoop_rpc.html#receiving-messages">Receiving messages</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">snakebite</a>
+      </nav>
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Snakebite documentation &mdash; snakebite 2.4.9 documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '2.4.9',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="snakebite 2.4.9 documentation" href="#" />
-    <link rel="next" title="Client library" href="client.html" /> 
-  </head>
-  <body>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="client.html" title="Client library"
-             accesskey="N">next</a> |</li>
-        <li><a href="#">snakebite 2.4.9 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>Snakebite documentation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
             
   <div class="section" id="snakebite-documentation">
 <h1>Snakebite documentation<a class="headerlink" href="#snakebite-documentation" title="Permalink to this headline">¶</a></h1>
@@ -56,14 +121,13 @@
 <div class="toctree-wrapper compound">
 </div>
 <ul class="simple">
-<li><a class="reference internal" href="client.html"><em>A pure python HDFS client library that uses protobuf messages over Hadoop RPC to communicate with the namenode.</em></a></li>
+<li><a class="reference internal" href="client.html"><em>A pure python HDFS client library that uses protobuf messages over Hadoop RPC to communicate with HDFS.</em></a></li>
 <li><a class="reference internal" href="cli.html"><em>A command line interface (CLI) for HDFS that uses the pure python client library.</em></a></li>
 <li><a class="reference internal" href="minicluster.html"><em>A hadoop minicluster wrapper.</em></a></li>
 <li><a class="reference internal" href="hadoop_rpc.html"><em>Hadoop RPC specification.</em></a></li>
 </ul>
-</div>
 <div class="section" id="background">
-<h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
 <p>Since the &#8216;normal&#8217; Hadoop HDFS client (<tt class="docutils literal"><span class="pre">hadoop</span> <span class="pre">fs</span></tt>) is written in Java and has
 a lot of dependencies on Hadoop jars, startup times are quite high (&gt; 3 secs).
 This isn&#8217;t ideal for integrating Hadoop commands in python projects.</p>
@@ -86,65 +150,8 @@ CRC during transfer, but this is disabled by default because of performance
 reasons. This is the opposite behaviour from the stock Hadoop client.</p>
 </div>
 </div>
-<div class="section" id="testing">
-<h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last"><a class="reference internal" href="client.html#module-client" title="client"><tt class="xref py py-mod docutils literal"><span class="pre">snakebite.client</span></tt></a> hasn&#8217;t been tested in the wild
-a lot! <strong>USE AT YOUR OWN RISK!</strong></p>
-</div>
-<p>Tests can be run with <tt class="docutils literal"><span class="pre">nosetests</span></tt>. Currently, only integration tests are
-provided and use <tt class="docutils literal"><span class="pre">minicluster.py</span></tt> to spawn an HDFS minicluster.</p>
-<p>When running the tests, make sure that the <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt> environment variable is set.
-The minicluster uses the <tt class="docutils literal"><span class="pre">hadoop-mapreduce-client-jobclient.&lt;version&gt;-tests.jar</span></tt> and
-assumes this is located in <tt class="docutils literal"><span class="pre">HADOOP_HOME</span></tt>. The job client test jar can also be specified
-by using the <tt class="docutils literal"><span class="pre">HADOOP_JOBCLIENT_JAR</span></tt> environment variable.</p>
-<p>Also, make sure the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable is set.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Different Hadoop distributions use different protocol versions. Snakebite 1.3.x
-and the tests default to version 7 (CDH 4.1.3).
-Snakebite 2.x <strong>ONLY</strong> supports Hadoop &gt; 2.2.0 (protocol version &gt;9, e.g. HDP2.0/CDH5)! I
-If you want to test with different protocol versions, set the <tt class="docutils literal"><span class="pre">HADOOP_PROTOCOL_VER</span></tt>
-environment variable to the apropriate version number.</p>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">A hadoop installation is only required for testing.</p>
-</div>
-</div>
-<div class="section" id="todo">
-<h1>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h1>
-<ul>
-<li><p class="first">Only supports Auth method SIMPLE. We might want to have SASL or KERBEROS as well</p>
-</li>
-<li><p class="first">More tests.</p>
-</li>
-<li><p class="first">Return correct exit codes from cli client.</p>
-</li>
-<li><p class="first">Imrove speed of CRC verification.</p>
-</li>
-<li><dl class="first docutils">
-<dt>Improve methods:</dt>
-<dd><ul class="first last simple">
-<li>[-rm [-f] [-r|-R] [-skipTrash] &lt;src&gt; ...] (implement -f)</li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>Implement more methods (those need interaction with DataNodes):</dt>
-<dd><ul class="first last simple">
-<li>[-expunge]</li>
-<li>put [paths] dst                copy sources from local file system to destination</li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</div>
 <div class="section" id="license">
-<h1>LICENSE<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<h2>LICENSE<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
 <p>Copyright (c) 2013 - 2014 Spotify AB</p>
 <p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;); you may not
 use this file except in compliance with the License. You may obtain a copy of
@@ -159,75 +166,76 @@ the License.</p>
 carries it&#8217;s respective license.</p>
 </div>
 <div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
 </div>
+</div>
 
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Snakebite documentation</a><ul>
-</ul>
-</li>
-<li><a class="reference internal" href="#background">Background</a></li>
-<li><a class="reference internal" href="#testing">Testing</a></li>
-<li><a class="reference internal" href="#todo">TODO</a></li>
-<li><a class="reference internal" href="#license">LICENSE</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="client.html" class="btn btn-neutral float-right" title="Client library"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
 
-  <h4>Next topic</h4>
-  <p class="topless"><a href="client.html"
-                        title="next chapter">Client library</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/index.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2013 - 2014, Spotify AB.
     </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="client.html" title="Client library"
-             >next</a> |</li>
-        <li><a href="#">snakebite 2.4.9 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2013 - 2014, Spotify AB.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.4.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

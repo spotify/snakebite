@@ -1,12 +1,12 @@
+*******************************
 Hadoop RPC protocol description
-===============================
+*******************************
 
 Snakebite currently implements the following protocol in
 :py:data:`snakebite.channel.SocketRpcChannel` to communicate with the NameNode.
 
-=============
 Connection
-=============
+==========
 The Hadoop RPC protocol works as described below. On connection, headers are
 sent to setup a session. After that, multiple requests can be sent within the session.
 
@@ -26,9 +26,8 @@ sent to setup a session. After that, multiple requests can be sent within the se
 | IpcConnectionContextProto        | :py:data:`bytes` |                                        |
 +----------------------------------+------------------+----------------------------------------+
 
-==================
 Sending messages
-==================
+================
 
 When sending a message, the following is sent to the sever:
 
@@ -62,9 +61,8 @@ The :py:data:`HadoopRpcRequestProto` contains a :py:data:`methodName` field that
 what server method is called and a has a property :py:data:`request` that contains the
 serialized actual request message.
 
-====================
 Receiving messages
-====================
+==================
 
 After a message is sent, the response can be read in the following way:
 
