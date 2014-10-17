@@ -61,6 +61,13 @@ class MiniClusterTestBase(unittest2.TestCase):
         self.cluster = self.__class__.cluster
         self.client = Client(self.cluster.host, self.cluster.port, int(version))
 
+
+class MiniClusterSpecificPortTest(unittest2.TestCase):
+    def test_explicit_port(self):
+        c = MiniCluster(None, nnport=50050)
+        self.assertEqual(50050, c.port)
+        c.terminate()
+
 if __name__ == '__main__':
     try:
         MiniClusterTestBase.setupClass()

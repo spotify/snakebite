@@ -57,7 +57,7 @@ class MiniCluster(object):
     .. note:: Not all hadoop commands have been implemented, only the ones that
               were necessary for testing the snakebite client, but please feel free to add them
     '''
-    def __init__(self, testfiles_path, start_cluster=True):
+    def __init__(self, testfiles_path, start_cluster=True, nnport=None):
         '''
         :param testfiles_path: Local path where test files can be found. Mainly used for ``put()``
         :type testfiles_path: string
@@ -69,7 +69,7 @@ class MiniCluster(object):
         self._jobclient_jar = os.environ.get('HADOOP_JOBCLIENT_JAR')
         self._hadoop_cmd = "%s/bin/hadoop" % self._hadoop_home
         if start_cluster:
-            self._start_mini_cluster()
+            self._start_mini_cluster(nnport)
             self.host = "localhost"
             self.port = self._get_namenode_port()
             self.hdfs_url = "hdfs://%s:%d" % (self.host, self.port)
@@ -148,19 +148,19 @@ class MiniCluster(object):
                 if re.match(".*hadoop-mapreduce-client-jobclient.+-tests.jar", files):
                     return os.path.join(dirpath, files)
 
-    def _start_mini_cluster(self):
+    def _start_mini_cluster(self, nnport=None):
         if self._jobclient_jar:
             hadoop_jar = self._jobclient_jar
         else:
             hadoop_jar = self._find_mini_cluster_jar(self._hadoop_home)
         if not hadoop_jar:
             raise Exception("No hadoop jobclient test jar found")
-        self.hdfs = subprocess.Popen([self._hadoop_cmd,
-                                      'jar',
-                                      hadoop_jar,
-                                      'minicluster', '-nomr', '-format'],
-                                      bufsize=0,
-                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = [self._hadoop_cmd, 'jar', hadoop_jar,
+               'minicluster', '-nomr', '-format']
+        if nnport:
+            cmd.extend(['-nnport', "%s" % nnport])
+        self.hdfs = subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE)
 
     def _get_namenode_port(self):
         port_found = False
