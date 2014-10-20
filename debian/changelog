@@ -1,3 +1,9 @@
+snakebite (2.4.10) unstable; urgency=low
+
+   * improve tox config thanks to tox 1.8  * update documentation  * add release script  * add port parameter for test minicluster 
+
+ -- Rafal Wojdyla <rav@spotify.com>  Mon, 20 Oct 2014 17:00:54 -0000
+
 snakebite (2.4.9) unstable; urgency=low
 
   Fixes #71 - Client.test() only accepts type str
