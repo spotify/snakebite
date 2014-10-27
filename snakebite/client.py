@@ -38,6 +38,7 @@ import inspect
 import socket
 import errno
 import time
+import re
 
 log = logging.getLogger(__name__)
 
@@ -1063,6 +1064,9 @@ class Client(object):
 
         # Expand paths if necessary (/foo/{bar,baz} --> ['/foo/bar', '/foo/baz'])
         paths = glob.expand_paths(paths)
+
+        # Replace multiple directory separators with a single one ('/foo//bar///baz' -> '/foo/bar/baz')
+        paths = [re.sub('/+', '/', path) for path in paths]
 
         for path in paths:
             if not path.startswith("/"):
