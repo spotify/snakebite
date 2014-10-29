@@ -36,7 +36,8 @@ class CatTest(MiniClusterTestBase):
         self.assertEqual(expected_output, client_output)
 
     def test_cat_file_on_2_blocks(self):  # 1 < size < 2 blocks
-        self._write_to_test_cluster('/test1', 200, '/temp_test')  # 677,972 * 200 = 135,594,400 bytes
+        self._write_to_test_cluster('/test1', 10, '/temp_test', 4 * 1024 * 1024)
+        # 6.77972 MB of test data, with 4MB block size gives 2 blocks
 
         client_output = ''
         for file_to_read in self.client.cat(['/temp_test']):
@@ -46,7 +47,10 @@ class CatTest(MiniClusterTestBase):
         self.assertEqual(expected_output, client_output)
 
     def test_cat_file_on_3_blocks(self):  # 2 < size < 3 blocks
-        self._write_to_test_cluster('/test1', 400, '/temp_test2')  # 677,972 * 400 = 271,188,800 bytes
+        # to limit size on test data, let's change default block size
+        self._write_to_test_cluster('/test1', 10, '/temp_test2', 3 * 1024 * 1024)
+        # size of the test data will be 677,972 * 10 = 6.77972 MB, and with
+        #block size 3 MB, it gives as 3 blocks
 
         client_output = ''
         for file_to_read in self.client.cat(['/temp_test2']):
@@ -56,7 +60,9 @@ class CatTest(MiniClusterTestBase):
         self.assertEqual(expected_output, client_output)
 
     def test_cat_file_on_exactly_1_block(self):  # Size == 1 block
-        self._write_to_test_cluster('/test3', 131072, '/temp_test3')  # 1024 * 131072 = 134,217,728 (default block size)
+        self._write_to_test_cluster('/test3', 1024, '/temp_test3', 1 * 1024 * 1024)
+        # test3 is 1024 bytes, write it 1024 times to get 1MB of test data
+        # set block size to 1MB to get exactly one block
 
         client_output = ''
         for file_to_read in self.client.cat(['/temp_test3']):
@@ -65,10 +71,10 @@ class CatTest(MiniClusterTestBase):
         expected_output = self.cluster.cat('/temp_test3')
         self.assertEqual(expected_output, client_output)
 
-    def _write_to_test_cluster(self, testfile, times, dst):
+    def _write_to_test_cluster(self, testfile, times, dst, block_size=134217728):
         testfiles_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testfiles")
         f = open(''.join([testfiles_path, testfile]))
-        p = self.cluster.put_subprocess('-', dst)
+        p = self.cluster.put_subprocess('-', dst, block_size)
         for _ in xrange(times):
             f.seek(0)
             for line in f.readlines():
