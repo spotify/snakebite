@@ -32,37 +32,7 @@ More information and documentation can be found at http://spotify.github.io/snak
 
 Development
 ***********
-
-NOTE: make sure you have java 7 installed - it's required for testing, verify
-  java -version
-
-To start playing with snakebite first you need to clone repository:
-
-  git clone git@github.com:spotify/snakebite.git
-
-We recommend to use virtualenv (+ virtualenvwrapper) for development purposes:
-
-  pip install virtualenvwrapper
-
-Create development environment for snakebite development:
-
-  mkvirtualenv snakebite_dev
-
-Fetch all developer requirements:
-
-  pip install -r requirements-dev.txt
-
-Run tests:
-
-  python setup.py test
-
-Tests should succeed (remember to always test your changes).
-
-Now install snakebite in your virtualenv, to ease development process:
-
-  python setup.py develop
-
-Now, go ahead hack and come back with pull requests <3
+Make sure to read about development `here <http://spotify.github.io/snakebite/development.html>`_ and about testing over `here <http://spotify.github.io/snakebite/testing.html>`_, hack and come back with a pull requests <3
 
 Travis CI status
 ****************
