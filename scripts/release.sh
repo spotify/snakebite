@@ -1,8 +1,12 @@
 #!/bin/bash
 
+set -o nounset
+set -o errexit
+set -o pipefail
+
 function print_color {
   local msg=${1?}
-  local kind=${2}
+  local kind=${2:-GREEN}
   case "$kind" in
     RED)
       echo -e "$(tput setaf 1) $msg $(tput setaf 7)" >&2 ;;
@@ -12,22 +16,22 @@ function print_color {
 }
 
 function fatal_error {
-  local msg=${1?}
+  local msg=${1?"log message for fatal error not set"}
   print_color "$msg" RED
   exit 1
 }
 
-if [[ $# != 3 && $# != 4 ]]; then
+function usage {
   print_color "usage $0 <release-type> <committer-fullname> <committer-email> [change-log-desc]" RED
   echo
   print_color "\trelease types: revision, minor, major" RED
   print_color "\tchange-log-desc is optional, default - 'Bump version'" RED
   exit 1
-fi
+}
 
-release_type=${1?}
-commiter_fullname=${2?}
-commiter_email=${3?}
+release_type=${1?$(usage)"relese not set"}
+committer_fullname=${2?$(usage)"committer name not set"}
+committer_email=${3?$(usage)"committer email not set"}
 change_log_desc=${4:-"Bump version"}
 
 if ! which git &>/dev/null; then
@@ -83,8 +87,13 @@ old_version=$version
 version="${major}.${minor}.${revision}"
 print_color "Future snakebite full version will be $version"
 
-sed -i .release_bak "s/$old_version/$version/g" $VERSION_FILE ||
-  fatal_error "Couldn't change version in $VERSION_FILE - check local changes"
+temp_changelog=$(mktemp tmp.XXXX)
+
+trap "rm -f $temp_changelog; rm -f ${VERSION_FILE}.release_bak; \
+fatal_error \"Something went wrong - please check your local changes \
+- revert if needed\"" EXIT
+
+sed -i .release_bak "s/$old_version/$version/g" $VERSION_FILE
 rm ${VERSION_FILE}.release_bak
 
 print_color "Version file updated:"
@@ -93,30 +102,21 @@ git --no-pager diff --no-prefix $VERSION_FILE
 rfc_date=$(echo "from email.Utils import formatdate
 print formatdate()" | python -)
 
-temp_changelog=$(mktemp tmp.XXXX)
-
 echo -e "snakebite ($version) unstable; urgency=low
 
   $change_log_desc
 
- -- $commiter_fullname <$commiter_email>  $rfc_date
+ -- $committer_fullname <$committer_email>  $rfc_date
 " | cat - $CHANGELOG_FILE > $temp_changelog && mv $temp_changelog $CHANGELOG_FILE
-
-if [ ! $? ]; then
-  fatal_error "Couldn't add entry to $CHANGELOG_FILE - check local changes"
-fi
 
 print_color "Debian changelog file updated:"
 git --no-pager diff --no-prefix $CHANGELOG_FILE
 
 print_color "Commit changes in $VERSION_FILE and $CHANGELOG_FILE"
-git add $VERSION_FILE $CHANGELOG_FILE ||
-  fatal_error "Couldn't add $VERSION_FILE and $CHANGELOG_FILE to git staging area - check local changes"
-
-git commit -m "Release version $version" ||
-  fatal_error "Couldn't commit changes in $VERSION_FILE and $CHANGELOG_FILE - check local changes"
+git add $VERSION_FILE $CHANGELOG_FILE
+git commit -m "Release version $version"
 
 print_color "Add tag $version"
-git tag $version || fatal_error "Couldn't add $version tag - check/rever local changes"
+git tag $version
 
 print_color "Release prepared to go live - check changes, push code and distribution for release $version"
