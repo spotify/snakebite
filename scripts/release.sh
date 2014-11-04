@@ -93,7 +93,7 @@ trap "rm -f $temp_changelog; rm -f ${VERSION_FILE}.release_bak; \
 fatal_error \"Something went wrong - please check your local changes \
 - revert if needed\"" EXIT
 
-sed -i .release_bak "s/$old_version/$version/g" $VERSION_FILE
+sed -i.release_bak "s/$old_version/$version/g" $VERSION_FILE
 rm ${VERSION_FILE}.release_bak
 
 print_color "Version file updated:"
@@ -118,5 +118,7 @@ git commit -m "Release version $version"
 
 print_color "Add tag $version"
 git tag $version
+
+trap - EXIT
 
 print_color "Release prepared to go live - check changes, push code and distribution for release $version"
