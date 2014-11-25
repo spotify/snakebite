@@ -23,6 +23,11 @@
   </property>
 
   <property>
+    <name>dfs.namenode.rpc-address.testha.other-domain</name>
+    <value>namenode.other-domain:8888</value>
+  </property>
+
+  <property>
     <name>dfs.namenode.http-address.testha.namenode1-mydomain</name>
     <value>namenode1.mydomain:50070</value>
   </property>

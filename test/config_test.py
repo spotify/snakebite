@@ -31,6 +31,19 @@ class ConfigTest(unittest2.TestCase):
         self.assertEqual('namenode2.mydomain', config[1]['namenode'])
         self.assertEqual(8888, config[1]['port'])
 
+    # namenodes in ha-port-hdfs-site.xml with no namespace (so all of them expected)
+    def _verify_hdfs_settings_all(self, config):
+        self.assertEquals(len(config), 3)
+        # assert first NN
+        self.assertEqual('namenode1.mydomain', config[0]['namenode'])
+        self.assertEqual(8888, config[0]['port'])
+        # assert second NN
+        self.assertEqual('namenode2.mydomain', config[1]['namenode'])
+        self.assertEqual(8888, config[1]['port'])
+        # assert third NN
+        self.assertEqual('namenode.other-domain', config[2]['namenode'])
+        self.assertEqual(8888, config[2]['port'])
+
     def _verify_hdfs_noport_settings(self, config):
         self.assertEquals(len(config), 2)
         # assert first NN
@@ -40,10 +53,27 @@ class ConfigTest(unittest2.TestCase):
         self.assertEqual('namenode2.mydomain', config[1]['namenode'])
         self.assertEqual(8020, config[1]['port'])
 
+    # namenodes in ha-port-hdfs-site.xml using namespace in ha-core-site.xml
+    def _verify_hdfs_port_settings(self, config):
+        self.assertEquals(len(config), 2)
+        # assert first NN
+        self.assertEqual('namenode1.mydomain', config[0]['namenode'])
+        self.assertEqual(8888, config[0]['port'])
+        # assert second NN
+        self.assertEqual('namenode2.mydomain', config[1]['namenode'])
+        self.assertEqual(8888, config[1]['port'])
+
     def test_read_hdfs_config_ha(self):
-        hdfs_site_path = self.get_config_path('ha-port-hdfs-site.xml')
-        config = HDFSConfig.read_hdfs_config(hdfs_site_path)
-        self._verify_hdfs_settings(config)
+        hdfs_core_path = self.get_config_path('ha-port-hdfs-site.xml')
+        conf = HDFSConfig.read_hadoop_config(hdfs_core_path)
+        config = HDFSConfig.read_hdfs_config('', conf, '', [])
+        self._verify_hdfs_settings_all(config)
+
+    def test_read_hdfs_port_config_ha(self):
+        hdfs_core_path = self.get_config_path('ha-port-hdfs-site.xml')
+        conf = HDFSConfig.read_hadoop_config(hdfs_core_path)
+        config = HDFSConfig.read_hdfs_config('', conf, 'testha', ['namenode1-mydomain', 'namenode2-mydomain'])
+        self._verify_hdfs_port_settings(config)
 
     def test_read_core_config_ha(self):
         core_site_path = self.get_config_path('ha-core-site.xml')
