@@ -227,14 +227,13 @@ def _create_count_listing(nodes, human_readable):
 
 
 def format_stat(results, json_output=False):
-    ret = []
+    ret = results
+    # By default snakebite returns permissions in decimal.
+    if ret.has_key('permission'):
+        ret['permission'] = oct(ret['permission'])
     if json_output:
-        return json.dumps(results)
-    for k, v in sorted(results.iteritems()):
-        if k == "permission":
-            v = oct(v)
-        ret.append("%-20s\t%s" % (k, v))
-    return "\n".join(ret)
+        return json.dumps(ret)
+    return "\n".join(["%-20s\t%s" % (k, v) for k, v in sorted(ret.iteritems())])
 
 
 def format_bytes(bytes):
