@@ -28,6 +28,15 @@ class ClientTest(unittest2.TestCase):
         cat_result_gen = ha_client.cat(ha_client, ['foobar'])
         self.assertRaises(OutOfNNException, all, cat_result_gen)
 
+    def test_ha_client_ehostunreach_socket_error(self):
+        e = socket.error
+        e.errno = errno.EHOSTUNREACH
+        mocked_client_cat = Mock(side_effect=e)
+        ha_client = HAClient([Namenode("foo"), Namenode("bar")])
+        ha_client.cat = HAClient._ha_gen_method(mocked_client_cat)
+        cat_result_gen = ha_client.cat(ha_client, ['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
+
     def test_ha_client_socket_timeout(self):
         e = socket.timeout
         mocked_client_cat = Mock(side_effect=e)

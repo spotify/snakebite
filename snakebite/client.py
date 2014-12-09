@@ -1289,7 +1289,7 @@ class HAClient(Client):
 
     def __handle_socket_error(self, exception):
         log.debug("Request failed with %s" % exception)
-        if exception.errno == errno.ECONNREFUSED:
+        if exception.errno in (errno.ECONNREFUSED, errno.EHOSTUNREACH):
             # if NN is down or machine is not available, pass it:
             pass
         elif isinstance(exception, socket.timeout):
