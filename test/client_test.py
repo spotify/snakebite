@@ -1,10 +1,13 @@
 import unittest2
 import inspect
-from mock import patch
+import errno
+import socket
+from mock import patch, Mock
 
-from snakebite.client import HAClient, AutoConfigClient
+from snakebite.client import HAClient, AutoConfigClient, Client
 from snakebite.config import HDFSConfig
-from snakebite.errors import OutOfNNException
+from snakebite.namenode import Namenode
+from snakebite.errors import OutOfNNException, RequestError
 
 class ClientTest(unittest2.TestCase):
     original_hdfs_try_path = set(HDFSConfig.hdfs_try_paths)
@@ -16,6 +19,30 @@ class ClientTest(unittest2.TestCase):
         HDFSConfig.hdfs_try_paths = self.original_hdfs_try_path
         HDFSConfig.core_try_paths = self.original_core_try_path
 
+    def test_ha_client_econnrefused_socket_error(self):
+        e = socket.error
+        e.errno = errno.ECONNREFUSED
+        mocked_client_cat = Mock(side_effect=e)
+        ha_client = HAClient([Namenode("foo"), Namenode("bar")])
+        ha_client.cat = HAClient._ha_gen_method(mocked_client_cat)
+        cat_result_gen = ha_client.cat(ha_client, ['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
+
+    def test_ha_client_socket_timeout(self):
+        e = socket.timeout
+        mocked_client_cat = Mock(side_effect=e)
+        ha_client = HAClient([Namenode("foo"), Namenode("bar")])
+        ha_client.cat = HAClient._ha_gen_method(mocked_client_cat)
+        cat_result_gen = ha_client.cat(ha_client, ['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
+
+    def test_ha_client_standby_errror(self):
+        e = RequestError("org.apache.hadoop.ipc.StandbyException foo bar")
+        mocked_client_cat = Mock(side_effect=e)
+        ha_client = HAClient([Namenode("foo"), Namenode("bar")])
+        ha_client.cat = HAClient._ha_gen_method(mocked_client_cat)
+        cat_result_gen = ha_client.cat(ha_client, ['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
 
     def test_wrapped_methods(self):
         public_methods = [(name, method) for name, method in inspect.getmembers(HAClient, inspect.ismethod) if not name.startswith("_")]
