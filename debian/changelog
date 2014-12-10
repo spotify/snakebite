@@ -1,3 +1,9 @@
+snakebite (2.4.11) unstable; urgency=low
+
+  Handle HOSTUNREACH in HAClient
+
+ -- Rafal Wojdyla <rav@spotify.com>  Wed, 10 Dec 2014 10:43:44 -0000
+
 snakebite (2.4.10) unstable; urgency=low
 
   * improve tox config thanks to tox 1.8 [#93]
