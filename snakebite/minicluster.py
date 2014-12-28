@@ -202,8 +202,17 @@ class MiniCluster(object):
         result = []
         for line in i.split("\n"):
             if line:
-                (length, path) = re.split("\s+", line)
-                result.append({"path": path.replace(base_path, ""), "length": long(length)})
+                fields = re.split("\s+", line)
+                if len(fields) == 3:
+                    (length, space_consumed, path) = re.split("\s+", line)
+                elif len(fields) == 2:
+                    (length, path) = re.split("\s+", line)
+                else:
+                    raise ValueError("Result of du operation should contain 2"
+                                     " or 3 field, but there's %d fields"
+                                     % len(fields))
+                result.append({"path": path.replace(base_path, ""),
+                               "length": long(length)})
         return result
 
     def _transform_count_output(self, i, base_path):
