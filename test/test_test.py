@@ -47,3 +47,16 @@ class TestTest(MiniClusterTestBase):
     def test_unicode(self):
         result = self.client.test(u'/zerofile', exists=True)
         self.assertTrue(result)
+
+    def test_simple_two_slashes_exists(self):
+        result = self.client.test('//zerofile', exists=True)
+        self.assertTrue(result)
+
+    def test_simple_multiple_slashes_exists(self):
+        result = self.client.test('///////zerofile', exists=True)
+        self.assertTrue(result)
+
+    def test_complex_slashes_exists(self):
+        result = self.client.test('/foo//bar////baz', exists=True)
+        self.assertTrue(result)
+

@@ -107,6 +107,10 @@ class CommandLineParserTest(unittest2.TestCase):
         self.assertTrue(output.human)
         self.assertEqual(output.dir, ['some_dir'])
 
+        #multiple slashes
+        output = parser.parse('ls ///dir1 //dir2 /dir3'.split())
+        self.assertEqual(output.dir, ['///dir1', '//dir2', '/dir3'])
+
     def test_mkdir(self):
         parser = self.parser
 
@@ -719,6 +723,34 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
         self.parser.read_config()
         self.assert_namenode_spec("foobar", 50070)
         self.assert_namenodes_spec("foobar", 50070)
+
+    def test_cl_config_slash_madness_check_scheme(self):
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070///user//rav",
+                                              "hdfs://foobar:50070/user/////rav2"])
+
+        self.parser.read_config()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assert_namenodes_spec("foobar", 50070)
+
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070/user////rav",
+                                              "hdfs://foobar:50070////user/rav2"],
+                                         single_arg="hdfs://foobar:50070/////user/rav",
+                                         command="mv")
+        self.parser.read_config()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assert_namenodes_spec("foobar", 50070)
+
+    def test_cl_config_slash_madness_full_check(self):
+        self.parser.args = MockParseArgs(dir=["hdfs://foobar/user////rav",
+                                              "hdfs://foobar////user/rav2"],
+                                         single_arg="hdfs://foobar/////user/rav",
+                                         command="mv")
+        self.parser.init()
+        self.assert_namenode_spec("foobar", Namenode.DEFAULT_PORT)
+        self.assert_namenodes_spec("foobar", Namenode.DEFAULT_PORT)
+        self.assertIn("/user////rav", self.parser.args.dir)
+        self.assertIn("////user/rav2", self.parser.args.dir)
+        self.assertEqual(self.parser.args.single_arg, "/////user/rav")
 
     def test_cl_config_reduce_paths(self):
         self.parser.args = MockParseArgs(dir=["hdfs://foobar:50070/user/rav",
