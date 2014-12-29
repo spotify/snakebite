@@ -1080,7 +1080,10 @@ class Client(object):
                     raise FileNotFoundException("`%s': No such file or directory" % path)
                 elif not fileinfo and check_nonexistence:
                     yield processor(path, None)
-                    return
+                    continue
+                elif fileinfo and check_nonexistence:
+                    yield {"path": path, "result": False, "error": "File already exists"}
+                    continue
 
                 if (include_toplevel and fileinfo) or not self._is_dir(fileinfo.fs):
                     # Construct the full path before processing
@@ -1204,7 +1207,6 @@ class Client(object):
     def _get_file_info(self, path):
         request = client_proto.GetFileInfoRequestProto()
         request.src = path
-
         return self.service.getFileInfo(request)
 
     def _join_user_path(self, path):
