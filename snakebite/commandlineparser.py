@@ -542,27 +542,11 @@ class CommandLineParser(object):
             for load in file_to_read:
                 print load
 
-    @command(args="path dst", descr="copy local file reference to destination", req_args=['dir [dirs]', 'arg'])
-    def copyFromLocal(self):
-        src = self.args.dir
-        dst = self.args.single_arg
-        result = self.client.copyFromLocal(src, dst)
-        for line in format_results(result, json_output=self.args.json):
-            print line
-
     @command(args="[paths] dst", descr="copy paths to local file system destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
     def copyToLocal(self):
         paths = self.args.dir
         dst = self.args.single_arg
         result = self.client.copyToLocal(paths, dst, check_crc=self.args.checkcrc)
-        for line in format_results(result, json_output=self.args.json):
-            print line
-
-    @command(args="[paths] dst", descr="copy files from source to destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
-    def cp(self):
-        paths = self.args.dir
-        dst = self.args.single_arg
-        result = self.client.cp(paths, dst, checkcrc=self.args.checkcrc)
         for line in format_results(result, json_output=self.args.json):
             print line
 
@@ -581,14 +565,6 @@ class CommandLineParser(object):
         result = self.client.getmerge(source, dst, newline=self.args.newline)
         for line in format_results(result, json_output=self.args.json):
             print line
-
-    # @command(args="[paths] dst", descr="copy sources from local file system to destination", req_args=['dir [dirs]', 'arg'])
-    # def put(self):
-    #     paths = self.args.dir
-    #     dst = self.args.single_arg
-    #     result = self.client.put(paths, dst)
-    #     for line in format_results(result, json_output=self.args.json):
-    #         print line
 
     @command(args="path", descr="display last kilobyte of the file to stdout", allowed_opts=['f'], req_args=['arg'])
     def tail(self):

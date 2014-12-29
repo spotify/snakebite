@@ -454,22 +454,6 @@ class CommandLineParserTest(unittest2.TestCase):
         output = parser.parse('cat -checkcrc dir1 dir2'.split())
         self.assertEqual(output.checkcrc, True)
 
-    def test_copyFromLocal(self):
-        parser = self.parser
-
-        #no dir
-        with self.assertRaises(SystemExit):
-            parser.parse('copyFromLocal'.split())
-
-        #one dir
-        with self.assertRaises(SystemExit):
-            parser.parse('copyFromLocal some_dir'.split())
-
-        #two dirs
-        output = parser.parse('copyFromLocal dir1 dir2'.split())
-        self.assertEqual(output.dir, ['dir1'])
-        self.assertEqual(output.single_arg, 'dir2')
-
     def test_copyToLocal(self):
         parser = self.parser
 
@@ -490,22 +474,6 @@ class CommandLineParserTest(unittest2.TestCase):
         #specific commands
         output = parser.parse('copyToLocal -checkcrc dir1 dir2'.split())
         self.assertEqual(output.checkcrc, True)
-
-    def test_cp(self):
-        parser = self.parser
-
-        #no dir
-        with self.assertRaises(SystemExit):
-            parser.parse('cp'.split())
-
-        #one dir
-        with self.assertRaises(SystemExit):
-            parser.parse('cp some_dir'.split())
-
-        #multiple dirs
-        output = parser.parse('cp dir1 dir2 dir3'.split())
-        self.assertEqual(output.dir, ['dir1', 'dir2'])
-        self.assertEqual(output.single_arg, 'dir3')
 
     def test_get(self):
         parser = self.parser
@@ -546,22 +514,6 @@ class CommandLineParserTest(unittest2.TestCase):
         #multiple dirs
         with self.assertRaises(SystemExit):
             parser.parse('getmerge dir1 dir2 dir3'.split())
-
-    # def test_put(self):
-    #     parser = self.parser
-
-    #     #no dir
-    #     with self.assertRaises(SystemExit):
-    #         parser.parse('put'.split())
-
-    #     #one dir
-    #     with self.assertRaises(SystemExit):
-    #         parser.parse('put some_dir'.split())
-
-    #     #multiple dirs
-    #     output = parser.parse('put dir1 dir2 dir3'.split())
-    #     self.assertEqual(output.dir, ['dir1', 'dir2'])
-    #     self.assertEqual(output.single_arg, 'dir3')
 
     def test_tail(self):
         parser = self.parser
