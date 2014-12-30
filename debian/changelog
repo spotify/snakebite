@@ -1,3 +1,11 @@
+snakebite (2.4.12) unstable; urgency=low
+
+  * handle multiple slashes in path/uri
+  * handle new du syntax introduced in HADOOP-6857
+  * support multiple items in touchz
+
+ -- Rafal Wojdyla <rav@spotify.com>  Tue, 30 Dec 2014 10:41:09 -0000
+
 snakebite (2.4.11) unstable; urgency=low
 
   Handle HOSTUNREACH in HAClient
