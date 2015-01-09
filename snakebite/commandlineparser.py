@@ -638,7 +638,13 @@ class CommandLineParser(object):
     @command(args="path", descr="test a path", allowed_opts=['d', 'z', 'e'], req_args=['arg'])
     def test(self):
         path = self.args.single_arg
-        if self.client.test(path, exists=self.args.exists, directory=self.args.directory, zero_length=self.args.zero):
+
+        try:
+            result = self.client.test(path, exists=self.args.exists, directory=self.args.directory, zero_length=self.args.zero)
+        except FileNotFoundException:
+            result = False
+
+        if result:
             sys.exit(0)
         else:
             sys.exit(1)
