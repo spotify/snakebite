@@ -1,2 +1,2 @@
 argparse
-protobuf>=2.4.1
+protobuf>2.4.1
