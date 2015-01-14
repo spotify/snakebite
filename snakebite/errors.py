@@ -19,9 +19,9 @@ class FileNotFoundException(Exception):
         super(FileNotFoundException, self).__init__(msg)
 
 
-class FileExistsException(Exception):
+class FileAlreadyExistsException(Exception):
     def __init__(self, msg):
-        super(FileExistsException, self).__init__(msg)
+        super(FileAlreadyExistsException, self).__init__(msg)
 
 
 class RequestError(Exception):

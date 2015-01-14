@@ -17,6 +17,7 @@ import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 import snakebite.glob as glob
 from snakebite.errors import RequestError
 from snakebite.service import RpcService
+from snakebite.errors import FileAlreadyExistsException
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
@@ -392,6 +393,71 @@ class Client(object):
         request.dst = dst
         response = self.service.rename(request)
         return {"path": path, "result": response.result}
+
+
+    def rename2(self, path, dst, overwriteDest=False):
+        ''' Rename (but don't move) path to a destination
+
+        By only renaming, we mean that you can't move a file or folder out or
+        in other folder. The renaming can only happen within the folder the
+        file or folder lies in.
+
+        Note that this operation "always succeeds" unless an exception is
+        raised, hence, the dict returned from this function  doesn't have the
+        'result' key.
+
+        Since you can't move with this operation, and only rename, it would
+        not make sense to pass multiple paths to rename to a single
+        destination. This method uses the underlying rename2 method.
+
+        https://github.com/apache/hadoop/blob/ae91b13/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/protocol/ClientProtocol.java#L483-L523
+
+        Out of all the different exceptions mentioned in the link above, this
+        method only wraps the FileAlreadyExistsException exception.  You will
+        also get a FileAlreadyExistsException if you have overwriteDest=True
+        and the destination folder is not empty. The other exceptions will just
+        be passed along.
+
+        :param path: Source path
+        :type path: string
+        :param dst: destination
+        :type dst: string
+        :returns: A dictionary or None
+        '''
+        if not path:
+            raise InvalidInputException("rename2: no path given")
+        if not dst:
+            raise InvalidInputException("rename2: no destination given")
+        if not isinstance(path, (str, unicode)):
+            raise InvalidInputException("rename2: Path should be a string")
+
+        processor = lambda path, node, dst=dst, overwriteDest=overwriteDest: self._handle_rename2(path, node, dst, overwriteDest)
+        for item in self._find_items([path], processor, include_toplevel=True):
+            return item
+
+
+    def _handle_rename2(self, path, node, dst, overwriteDest):
+        if not dst.startswith("/"):
+            dst = self._join_user_path(dst)
+
+        # Strip the last / if there is one. Hadoop doesn't like this
+        if dst.endswith("/"):
+            dst = dst[:-1]
+
+        request = client_proto.Rename2RequestProto()
+        request.src = path
+        request.dst = dst
+        request.overwriteDest = overwriteDest
+        try:
+            self.service.rename2(request)
+        except RequestError, ex:
+            if ("FileAlreadyExistsException" in str(ex) or
+                "rename destination directory is not empty" in str(ex)):
+                raise FileAlreadyExistsException(ex)
+            else:
+                raise
+
+        return {"path": path}
 
     def delete(self, paths, recurse=False):
         ''' Delete paths
