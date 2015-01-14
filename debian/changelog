@@ -1,3 +1,10 @@
+snakebite (2.4.13) unstable; urgency=low
+
+  * tests communicates results via return code
+  * stat returns octal permissions
+
+ -- Rafal Wojdyla <rav@spotify.com>  Wed, 14 Jan 2015 09:42:40 -0000
+
 snakebite (2.4.12) unstable; urgency=low
 
   * handle multiple slashes in path/uri
