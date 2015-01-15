@@ -70,3 +70,8 @@ class ClientTest(unittest2.TestCase):
         HDFSConfig.hdfs_try_paths = ()
         HDFSConfig.core_try_paths = ()
         self.assertRaises(OutOfNNException, AutoConfigClient)
+
+    def test_cleanup_path(self):
+        c = Client("_")
+        p = c._cleanup_path("/a/b/c/../d/../")
+        self.assertEqual(p, "/a/b")

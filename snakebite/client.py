@@ -134,6 +134,8 @@ class Client(object):
         if not isinstance(paths, list):
             raise InvalidInputException("Paths should be a list")
 
+        paths = self._cleanup_paths(paths)
+
         for item in self._find_items(paths, self._handle_ls,
                                      include_toplevel=include_toplevel,
                                      include_children=include_children,
@@ -176,6 +178,8 @@ class Client(object):
         if not mode:
             raise InvalidInputException("chmod: no mode given")
 
+        paths = self._cleanup_paths(paths)
+
         processor = lambda path, node, mode=mode: self._handle_chmod(path, node, mode)
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
@@ -207,6 +211,8 @@ class Client(object):
             raise InvalidInputException("chown: no path given")
         if not owner:
             raise InvalidInputException("chown: no owner given")
+
+        paths = self._cleanup_paths(paths)
 
         processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
         for item in self._find_items(paths, processor, include_toplevel=True,
@@ -248,6 +254,8 @@ class Client(object):
         if not group:
             raise InvalidInputException("chgrp: no group given")
 
+        paths = self._cleanup_paths(paths)
+
         owner = ":%s" % group
         processor = lambda path, node, owner=owner: self._handle_chown(path, node, owner)
         for item in self._find_items(paths, processor, include_toplevel=True,
@@ -272,6 +280,8 @@ class Client(object):
             raise InvalidInputException("Paths should be a list")
         if not paths:
             raise InvalidInputException("count: no path given")
+
+        paths = self._cleanup_paths(paths)
 
         for item in self._find_items(paths, self._handle_count, include_toplevel=True,
                                      include_children=False, recurse=False):
@@ -340,6 +350,8 @@ class Client(object):
         if not paths:
             raise InvalidInputException("du: no path given")
 
+        paths = self._cleanup_paths(paths)
+
         processor = lambda path, node: self._handle_du(path, node)
         for item in self._find_items(paths, processor, include_toplevel=include_toplevel,
                                      include_children=include_children, recurse=False):
@@ -373,6 +385,9 @@ class Client(object):
             raise InvalidInputException("rename: no path given")
         if not dst:
             raise InvalidInputException("rename: no destination given")
+
+        paths = self._cleanup_paths(paths)
+        dst = self._cleanup_path(dst)
 
         processor = lambda path, node, dst=dst: self._handle_rename(path, node, dst)
         for item in self._find_items(paths, processor, include_toplevel=True):
@@ -411,6 +426,8 @@ class Client(object):
             raise InvalidInputException("Paths should be a list")
         if not paths:
             raise InvalidInputException("delete: no path given")
+
+        paths = self._cleanup_paths(paths)
 
         processor = lambda path, node, recurse=recurse: self._handle_delete(path, node, recurse)
         for item in self._find_items(paths, processor, include_toplevel=True):
@@ -485,6 +502,8 @@ class Client(object):
         if not paths:
             raise InvalidInputException("rmdir: no path given")
 
+        paths = self._cleanup_paths(paths)
+
         processor = lambda path, node: self._handle_rmdir(path, node)
         for item in self._find_items(paths, processor, include_toplevel=True):
             if item:
@@ -517,6 +536,8 @@ class Client(object):
             raise InvalidInputException("Paths should be a list")
         if not paths:
             raise InvalidInputException("touchz: no path given")
+
+        paths = self._cleanup_paths(paths)
 
         # Let's get the blocksize and replication from the server defaults
         # provided by the namenode if they are not specified
@@ -569,6 +590,8 @@ class Client(object):
         if not replication:
             raise InvalidInputException("setrep: no replication given")
 
+        paths = self._cleanup_paths(paths)
+
         processor = lambda path, node, replication=replication: self._handle_setrep(path, node, replication)
         for item in self._find_items(paths, processor, include_toplevel=True,
                                      include_children=False, recurse=recurse):
@@ -597,6 +620,8 @@ class Client(object):
             raise InvalidInputException("Paths should be a list")
         if not paths:
             raise InvalidInputException("cat: no path given")
+
+        paths = self._cleanup_paths(paths)
 
         processor = lambda path, node, check_crc=check_crc: self._handle_cat(path, node, check_crc)
         for item in self._find_items(paths, processor, include_toplevel=True,
@@ -631,6 +656,9 @@ class Client(object):
             raise InvalidInputException("copyToLocal: no path given")
         if not dst:
             raise InvalidInputException("copyToLocal: no destination given")
+
+        paths = self._cleanup_paths(paths)
+        dst = self._cleanup_path(dst)
 
         self.base_source = None
         processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_copyToLocal(path, node, dst, check_crc)
@@ -700,6 +728,9 @@ class Client(object):
         if not dst:
             raise InvalidInputException("getmerge: no destination given")
 
+        paths = self._cleanup_paths(paths)
+        dst = self._cleanup_path(dst)
+
         temporary_target = "%s._COPYING_" % dst
         f = open(temporary_target, 'w')
 
@@ -762,6 +793,8 @@ class Client(object):
         if not paths:
             raise InvalidInputException("stat: no path given")
 
+        paths = self._cleanup_paths(paths)
+
         processor = lambda path, node: self._handle_stat(path, node)
         return list(self._find_items(paths, processor, include_toplevel=True))[0]
 
@@ -789,6 +822,8 @@ class Client(object):
         '''
         if not path:
             raise InvalidInputException("tail: no path given")
+
+        path = self._cleanup_path(path)
 
         processor = lambda path, node, tail_only=True, append=append: self._handle_tail(path, node, tail_only, append)
         for item in self._find_items([path], processor, include_toplevel=True,
@@ -824,6 +859,8 @@ class Client(object):
         if not path:
             raise InvalidInputException("test: no path given")
 
+        path = self._cleanup_paths(path)
+
         processor = lambda path, node, exists=exists, directory=directory, zero_length=zero_length: self._handle_test(path, node, exists, directory, zero_length)
         try:
             items = list(self._find_items([path], processor, include_toplevel=True))
@@ -853,6 +890,8 @@ class Client(object):
             raise InvalidInputException("Paths should be a list")
         if not paths:
             raise InvalidInputException("text: no path given")
+
+        paths = self._cleanup_paths(paths)
 
         processor = lambda path, node, check_crc=check_crc: self._handle_text(path, node, check_crc)
         for item in self._find_items(paths, processor, include_toplevel=True,
@@ -891,6 +930,8 @@ class Client(object):
             raise InvalidInputException("Paths should be a list")
         if not paths:
             raise InvalidInputException("mkdirs: no path given")
+
+        paths = self._cleanup_paths(paths)
 
         for path in paths:
             if not path.startswith("/"):
@@ -1220,6 +1261,11 @@ class Client(object):
         dir_to_remove = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
         return path.replace(dir_to_remove+'/', "", 1)
 
+    def _cleanup_paths(self, paths):
+        return [self._cleanup_path(path) for path in paths]
+
+    def _cleanup_path(self, path):
+        return os.path.normpath(path)
 
 class HAClient(Client):
     ''' Snakebite client with support for High Availability
