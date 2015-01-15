@@ -383,9 +383,8 @@ class Client(object):
         if not dst.startswith("/"):
             dst = self._join_user_path(dst)
 
-        # Strip the last / if there is one. Hadoop doesn't like this
-        if dst.endswith("/"):
-            dst = dst[:-1]
+        dst = self._normalize_path(dst)
+
 
         request = client_proto.RenameRequestProto()
         request.src = path
@@ -632,6 +631,8 @@ class Client(object):
         if not dst:
             raise InvalidInputException("copyToLocal: no destination given")
 
+        dst = self._normalize_path(dst)
+
         self.base_source = None
         processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_copyToLocal(path, node, dst, check_crc)
         for item in self._find_items(paths, processor, include_toplevel=True, recurse=True, include_children=True):
@@ -647,10 +648,11 @@ class Client(object):
             else:
                 self.base_source = path
 
-            if self.base_source.endswith("/"):
-                self.base_source = self.base_source[:-1]
-
-        target = dst + (path.replace(self.base_source, "", 1))
+        path_without_base_source = path.replace(self.base_source, "", 1)
+        if path_without_base_source:
+            target = os.path.join(dst, path_without_base_source)
+        else:
+            target = dst
 
         error = ""
         result = False
@@ -724,6 +726,9 @@ class Client(object):
 
     def _handle_getmerge(self, path, node, dst, check_crc):
         log.debug("in handle getmerge")
+
+        dst = self._normalize_path(dst)
+
         error = ''
         if not self._is_file(node):
             # Target is an existing file
@@ -1065,12 +1070,12 @@ class Client(object):
         # Expand paths if necessary (/foo/{bar,baz} --> ['/foo/bar', '/foo/baz'])
         paths = glob.expand_paths(paths)
 
-        # Replace multiple directory separators with a single one ('/foo//bar///baz' -> '/foo/bar/baz')
-        paths = [re.sub('/+', '/', path) for path in paths]
-
         for path in paths:
             if not path.startswith("/"):
                 path = self._join_user_path(path)
+
+            # Normalize path (remove double /, handle '..', remove trailing /, etc)
+            path = self._normalize_path(path)
 
             log.debug("Trying to find path %s" % path)
 
@@ -1135,10 +1140,6 @@ class Client(object):
         we don't add the found children to the result, but traverse into paths
         that did have a match.
         '''
-
-        # Remove the last / from the path, since hadoop doesn't understand it
-        if path.endswith("/"):
-            path = path[:-1]
 
         # Split path elements and check where the first occurence of magic is
         path_elements = path.split("/")
@@ -1220,6 +1221,8 @@ class Client(object):
         dir_to_remove = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
         return path.replace(dir_to_remove+'/', "", 1)
 
+    def _normalize_path(self, path):
+        return os.path.normpath(re.sub('/+', '/', path))
 
 class HAClient(Client):
     ''' Snakebite client with support for High Availability
