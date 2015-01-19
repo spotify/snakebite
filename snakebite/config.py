@@ -1,5 +1,4 @@
 import os
-import sys
 import logging
 import xml.etree.ElementTree as ET
 
@@ -11,73 +10,80 @@ log = logging.getLogger(__name__)
 class HDFSConfig(object):
     use_trash = False
 
-    @classmethod
-    def get_config_from_env(cls):
-        '''Gets configuration out of environment.
-
-        Returns list of dicts - list of namenode representations
-        '''
-        core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
-        configs = cls.read_core_config(core_path)
-
-        hdfs_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'hdfs-site.xml')
-        tmp_config = cls.read_hdfs_config(hdfs_path)
-
-        if tmp_config:
-            # if config exists in hdfs - it's HA config, update configs
-            configs = tmp_config
-
-        if not configs:
-            raise Exception("No config found in %s nor in %s" % (core_path, hdfs_path))
-
-        return configs
-
-
     @staticmethod
     def read_hadoop_config(hdfs_conf_path):
+        config_entries = []
         if os.path.exists(hdfs_conf_path):
             try:
                 tree = ET.parse(hdfs_conf_path)
             except:
                 log.error("Unable to parse %s" % hdfs_conf_path)
-                return
+                return config_entries
             root = tree.getroot()
-            for p in root.findall("./property"):
-                yield p
-
+            config_entries.extend(root.findall("./property"))
+        return config_entries
 
     @classmethod
     def read_core_config(cls, core_site_path):
-        config = []
-        for property in cls.read_hadoop_config(core_site_path):
+        conf = cls.read_hadoop_config(core_site_path)
+        configs = []
+        for property in conf:
             if property.findall('name')[0].text == 'fs.defaultFS':
                 parse_result = urlparse(property.findall('value')[0].text)
-                log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), core_site_path))
+                configs.append(cls.get_namenode(parse_result))
 
-                config.append({"namenode": parse_result.hostname,
-                               "port": parse_result.port if parse_result.port
-                                                         else Namenode.DEFAULT_PORT})
-
-            if property.findall('name')[0].text == 'fs.trash.interval':
-                cls.use_trash = True
-
-        return config
-
-    @classmethod
-    def read_hdfs_config(cls, hdfs_site_path):
-        configs = []
-        for property in cls.read_hadoop_config(hdfs_site_path):
-            if property.findall('name')[0].text.startswith("dfs.namenode.rpc-address"):
-                parse_result = urlparse("//" + property.findall('value')[0].text)
-                log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), hdfs_site_path))
-                configs.append({"namenode": parse_result.hostname,
-                                "port": parse_result.port if parse_result.port
-                                                          else Namenode.DEFAULT_PORT})
-
-            if property.findall('name')[0].text == 'fs.trash.interval':
-                cls.use_trash = True
+            cls.set_trash_mode(property)
 
         return configs
+
+    @classmethod
+    def read_hdfs_config(cls, config_path, conf, environment, environment_suffixes):
+        configs = []
+        for property in conf:
+            if cls.is_namenode_host(property, environment, environment_suffixes):
+                parse_result = urlparse("//" + property.findall('value')[0].text)
+                log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), config_path))
+                configs.append(cls.get_namenode(parse_result))
+
+            cls.set_trash_mode(property)
+
+        return configs
+
+    @classmethod
+    def is_namenode_host(cls, property, environment, environment_suffixes):
+        name = property.findall('name')[0].text
+        if not environment_suffixes:
+            return name.startswith("dfs.namenode.rpc-address")
+        for suffix in environment_suffixes:
+            if name.startswith("dfs.namenode.rpc-address." + environment + "." + suffix):
+                return True
+        return False
+
+    @classmethod
+    def get_namenode(cls, parse_result):
+        return {
+            "namenode": parse_result.hostname,
+            "port": parse_result.port if parse_result.port else Namenode.DEFAULT_PORT
+        }
+
+    @classmethod
+    def set_trash_mode(cls, property):
+        if property.findall('name')[0].text == 'fs.trash.interval':
+                cls.use_trash = True
+
+    @classmethod
+    def get_environment(cls, core_config):
+        for config in core_config:
+            environment_name = config['namenode']
+            if environment_name:
+                return environment_name
+
+    @classmethod
+    def get_environment_suffixes(cls, environment, hadoop_config):
+        for property in hadoop_config:
+            if property.findall('name')[0].text == 'dfs.ha.namenodes.' + environment:
+                return property.findall('value')[0].text.split(',')
+
 
     core_try_paths = ('/etc/hadoop/conf/core-site.xml',
                       '/usr/local/etc/hadoop/conf/core-site.xml',
@@ -90,19 +96,30 @@ class HDFSConfig(object):
     @classmethod
     def get_external_config(cls):
         if os.environ.get('HADOOP_HOME'):
-            configs = cls.get_config_from_env()
-            return configs
+            core_paths = [os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')]
+            hdfs_paths = [os.path.join(os.environ['HADOOP_HOME'], 'conf', 'hdfs-site.xml')]
         else:
             # Try to find other paths
-            configs = []
-            for core_conf_path in cls.core_try_paths:
-                configs = cls.read_core_config(core_conf_path)
-                if configs:
-                    break
+            core_paths = cls.core_try_paths
+            hdfs_paths = cls.hdfs_try_paths
 
-            for hdfs_conf_path in cls.hdfs_try_paths:
-                tmp_config = cls.read_hdfs_config(hdfs_conf_path)
-                if tmp_config:
-                    # if there is hdfs-site data available return it
-                    return tmp_config
-            return configs
+        configs = []
+        for core_conf_path in core_paths:
+            configs = cls.read_core_config(core_conf_path)
+            if configs:
+                break
+
+        environment = cls.get_environment(configs)
+
+        for hdfs_conf_path in hdfs_paths:
+            hadoop_config = cls.read_hadoop_config(hdfs_conf_path)
+            environment_suffixes = cls.get_environment_suffixes(environment, hadoop_config)
+            tmp_config = cls.read_hdfs_config(hdfs_conf_path, hadoop_config, environment, environment_suffixes)
+            if tmp_config:
+                # if there is hdfs-site data available return it
+                return tmp_config
+
+        if not configs:
+            raise Exception("No configs found")
+
+        return configs
