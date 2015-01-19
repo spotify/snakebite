@@ -191,8 +191,7 @@ class MiniCluster(object):
                                      stderr=subprocess.PIPE)
 
     def _get_namenode_port(self):
-        port_found = False
-        while self.hdfs.poll() is None and not port_found:
+        while self.hdfs.poll() is None:
             rlist, wlist, xlist = select.select([self.hdfs.stderr, self.hdfs.stdout], [], [])
             for f in rlist:
                 line = f.readline()
