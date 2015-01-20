@@ -50,7 +50,9 @@ class HDFSConfig(object):
     def read_core_config(cls, core_site_path):
         config = []
         for property in cls.read_hadoop_config(core_site_path):
-            if property.findall('name')[0].text == 'fs.defaultFS':
+
+            # fs.default.name is the key name for the file system on EMR clusters
+            if property.findall('name')[0].text in ('fs.defaultFS', 'fs.default.name'):
                 parse_result = urlparse(property.findall('value')[0].text)
                 log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), core_site_path))
 

@@ -53,6 +53,14 @@ class ConfigTest(unittest2.TestCase):
         self.assertEquals(8020, config[0]['port'])
         self.assertFalse(HDFSConfig.use_trash)
 
+    def test_read_core_config_emr(self):
+        core_site_path = self.get_config_path('emr-core-site.xml')
+        config = HDFSConfig.read_core_config(core_site_path)
+        self.assertEquals(len(config), 1)
+        self.assertEquals('testha', config[0]['namenode'])
+        self.assertEquals(8020, config[0]['port'])
+        self.assertFalse(HDFSConfig.use_trash)
+
     @patch('os.environ.get')
     def test_read_config_ha_with_ports(self, environ_get):
         environ_get.return_value = False
