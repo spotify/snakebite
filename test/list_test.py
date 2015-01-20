@@ -103,6 +103,13 @@ class ListTest(MiniClusterTestBase):
         self.assertTrue(len(client_output) > 1)
         assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
 
+    def test_path_cleanup(self):
+        expected_output = self.cluster.ls(['/log/service/..'])
+        client_output = list(self.client.ls(['/log/service/..']))
+        self.assertTrue(len(expected_output) > 0)
+        self.assertTrue(len(client_output) > 0)
+        assertListings(expected_output, client_output, self.assertEqual, self.assertEqual)
+
     def test_unknown_file(self):
         result = self.client.ls(['/doesnotexist'])
         self.assertRaises(FileNotFoundException, result.next)
