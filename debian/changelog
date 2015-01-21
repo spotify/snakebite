@@ -1,3 +1,10 @@
+snakebite (2.5.0) unstable; urgency=low
+
+  * beta/initial support for EMR
+  * rename2 operation in client
+
+ -- Rafal Wojdyla <rav@spotify.com>  Wed, 21 Jan 2015 14:56:32 -0000
+
 snakebite (2.4.14) unstable; urgency=low
 
   * use normpath when needed
