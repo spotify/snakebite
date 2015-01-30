@@ -699,24 +699,27 @@ class Client(object):
 
         dst = self._normalize_path(dst)
 
-        self.base_source = None
         processor = lambda path, node, dst=dst, check_crc=check_crc: self._handle_copyToLocal(path, node, dst, check_crc)
-        for item in self._find_items(paths, processor, include_toplevel=True, recurse=True, include_children=True):
-            if item:
-                yield item
+        for path in paths:
+            self.base_source = None
+            for item in self._find_items([path], processor, include_toplevel=True, recurse=True, include_children=True):
+                if item:
+                    yield item
 
     def _handle_copyToLocal(self, path, node, dst, check_crc):
-        # Calculate base directory using the first node only
-        if self.base_source is None:
-            self.dst = os.path.abspath(dst)
-            if os.path.isdir(dst):  # If input destination is an existing directory, include toplevel
-                self.base_source = os.path.dirname(path)
-            else:
-                self.base_source = path
+        # _handle_copyToLocal makes sense only per on dir tree
+        # with common base_source
+        dst = os.path.abspath(dst)
+        if not self.base_source:
+            # base_source is shared for whole dir tree, and can
+            # be computed only once per dir tree
+            self.base_source = os.path.dirname(path)
+            self.base_source = self.base_source if self.base_source.endswith("/") else self.base_source + "/"
 
-        path_without_base_source = path.replace(self.base_source, "", 1)
-        if path_without_base_source:
-            target = os.path.join(dst, path_without_base_source)
+        # If input destination is an existing directory, include toplevel
+        if os.path.isdir(dst):
+            local_prefix = path.replace(self.base_source, "", 1)
+            target = os.path.join(dst, local_prefix)
         else:
             target = dst
 

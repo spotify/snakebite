@@ -77,6 +77,38 @@ class CopyToLocalTest(MiniClusterTestBase):
 
         self.assertEqual(expected_dir_structure, test_dir_structure)
 
+    def test_copyToLocal_relative_directory_structure(self):
+        test_dir = '%s/relative_actual' % TESTFILES_PATH
+        test_dir = os.path.relpath(test_dir)
+        expected_dir = '%s/relative_expected' % TESTFILES_PATH
+        os.mkdir(TESTFILES_PATH)
+        os.mkdir(expected_dir)
+        os.mkdir(test_dir)
+        expected_dir_structure = []
+        test_dir_structure = []
+
+        self.cluster.copyToLocal('/bar/baz', expected_dir)
+
+        for result in self.client.copyToLocal(['/bar/baz'], test_dir):
+            self.assertEqual(result['result'], True)
+
+        for path, dirs, files in os.walk(expected_dir):
+            expected_dir_structure.append(path.replace('/relative_expected', "", 1))
+            for f in files:
+                f = "%s/%s" % (path, f)
+                data = self._read_file(f)
+                expected_dir_structure.append((f.replace('/relative_expected', "", 1), data))
+
+        for path, dirs, files in os.walk(os.path.abspath(test_dir)):
+            test_dir_structure.append(path.replace('/relative_actual', "", 1))
+            for f in files:
+                f = "%s/%s" % (path, f)
+                data = self._read_file(f)
+                test_dir_structure.append((f.replace('/relative_actual', "", 1), data))
+
+        self.assertEqual(expected_dir_structure, test_dir_structure)
+
+
     def _read_file(self, file):
         f = open(file, 'r')
         data = f.read()
