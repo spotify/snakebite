@@ -1,3 +1,9 @@
+snakebite (2.5.1) unstable; urgency=low
+
+  * fix copyToLocal bugs
+
+ -- Rafal Wojdyla <rav@spotify.com>  Fri, 30 Jan 2015 09:58:52 -0000
+
 snakebite (2.5.0) unstable; urgency=low
 
   * beta/initial support for EMR
