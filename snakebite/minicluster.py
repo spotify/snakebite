@@ -90,12 +90,12 @@ class MiniCluster(object):
         This will take a file from the ``testfiles_path`` supplied in the constuctor.
         '''
         src = "%s%s" % (self._testfiles_path, src)
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-put', src, self._full_hdfs_path(dst)])
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-put', src, self._full_hdfs_path(dst)], True)
 
-    def put_subprocess(self, src, dst, block_size=134217728):  # This is used for testing with large files.
+    def put_subprocess(self, src, dst, block_size=134217728, text=True):  # This is used for testing with large files.
         block_size_flag = "-Ddfs.block.size=%s" % str(block_size)
         cmd = [self._hadoop_cmd, 'fs', block_size_flag, '-put', src, self._full_hdfs_path(dst)]
-        return subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        return subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=text)
 
     def exists(self, path):
         """Return True if <src> exists, False if doesn't"""
@@ -120,52 +120,52 @@ class MiniCluster(object):
     def ls(self, src, extra_args=[]):
         '''List files in a directory'''
         src = [self._full_hdfs_path(x) for x in src]
-        output = self._getStdOutCmd([self._hadoop_cmd, 'fs', '-ls'] + extra_args + src)
+        output = self._getStdOutCmd([self._hadoop_cmd, 'fs', '-ls'] + extra_args + src, True)
         return self._transform_ls_output(output, self.hdfs_url)
 
     def mkdir(self, src, extra_args=[]):
         '''Create a directory'''
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-mkdir'] + extra_args + [self._full_hdfs_path(src)])
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-mkdir'] + extra_args + [self._full_hdfs_path(src)], True)
 
     def df(self, src):
         '''Perform ``df`` on a path'''
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-df', self._full_hdfs_path(src)])
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-df', self._full_hdfs_path(src)], True)
 
     def du(self, src, extra_args=[]):
         '''Perform ``du`` on a path'''
         src = [self._full_hdfs_path(x) for x in src]
-        return self._transform_du_output(self._getStdOutCmd([self._hadoop_cmd, 'fs', '-du'] + extra_args + src), self.hdfs_url)
+        return self._transform_du_output(self._getStdOutCmd([self._hadoop_cmd, 'fs', '-du'] + extra_args + src, True), self.hdfs_url)
 
     def count(self, src):
         '''Perform ``count`` on a path'''
         src = [self._full_hdfs_path(x) for x in src]
-        return self._transform_count_output(self._getStdOutCmd([self._hadoop_cmd, 'fs', '-count'] + src), self.hdfs_url)
+        return self._transform_count_output(self._getStdOutCmd([self._hadoop_cmd, 'fs', '-count'] + src, True), self.hdfs_url)
 
-    def cat(self, src, extra_args=[]):
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-cat'] + extra_args + [self._full_hdfs_path(src)])
+    def cat(self, src, extra_args=[], text=False):
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-cat'] + extra_args + [self._full_hdfs_path(src)], text)
 
     def copyToLocal(self, src, dst, extra_args=[]):
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-copyToLocal'] + extra_args + [self._full_hdfs_path(src), dst])
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-copyToLocal'] + extra_args + [self._full_hdfs_path(src), dst], True)
 
     def getmerge(self, src, dst, extra_args=[]):
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-getmerge'] + extra_args + [self._full_hdfs_path(src), dst])
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-getmerge'] + extra_args + [self._full_hdfs_path(src), dst], True)
 
-    def tail(self, src, extra_args=[]):
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-tail'] + extra_args + [self._full_hdfs_path(src)])
+    def tail(self, src, extra_args=[], text=False):
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-tail'] + extra_args + [self._full_hdfs_path(src)], text)
 
     def text(self, src):
-        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-text', self._full_hdfs_path(src)])
+        return self._getStdOutCmd([self._hadoop_cmd, 'fs', '-text', self._full_hdfs_path(src)], True)
 
     def _getReturnCodeCmd(self, cmd):
-        proc = self._getCmdProcess(cmd)
-        print proc.communicate()
+        proc = self._getCmdProcess(cmd, True)
+        print(proc.communicate())
         return proc.wait()
 
-    def _getCmdProcess(self, cmd):
-        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    def _getCmdProcess(self, cmd, text=False):
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=text)
 
-    def _getStdOutCmd(self, cmd):
-        return self._getCmdProcess(cmd).communicate()[0]
+    def _getStdOutCmd(self, cmd, text=False):
+        return self._getCmdProcess(cmd, text).communicate()[0]
 
     def _full_hdfs_path(self, src):
         return "%s%s" % (self.hdfs_url, src)
@@ -188,14 +188,14 @@ class MiniCluster(object):
         if nnport:
             cmd.extend(['-nnport', "%s" % nnport])
         self.hdfs = subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE)
+                                     stderr=subprocess.PIPE, universal_newlines=True)
 
     def _get_namenode_port(self):
         while self.hdfs.poll() is None:
             rlist, wlist, xlist = select.select([self.hdfs.stderr, self.hdfs.stdout], [], [])
             for f in rlist:
                 line = f.readline()
-                print line,
+                print(line,)
                 m = re.match(".*Started MiniDFSCluster -- namenode on port (\d+).*", line)
                 if m:
                     return int(m.group(1))

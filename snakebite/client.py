@@ -40,6 +40,10 @@ import socket
 import errno
 import time
 import re
+import sys
+
+if sys.version_info[0] == 3:
+    long = int
 
 log = logging.getLogger(__name__)
 
@@ -163,7 +167,7 @@ class Client(object):
 
         :param paths: List of paths to chmod
         :type paths: list
-        :param mode: Octal mode (e.g. 0755)
+        :param mode: Octal mode (e.g. 0o755)
         :type mode: int
         :param recurse: Recursive chmod
         :type recurse: boolean
@@ -354,8 +358,8 @@ class Client(object):
             try:
                 response = self.service.getContentSummary(request)
                 return {"path": path, "length": response.summary.length}
-            except RequestError, e:
-                print e
+            except RequestError as e:
+                print(e)
         else:
             return {"path": path, "length": node.length}
 
@@ -449,7 +453,7 @@ class Client(object):
         request.overwriteDest = overwriteDest
         try:
             self.service.rename2(request)
-        except RequestError, ex:
+        except RequestError as ex:
             if ("FileAlreadyExistsException" in str(ex) or
                 "rename destination directory is not empty" in str(ex)):
                 raise FileAlreadyExistsException(ex)
@@ -506,7 +510,7 @@ class Client(object):
 
             # Try twice, in case checkpoint between mkdir() and rename()
             for i in range(0, 2):
-                list(self.mkdir([base_trash_path], create_parent=True, mode=0700))
+                list(self.mkdir([base_trash_path], create_parent=True, mode=0o700))
 
                 original_path = trash_path
 
@@ -745,7 +749,7 @@ class Client(object):
                 f.close()
                 os.rename(temporary_target, target)
                 result = True
-            except Exception, e:
+            except Exception as e:
                 result = False
                 error = e
                 if os.path.isfile(temporary_target):
@@ -815,7 +819,7 @@ class Client(object):
                 try:
                     for load in self._read_file(path, node, tail_only=False, check_crc=check_crc):
                         yield {"path": path, "response": load, "result": True, "error": error, "source_path": path}
-                except Exception, e:
+                except Exception as e:
                     error = e
                     yield {"path": path, "response": '', "result": False, "error": error, "source_path": path}
 
@@ -904,7 +908,7 @@ class Client(object):
             if len(items) == 0:
                 return False
             return all(items)
-        except FileNotFoundException, e:
+        except FileNotFoundException as e:
             if exists:
                 return False
             else:
@@ -950,7 +954,7 @@ class Client(object):
         else:
             return text
 
-    def mkdir(self, paths, create_parent=False, mode=0755):
+    def mkdir(self, paths, create_parent=False, mode=0o755):
         ''' Create a directoryCount
 
         :param paths: Paths to create
@@ -979,7 +983,7 @@ class Client(object):
                     request.createParent = create_parent
                     response = self.service.mkdirs(request)
                     yield {"path": path, "result": response.result}
-                except RequestError, e:
+                except RequestError as e:
                     yield {"path": path, "result": False, "error": str(e)}
             else:
                 yield {"path": path, "result": False, "error": "mkdir: `%s': File exists" % path}
@@ -1026,7 +1030,7 @@ class Client(object):
         # Issue a CreateRequestProto
         request = client_proto.CreateRequestProto()
         request.src = path
-        request.masked.perm = 0644
+        request.masked.perm = 0o644
         request.clientName = "snakebite"
         request.createFlag = createFlag
         request.createParent = False
@@ -1053,7 +1057,7 @@ class Client(object):
         if tail_only:  # Only read last KB
             request.offset = max(0, length - 1024)
         else:
-            request.offset = 0L
+            request.offset = long(0)
         response = self.service.getBlockLocations(request)
 
         if response.locations.fileLength == 0:  # Can't read empty file
@@ -1101,7 +1105,7 @@ class Client(object):
                             total_bytes_read += len(load)
                             successful_read = True
                             yield load
-                    except Exception, e:
+                    except Exception as e:
                         log.error(e)
                         if not location.id.storageID in failed_nodes:
                             failed_nodes.append(location.id.storageID)
