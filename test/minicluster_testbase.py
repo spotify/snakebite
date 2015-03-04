@@ -51,6 +51,8 @@ class MiniClusterTestBase(unittest2.TestCase):
             cls.cluster.put("/zerofile", "/bar/foo/baz/qux")
             cls.cluster.put("/log", "/")
 
+            cls.cluster.mkdir("/sticky_dir")
+
     @classmethod
     def tearDownClass(cls):
         if cls.cluster:

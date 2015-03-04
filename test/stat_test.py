@@ -15,6 +15,7 @@
 from minicluster_testbase import MiniClusterTestBase
 from snakebite.errors import InvalidInputException
 from snakebite.errors import FileNotFoundException
+from snakebite.formatter import _format_permission
 import os
 
 
@@ -23,7 +24,7 @@ class StatTest(MiniClusterTestBase):
     def test_valid_path(self):
         client_output = self.client.stat(['/'])
         self.assertEqual(client_output['path'], '/')
-        self.assertEqual(client_output['permission'], 0755)
+        self.assertEqual(client_output['permission'], 0o755)
         self.assertEqual(client_output['owner'], os.environ['USER'])
         self.assertEqual(client_output['group'], 'supergroup')
 
@@ -33,3 +34,13 @@ class StatTest(MiniClusterTestBase):
     def test_invalid_path(self):
         self.assertRaises(FileNotFoundException, self.client.stat,
                           ['/does/not/exist'])
+
+    def test_format_permission(self):
+        self.assertEquals(_format_permission(int(0o1777)), '1777')
+        self.assertEquals(_format_permission(int(0o777)), '0777')
+        self.assertEquals(_format_permission(int(0o000777)), '0777')
+
+    def test_sticky_mode(self):
+        list(self.client.chmod(['/sticky_dir'], 0o1777))
+        stat_output = self.client.stat(['/sticky_dir'])
+        self.assertEqual(stat_output['permission'], 0o1777)
