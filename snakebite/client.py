@@ -50,7 +50,7 @@ class Client(object):
     **Example:**
 
     >>> from snakebite.client import Client
-    >>> client = Client("localhost", 54310, use_trash=False)
+    >>> client = Client("localhost", 8020, use_trash=False)
     >>> for x in client.ls(['/']):
     ...     print x
 
@@ -298,7 +298,7 @@ class Client(object):
         **Examples:**
 
         >>> client.df()
-        {'used': 491520L, 'capacity': 120137519104L, 'under_replicated': 0L, 'missing_blocks': 0L, 'filesystem': 'hdfs://localhost:54310', 'remaining': 19669295104L, 'corrupt_blocks': 0L}
+        {'used': 491520L, 'capacity': 120137519104L, 'under_replicated': 0L, 'missing_blocks': 0L, 'filesystem': 'hdfs://localhost:8020', 'remaining': 19669295104L, 'corrupt_blocks': 0L}
         '''
         processor = lambda path, node: self._handle_df(path, node)
         return list(self._find_items(['/'], processor, include_toplevel=True, include_children=False, recurse=False))[0]
@@ -1302,8 +1302,8 @@ class HAClient(Client):
 
     >>> from snakebite.client import HAClient
     >>> from snakebite.namenode import Namenode
-    >>> n1 = Namenode("namenode1.mydomain", 54310)
-    >>> n2 = Namenode("namenode2.mydomain", 54310)
+    >>> n1 = Namenode("namenode1.mydomain", 8020)
+    >>> n2 = Namenode("namenode2.mydomain", 8020)
     >>> client = HAClient([n1, n2], use_trash=True)
     >>> for x in client.ls(['/']):
     ...     print x
