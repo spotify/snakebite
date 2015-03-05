@@ -225,12 +225,17 @@ def _create_count_listing(nodes, human_readable):
         ret.append(templ % (node['length'], node['path']))
     return "\n".join(ret)
 
+def _format_permission(decimal_permissions):
+    """ formats a decimal representation of UNIX-style permissions,
+        removing leading 0 for octal numbers with length > 4,
+        into a string representation """
+    return "{0:04o}".format(decimal_permissions)[-4:]
 
 def format_stat(results, json_output=False):
     ret = results
     # By default snakebite returns permissions in decimal.
     if ret.has_key('permission'):
-        ret['permission'] = oct(ret['permission'])
+        ret['permission'] = _format_permission(ret['permission'])
     if json_output:
         return json.dumps(ret)
     return "\n".join(["%-20s\t%s" % (k, v) for k, v in sorted(ret.iteritems())])
