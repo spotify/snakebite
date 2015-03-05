@@ -33,8 +33,8 @@ A config looks like:
       "config_version": 2,
       "skiptrash": true,
       "namenodes": [
-          {"host": "mynamenode1", "port": 54310, "version": 9},
-          {"host": "mynamenode2", "port": 54310, "version": 9}
+          {"host": "mynamenode1", "port": 8020, "version": 9},
+          {"host": "mynamenode2", "port": 8020, "version": 9}
       ]
   }
 
