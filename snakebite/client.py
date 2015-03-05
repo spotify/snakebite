@@ -1392,6 +1392,8 @@ class HAClient(Client):
                     self.__handle_request_error(e)
                 except socket.error as e:
                     self.__handle_socket_error(e)
+        wrapped.__doc__ = func.__doc__
+        wrapped.__name__ = func.__name__
         return wrapped
 
     @staticmethod
@@ -1407,6 +1409,8 @@ class HAClient(Client):
                     self.__handle_request_error(e)
                 except socket.error as e:
                     self.__handle_socket_error(e)
+        wrapped.__doc__ = func.__doc__
+        wrapped.__name__ = func.__name__
         return wrapped
 
 HAClient._wrap_methods()
