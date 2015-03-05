@@ -12,6 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from __future__ import division
+
 import datetime
 import stat
 import json
@@ -63,7 +65,7 @@ def format_column(col, node, human_readable):
     elif col == "permission":
         return _octal_to_perm(value)
     elif col == "modification_time":
-        timestamp = datetime.datetime.fromtimestamp(value / 1000)
+        timestamp = datetime.datetime.fromtimestamp(value // 1000)
         return timestamp.strftime('%Y-%m-%d %H:%M')
     elif col == "block_replication":
         if node["file_type"] == "f":
