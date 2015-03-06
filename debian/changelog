@@ -1,3 +1,11 @@
+snakebite (2.5.2) unstable; urgency=low
+
+  * apply py3 style to minicluster (for use in luigi)
+  * fix permission formating in stat method
+  * use default port in documentation
+
+ -- Rafal Wojdyla <rav@spotify.com>  Fri, 06 Mar 2015 09:10:56 -0000
+
 snakebite (2.5.1) unstable; urgency=low
 
   * fix copyToLocal bugs
