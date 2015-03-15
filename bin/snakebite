@@ -32,7 +32,7 @@ class SnakebiteCli(object):
         if self.args.debug:
             loglevel = logging.DEBUG
         else:
-            loglevel = logging.INFO
+            loglevel = logging.ERROR
         logging.basicConfig(level=loglevel)
 
 SnakebiteCli()

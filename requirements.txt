@@ -1,2 +1,3 @@
 argparse
 protobuf>2.4.1
+trollius==1.0.4
