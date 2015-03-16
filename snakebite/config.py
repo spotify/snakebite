@@ -1,12 +1,12 @@
 import os
-import sys
 import logging
 import xml.etree.ElementTree as ET
-
 from urlparse import urlparse
+
 from namenode import Namenode
 
 log = logging.getLogger(__name__)
+
 
 class HDFSConfig(object):
     use_trash = False
@@ -34,7 +34,6 @@ class HDFSConfig(object):
 
         return configs
 
-
     @staticmethod
     def read_hadoop_config(hdfs_conf_path):
         if os.path.exists(hdfs_conf_path):
@@ -46,7 +45,6 @@ class HDFSConfig(object):
             root = tree.getroot()
             for p in root.findall("./property"):
                 yield p
-
 
     @classmethod
     def read_core_config(cls, core_site_path):
