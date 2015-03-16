@@ -13,10 +13,12 @@ class HDFSConfig(object):
 
     @classmethod
     def get_config_from_env(cls):
-        '''Gets configuration out of environment.
+        """
+        .. deprecated:: 2.5.3
+        Gets configuration out of environment.
 
         Returns list of dicts - list of namenode representations
-        '''
+        """
         core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
         configs = cls.read_core_config(core_path)
 
