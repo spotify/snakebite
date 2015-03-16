@@ -92,19 +92,22 @@ class HDFSConfig(object):
     @classmethod
     def get_external_config(cls):
         if os.environ.get('HADOOP_HOME'):
-            configs = cls.get_config_from_env()
-            return configs
-        else:
-            # Try to find other paths
-            configs = []
-            for core_conf_path in cls.core_try_paths:
-                configs = cls.read_core_config(core_conf_path)
-                if configs:
-                    break
+            hdfs_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'hdfs-site.xml')
+            cls.hdfs_try_paths = (hdfs_path,) + cls.hdfs_try_paths
+            core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
+            cls.core_try_paths = (core_path,) + cls.core_try_paths
 
-            for hdfs_conf_path in cls.hdfs_try_paths:
-                tmp_config = cls.read_hdfs_config(hdfs_conf_path)
-                if tmp_config:
-                    # if there is hdfs-site data available return it
-                    return tmp_config
-            return configs
+        # Try to find other paths
+        configs = []
+        for core_conf_path in cls.core_try_paths:
+            configs = cls.read_core_config(core_conf_path)
+            if configs:
+                break
+
+        for hdfs_conf_path in cls.hdfs_try_paths:
+            tmp_config = cls.read_hdfs_config(hdfs_conf_path)
+            if tmp_config:
+                # if there is hdfs-site data available return it
+                return tmp_config
+
+        return configs
