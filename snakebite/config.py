@@ -96,6 +96,11 @@ class HDFSConfig(object):
             cls.hdfs_try_paths = (hdfs_path,) + cls.hdfs_try_paths
             core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
             cls.core_try_paths = (core_path,) + cls.core_try_paths
+        if os.environ.get('HADOOP_CONF_DIR'):
+            hdfs_path = os.path.join(os.environ['HADOOP_CONF_DIR'], 'hdfs-site.xml')
+            cls.hdfs_try_paths = (hdfs_path,) + cls.hdfs_try_paths
+            core_path = os.path.join(os.environ['HADOOP_CONF_DIR'], 'core-site.xml')
+            cls.core_try_paths = (core_path,) + cls.core_try_paths
 
         # Try to find other paths
         configs = []
