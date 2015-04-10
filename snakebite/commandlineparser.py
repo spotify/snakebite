@@ -251,7 +251,7 @@ class CommandLineParser(object):
         for path in self.__get_all_directories():
             if path.startswith('hdfs://'):
                 parse_result = urlparse(path)
-                if path in self.args.dir:
+                if 'dir' in self.args and path in self.args.dir:
                     self.args.dir.remove(path)
                     self.args.dir.append(parse_result.path)
                 else:
@@ -357,13 +357,19 @@ class CommandLineParser(object):
             print_error_exit("Config retrieved from %s is corrupted! Remove it!" % path)
 
     def __get_all_directories(self):
-        if self.args and 'dir' in self.args:
-            dirs_to_check = list(self.args.dir)
-            if self.args.command == 'mv':
+        dirs_to_check = []
+
+        # append single_arg for operations that use single_arg
+        # as HDFS path
+        if self.args.command in ('mv', 'test', 'tail'):
+            if self.args.single_arg is not None:
                 dirs_to_check.append(self.args.single_arg)
-            return dirs_to_check
-        else:
-            return ()
+
+        # add dirs if they exists:
+        if self.args and 'dir' in self.args:
+            dirs_to_check += self.args.dir
+
+        return dirs_to_check
 
     def _read_config_cl(self):
         ''' Check if any directory arguments contain hdfs://'''
