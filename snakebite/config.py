@@ -1,22 +1,24 @@
 import os
-import sys
 import logging
 import xml.etree.ElementTree as ET
-
 from urlparse import urlparse
+
 from namenode import Namenode
 
 log = logging.getLogger(__name__)
+
 
 class HDFSConfig(object):
     use_trash = False
 
     @classmethod
     def get_config_from_env(cls):
-        '''Gets configuration out of environment.
+        """
+        .. deprecated:: 2.5.3
+        Gets configuration out of environment.
 
         Returns list of dicts - list of namenode representations
-        '''
+        """
         core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
         configs = cls.read_core_config(core_path)
 
@@ -32,7 +34,6 @@ class HDFSConfig(object):
 
         return configs
 
-
     @staticmethod
     def read_hadoop_config(hdfs_conf_path):
         if os.path.exists(hdfs_conf_path):
@@ -44,7 +45,6 @@ class HDFSConfig(object):
             root = tree.getroot()
             for p in root.findall("./property"):
                 yield p
-
 
     @classmethod
     def read_core_config(cls, core_site_path):
@@ -92,19 +92,27 @@ class HDFSConfig(object):
     @classmethod
     def get_external_config(cls):
         if os.environ.get('HADOOP_HOME'):
-            configs = cls.get_config_from_env()
-            return configs
-        else:
-            # Try to find other paths
-            configs = []
-            for core_conf_path in cls.core_try_paths:
-                configs = cls.read_core_config(core_conf_path)
-                if configs:
-                    break
+            hdfs_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'hdfs-site.xml')
+            cls.hdfs_try_paths = (hdfs_path,) + cls.hdfs_try_paths
+            core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
+            cls.core_try_paths = (core_path,) + cls.core_try_paths
+        if os.environ.get('HADOOP_CONF_DIR'):
+            hdfs_path = os.path.join(os.environ['HADOOP_CONF_DIR'], 'hdfs-site.xml')
+            cls.hdfs_try_paths = (hdfs_path,) + cls.hdfs_try_paths
+            core_path = os.path.join(os.environ['HADOOP_CONF_DIR'], 'core-site.xml')
+            cls.core_try_paths = (core_path,) + cls.core_try_paths
 
-            for hdfs_conf_path in cls.hdfs_try_paths:
-                tmp_config = cls.read_hdfs_config(hdfs_conf_path)
-                if tmp_config:
-                    # if there is hdfs-site data available return it
-                    return tmp_config
-            return configs
+        # Try to find other paths
+        configs = []
+        for core_conf_path in cls.core_try_paths:
+            configs = cls.read_core_config(core_conf_path)
+            if configs:
+                break
+
+        for hdfs_conf_path in cls.hdfs_try_paths:
+            tmp_config = cls.read_hdfs_config(hdfs_conf_path)
+            if tmp_config:
+                # if there is hdfs-site data available return it
+                return tmp_config
+
+        return configs
