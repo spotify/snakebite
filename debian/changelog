@@ -1,3 +1,10 @@
+snakebite (2.5.3) unstable; urgency=low
+
+   * fix single_args problem for test/tail #149
+   * improve searching for hdfs config #143
+
+ -- Rafal Wojdyla <rav@spotify.com>  Fri, 10 Apr 2015 08:41:25 -0000
+
 snakebite (2.5.2) unstable; urgency=low
 
   * apply py3 style to minicluster (for use in luigi)
