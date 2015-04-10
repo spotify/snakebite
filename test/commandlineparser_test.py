@@ -763,6 +763,28 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
         self.assertIn("/user/rav2", self.parser.args.dir)
         self.assertEqual(self.parser.args.single_arg, "/user/rav3")
 
+    def test_cl_config_test_single_arg_hdfs_paths(self):
+        self.parser.args = MockParseArgs(single_arg="hdfs://foobar:50070/user/rav3",
+                                         command="test")
+        self.parser.init()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assertEqual(self.parser.args.single_arg, "/user/rav3")
+
+    def test_cl_config_tail_single_arg_hdfs_paths(self):
+        self.parser.args = MockParseArgs(single_arg="hdfs://foobar:50070/user/rav3",
+                                         command="tail")
+        self.parser.init()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assertEqual(self.parser.args.single_arg, "/user/rav3")
+
+    def test_cl_config_mv_single_arg_hdfs_paths(self):
+        self.parser.args = MockParseArgs(single_arg="hdfs://foobar:50070/user/rav3",
+                                         command="mv")
+        self.parser.init()
+        self.assert_namenode_spec("foobar", 50070)
+        self.assertEqual(self.parser.args.single_arg, "/user/rav3")
+
+
     import snakebite.config
     @patch.object(snakebite.config.HDFSConfig, 'get_external_config')
     @patch("snakebite.commandlineparser.CommandLineParser._read_config_snakebiterc", return_value=None)
