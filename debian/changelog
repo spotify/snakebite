@@ -1,3 +1,9 @@
+snakebite (2.5.4) unstable; urgency=low
+
+   * Handles broken pipe errors in snakebite commands #150
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 5 May 2015 08:41:25 -0000
+
 snakebite (2.5.3) unstable; urgency=low
 
    * fix single_args problem for test/tail #149
