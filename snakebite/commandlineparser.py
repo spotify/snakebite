@@ -14,6 +14,7 @@
 # the License.
 
 import argparse
+import errno
 import sys
 import os
 import pwd
@@ -450,6 +451,9 @@ class CommandLineParser(object):
             sys.exit(-1)
         try:
             return Commands.methods[self.cmd]['method'](self)
+        except IOError as e:
+            if e.errno != errno.EPIPE:
+                exitError(sys.exc_info())
         except Exception:
             exitError(sys.exc_info())
 
