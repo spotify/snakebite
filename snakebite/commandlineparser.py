@@ -41,8 +41,10 @@ def print_error_exit(msg, fd=sys.stderr):
     print >> fd, "Error: %s" % msg
     sys.exit(-1)
 
+
 def print_info(msg, fd=sys.stderr):
     print >> fd, "Info: %s" % msg
+
 
 def exitError(exc_info):
     exc_type, exc_value, exc_traceback = exc_info
@@ -182,7 +184,7 @@ class CommandLineParser(object):
         self.namenodes = []
 
     def _build_parent_parser(self):
-        #general options
+        # general options
         for opt_name, opt_data in self.GENERIC_OPTS.iteritems():
             if 'action' in opt_data:
                 self.parser.add_argument(opt_data['short'], opt_data['long'], help=opt_data['help'], action=opt_data['action'])
@@ -195,7 +197,7 @@ class CommandLineParser(object):
     def _add_subparsers(self):
         default_dir = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
 
-        #sub-options
+        # sub-options
         arg_parsers = {}
         for opt_name, opt_data in self.SUB_OPTS.iteritems():
             arg_parsers[opt_name] = argparse.ArgumentParser(add_help=False)
@@ -259,7 +261,7 @@ class CommandLineParser(object):
                     self.args.single_arg = parse_result.path
 
     def __usetrash_unset(self):
-        return not 'usetrash' in self.args or self.args.usetrash == False
+        return 'usetrash' not in self.args or not self.args.usetrash
 
     def __use_cl_port_first(self, alt):
         # Port provided from CL has the highest priority:
@@ -274,7 +276,7 @@ class CommandLineParser(object):
         config_file = os.path.join(os.path.expanduser('~'), '.snakebiterc')
 
         if os.path.exists(config_file):
-            #if ~/.snakebiterc exists - read config from it
+            # if ~/.snakebiterc exists - read config from it
             self._read_config_snakebiterc()
         elif os.path.exists('/etc/snakebiterc'):
             self._read_config_snakebiterc('/etc/snakebiterc')
@@ -312,7 +314,7 @@ class CommandLineParser(object):
 
             sys.exit(1)
 
-    def _read_config_snakebiterc(self, path = os.path.join(os.path.expanduser('~'), '.snakebiterc')):
+    def _read_config_snakebiterc(self, path=os.path.join(os.path.expanduser('~'), '.snakebiterc')):
         old_version_info = "You're are using snakebite %s with Trash support together with old snakebiterc, please update/remove your %s file. By default Trash is %s." % (path, version(), 'disabled' if not HDFSConfig.use_trash else 'enabled')
         with open(path) as config_file:
             configs = json.load(config_file)
@@ -383,11 +385,11 @@ class CommandLineParser(object):
                 ports.append(parse_result.port)
 
         # remove duplicates and None from (hosts + self.args.namenode)
-        hosts = filter(lambda x: x != None, set(hosts + [self.args.namenode]))
+        hosts = filter(lambda x: x is not None, set(hosts + [self.args.namenode]))
         if len(hosts) > 1:
             print_error_exit('Conficiting namenode hosts in commandline arguments, hosts: %s' % str(hosts))
 
-        ports = filter(lambda x: x != None, set(ports + [self.args.port]))
+        ports = filter(lambda x: x is not None, set(ports + [self.args.port]))
         if len(ports) > 1:
             print_error_exit('Conflicting namenode ports in commandline arguments, ports: %s' % str(ports))
 
@@ -443,7 +445,7 @@ class CommandLineParser(object):
 
     def execute(self):
         if self.args.help:
-            #if 'ls -H' is called, execute 'usage ls'
+            # if 'ls -H' is called, execute 'usage ls'
             self.args.arg = [self.cmd]
             return Commands.methods['usage']['method'](self)
         if not Commands.methods.get(self.cmd):
@@ -610,7 +612,7 @@ class CommandLineParser(object):
 
     @command(args="<cmd>", descr="show cmd usage", req_args=['[args]'])
     def usage(self):
-        if not 'arg' in self.args or self.args.arg == []:
+        if 'arg' not in self.args or self.args.arg == []:
             self.parser.print_help()
             sys.exit(-1)
 

@@ -14,7 +14,9 @@
 # the License.
 
 import re
-import itertools
+
+expandable = re.compile("{(.*?)}")
+magick_check = re.compile('[*?[{}]')
 
 
 def expand_paths(paths):
@@ -25,23 +27,17 @@ def expand_paths(paths):
     return result
 
 
-exp = re.compile("{(.*?)}")
-
-
 def expand_path(path):
-    m = exp.findall(path)
+    m = expandable.findall(path)
     if not m:
         return [path]
     else:
         first_close = path.index("}")
         last_open = path[:first_close].rfind("{") + 1
         opts = path[last_open:first_close].split(",")
-        template = path[:last_open-1]+"%s"+path[first_close+1:]
+        template = path[:last_open - 1] + "%s" + path[first_close + 1:]
         results = [template % s for s in opts]
         return expand_paths(results)
-
-
-magick_check = re.compile('[*?[{}]')
 
 
 def has_magic(s):

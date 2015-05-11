@@ -390,13 +390,11 @@ class Client(object):
 
         dst = self._normalize_path(dst)
 
-
         request = client_proto.RenameRequestProto()
         request.src = path
         request.dst = dst
         response = self.service.rename(request)
         return {"path": path, "result": response.result}
-
 
     def rename2(self, path, dst, overwriteDest=False):
         ''' Rename (but don't move) path to a destination
@@ -438,7 +436,6 @@ class Client(object):
         for item in self._find_items([path], processor, include_toplevel=True):
             return item
 
-
     def _handle_rename2(self, path, node, dst, overwriteDest):
         if not dst.startswith("/"):
             dst = self._join_user_path(dst)
@@ -454,8 +451,7 @@ class Client(object):
         try:
             self.service.rename2(request)
         except RequestError as ex:
-            if ("FileAlreadyExistsException" in str(ex) or
-                "rename destination directory is not empty" in str(ex)):
+            if ("FileAlreadyExistsException" in str(ex) or "rename destination directory is not empty" in str(ex)):
                 raise FileAlreadyExistsException(ex)
             else:
                 raise
@@ -1297,6 +1293,7 @@ class Client(object):
     def _normalize_path(self, path):
         return os.path.normpath(re.sub('/+', '/', path))
 
+
 class HAClient(Client):
     ''' Snakebite client with support for High Availability
 
@@ -1321,7 +1318,7 @@ class HAClient(Client):
     def _wrap_methods(cls):
         # Add HA support to all public Client methods, but only do this when we haven't done this before
         for name, meth in inspect.getmembers(cls, inspect.ismethod):
-            if not name.startswith("_"): # Only public methods
+            if not name.startswith("_"):  # Only public methods
                 if inspect.isgeneratorfunction(meth):
                     setattr(cls, name, cls._ha_gen_method(meth))
                 else:
@@ -1385,7 +1382,7 @@ class HAClient(Client):
     def _ha_return_method(func):
         ''' Method decorator for 'return type' methods '''
         def wrapped(self, *args, **kw):
-            while(True): # switch between all namenodes
+            while(True):  # switch between all namenodes
                 try:
                     return func(self, *args, **kw)
                 except RequestError as e:
@@ -1398,10 +1395,10 @@ class HAClient(Client):
     def _ha_gen_method(func):
         ''' Method decorator for 'generator type' methods '''
         def wrapped(self, *args, **kw):
-            while(True): # switch between all namenodes
+            while(True):  # switch between all namenodes
                 try:
                     results = func(self, *args, **kw)
-                    while(True): # yield all results
+                    while(True):  # yield all results
                         yield results.next()
                 except RequestError as e:
                     self.__handle_request_error(e)
@@ -1410,6 +1407,7 @@ class HAClient(Client):
         return wrapped
 
 HAClient._wrap_methods()
+
 
 class AutoConfigClient(HAClient):
     ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_PATH`` environment variable.
