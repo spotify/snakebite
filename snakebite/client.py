@@ -1327,7 +1327,7 @@ class HAClient(Client):
                 else:
                     setattr(cls, name, cls._ha_return_method(meth))
 
-    def __init__(self, namenodes, use_trash=False, effective_user=None):
+    def __init__(self, namenodes, use_trash=False, effective_user=None, authentication="simple"):
         '''
         :param namenodes: Set of namenodes for HA setup
         :type namenodes: list
@@ -1338,6 +1338,7 @@ class HAClient(Client):
         '''
         self.use_trash = use_trash
         self.effective_user = effective_user
+        self.use_sasl = True if authentication == "kerberos" else False
 
         if not namenodes:
             raise OutOfNNException("List of namenodes is empty - couldn't create the client")
@@ -1441,4 +1442,4 @@ class AutoConfigClient(HAClient):
         nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
         if not nns:
             raise OutOfNNException("Tried and failed to find namenodes - couldn't created the client!")
-        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash, effective_user)
+        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash, effective_user, HDFSConfig.use_sasl)

@@ -63,6 +63,12 @@ class HDFSConfig(object):
             if property.findall('name')[0].text == 'fs.trash.interval':
                 cls.use_trash = True
 
+            if property.findall('name')[0].text == 'hadoop.security.authentication':
+                if property.findall('value')[0].text == 'kerberos':
+                    cls.use_sasl = True
+                else:
+                    cls.use_sasl = False
+ 
         return config
 
     @classmethod
