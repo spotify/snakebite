@@ -81,7 +81,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False, effective_user=None):
+    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False, effective_user=None, use_sasl=False):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -93,18 +93,21 @@ class Client(object):
         :type use_trash: boolean
         :param effective_user: Effective user for the HDFS operations (default: None - current user)
         :type effective_user: string
+        :param use_sasl: Use SASL authentication or not
+        :type use_sasl: boolean
         '''
         if hadoop_version < 9:
             raise Exception("Only protocol versions >= 9 supported")
 
         self.host = host
         self.port = port
+        self.use_sasl = use_sasl
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
-        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, effective_user)
+        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, effective_user, self.use_sasl)
         self.use_trash = use_trash
         self.trash = self._join_user_path(".Trash")
 
-        log.debug("Created client for %s:%s with trash=%s" % (host, port, use_trash))
+        log.debug("Created client for %s:%s with trash=%s and sasl=%s" % (host, port, use_trash, use_sasl))
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
         ''' Issues 'ls' command and returns a list of maps that contain fileinfo
@@ -1327,7 +1330,7 @@ class HAClient(Client):
                 else:
                     setattr(cls, name, cls._ha_return_method(meth))
 
-    def __init__(self, namenodes, use_trash=False, effective_user=None, authentication="simple"):
+    def __init__(self, namenodes, use_trash=False, effective_user=None, use_sasl=False):
         '''
         :param namenodes: Set of namenodes for HA setup
         :type namenodes: list
@@ -1338,7 +1341,7 @@ class HAClient(Client):
         '''
         self.use_trash = use_trash
         self.effective_user = effective_user
-        self.use_sasl = True if authentication == "kerberos" else False
+        self.use_sasl = use_sasl
 
         if not namenodes:
             raise OutOfNNException("List of namenodes is empty - couldn't create the client")
@@ -1353,7 +1356,8 @@ class HAClient(Client):
                                                  namenode.port,
                                                  namenode.version,
                                                  self.use_trash,
-                                                 self.effective_user)
+                                                 self.effective_user,
+                                                 self.use_sasl)
         else:
             msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
             for namenode in namenodes:
@@ -1430,12 +1434,14 @@ class AutoConfigClient(HAClient):
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``hadoop_version`` parameter to the constructor.
     '''
-    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION, effective_user=None):
+    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION, effective_user=None, use_sasl=False):
         '''
         :param hadoop_version: What hadoop protocol version should be used (default: 9)
         :type hadoop_version: int
         :param effective_user: Effective user for the HDFS operations (default: None - current user)
         :type effective_user: string
+        :param use_sasl: Use SASL for authenication or not
+        :type use_sasl: boolean
         '''
 
         configs = HDFSConfig.get_external_config()
