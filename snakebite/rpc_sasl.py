@@ -45,13 +45,13 @@ def log_protobuf_message(header, message):
     log.debug("%s:\n\n\033[92m%s\033[0m" % (header, message))
 
 class SaslRpcClient:
-    def __init__(self, sasl_client_factory, mechanism, trans):
-        self.sasl_client_factory = sasl_client_factory
+    def __init__(self, trans):
+        #self.sasl_client_factory = sasl_client_factory
         self.sasl = None
-        self.mechanism = mechanism
+        #self.mechanism = mechanism
         self._trans = trans
 
-    def send_sasl_message(self, message):
+    def _send_sasl_message(self, message):
         rpcheader = RpcRequestHeaderProto()
         rpcheader.rpcKind = 2 # RPC_PROTOCOL_BUFFER
         rpcheader.rpcOp = 0
@@ -70,59 +70,66 @@ class SaslRpcClient:
 
         log_protobuf_message("Send out", message)
 
-    def recv_sasl_message(self):
+    def _recv_sasl_message(self):
         bytestream = self._trans.recv_rpc_message()
         sasl_response = self._trans.parse_response(bytestream, RpcSaslProto)
 
         return sasl_response
 
-    def sasl_connect(self):
+    def connect(self):
         negotiate = RpcSaslProto()
         negotiate.state = 1
-        self.send_sasl_message(negotiate)
+        self._send_sasl_message(negotiate)
 
-        self.sasl = self.sasl_client_factory()
-        ret, chosen_mech, initial_response = self.sasl.start("TOKEN,GSSAPI")
-        log.debug("Chosen mech: %s" % chosen_mech)
-        log.debug("Initial response: %s" % initial_response)
+        self.sasl = sasl.Client()
+        self.sasl.setAttr("service", "hdfs")
+        self.sasl.setAttr("host", self._trans.host)
+        self.sasl.init()
 
         # do while true
         while True:
-          res = self.recv_sasl_message()
+          res = self._recv_sasl_message()
           # TODO: check mechanisms
           if res.state == 1:
-            #res_token = b""
+            mechs = []
+            for auth in res.auths:
+                mechs.append(auth.mechanism)
+
+            log.debug("Available mechs: %s" % (",".join(mechs)))
+            s_mechs = str(",".join(mechs))
+            ret, chosen_mech, initial_response = self.sasl.start(s_mechs)
+            log.debug("Chosen mech: %s" % chosen_mech)
+
             initiate = RpcSaslProto()
             initiate.state = 2
             initiate.token = initial_response
 
-            #auth_method = RpcSaslProto.SaslAuth()
-            auth_method = initiate.auths.add()
-            auth_method.mechanism = "GSSAPI"
-            auth_method.method = "KERBEROS"
-            auth_method.protocol = "hdfs"
-            auth_method.serverId = "master01.paymentslab.int"
+            for auth in res.auths:
+                if auth.mechanism == chosen_mech:
+                    auth_method = initiate.auths.add()
+                    auth_method.mechanism = chosen_mech
+                    auth_method.method = auth.method
+                    auth_method.protocol = auth.protocol
+                    auth_method.serverId = self._trans.host
 
-            #initiate.auths.append(auth_method) 
-            self.send_sasl_message(initiate)
+            self._send_sasl_message(initiate)
             continue
            
           if res.state == 3:
-            res_token = self.sasl_evaluate_token(res)
+            res_token = self._evaluate_token(res)
             response = RpcSaslProto()
             response.token = res_token
             response.state = 4
-            self.send_sasl_message(response)
+            self._send_sasl_message(response)
             continue
 
           if res.state == 0:
             return True
 
-    def sasl_evaluate_token(self, sasl_response):
+    def _evaluate_token(self, sasl_response):
         ret, response = self.sasl.step(sasl_response.token)
         if not ret:
           raise Exception("Bad SASL results: %s" % (self.sasl.getError()))
 
         return response 
 
-    def select
