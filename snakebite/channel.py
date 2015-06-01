@@ -60,6 +60,10 @@ from snakebite.crc32c import crc
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
+# SASL
+from snakebite.rpc_sasl import SaslRpcClient
+from snakebite.kerberos import Kerberos
+
 # Module imports
 
 import logger
@@ -173,7 +177,11 @@ class SocketRpcChannel(RpcChannel):
         self.version = version
         self.client_id = str(uuid.uuid4())
         self.use_sasl = use_sasl
-        self.effective_user = effective_user or pwd.getpwuid(os.getuid())[0]
+        if self.use_sasl:
+            kerberos = Kerberos()
+            self.effective_user = effective_user or kerberos.user_principal().name
+        else: 
+            self.effective_user = effective_user or pwd.getpwuid(os.getuid())[0]
 
     def validate_request(self, request):
         '''Validate the client request against the protocol file.'''

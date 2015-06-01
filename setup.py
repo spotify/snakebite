@@ -42,7 +42,9 @@ class Tox(TestCommand):
 
 install_requires = [
     'protobuf>2.4.1',
-    'argparse']
+    'argparse',
+    'sasl',
+    'python-krbV']
 
 tests_require = [
     'tox',

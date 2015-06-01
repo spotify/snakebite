@@ -1,3 +1,4 @@
 argparse
 protobuf>2.4.1
 sasl
+python-krbV
