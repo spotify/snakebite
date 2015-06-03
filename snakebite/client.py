@@ -15,17 +15,20 @@
 
 import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 import snakebite.glob as glob
-from snakebite.errors import RequestError
-from snakebite.service import RpcService
-from snakebite.errors import FileAlreadyExistsException
-from snakebite.errors import FileNotFoundException
-from snakebite.errors import DirectoryException
-from snakebite.errors import FileException
-from snakebite.errors import InvalidInputException
-from snakebite.errors import OutOfNNException
 from snakebite.channel import DataXceiverChannel
 from snakebite.config import HDFSConfig
+from snakebite.errors import (
+    ConnectionFailureException,
+    DirectoryException,
+    FileAlreadyExistsException,
+    FileException,
+    FileNotFoundException,
+    InvalidInputException,
+    OutOfNNException,
+    RequestError,
+    )
 from snakebite.namenode import Namenode
+from snakebite.service import RpcService
 
 import Queue
 import zlib
@@ -1111,7 +1114,10 @@ class Client(object):
                             failed_nodes.append(location.id.storageID)
                         successful_read = False
                 else:
-                    raise Exception
+                    raise ConnectionFailureException(
+                        u"Failure to connect to data node at ({}:{})".format(
+                            host, port
+                            ))
                 if successful_read:
                     break
             if successful_read is False:
