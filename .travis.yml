@@ -2,12 +2,15 @@ language: python
 python: 2.7
 jdk: oraclejdk7
 branches:
-    except:
-        - gh-pages
+  except:
+    - gh-pages
 env:
-    - TOX_ENV=py26-cdh
-    - TOX_ENV=py27-cdh
-    - TOX_ENV=py26-hdp
-    - TOX_ENV=py27-hdp
-install: pip install -r requirements-dev.txt
-script: python setup.py test --tox-args="-e $TOX_ENV"
+  - TOX_ENV=py26-cdh
+  - TOX_ENV=py27-cdh
+  - TOX_ENV=py26-hdp
+  - TOX_ENV=py27-hdp
+install:
+  - pip install tox
+script:
+  - tox --version
+  - python setup.py test --tox-args="-e $TOX_ENV"
