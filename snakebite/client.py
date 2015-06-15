@@ -1412,10 +1412,12 @@ class HAClient(Client):
 HAClient._wrap_methods()
 
 class AutoConfigClient(HAClient):
-    ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_PATH`` environment variable.
+    ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_HOME`` environment variable.
 
     HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.
-    This client tries to read ``${HADOOP_PATH}/conf/hdfs-site.xml`` to get the address of the namenode.
+    This client tries to read ``${HADOOP_HOME}/conf/hdfs-site.xml`` and ``${HADOOP_HOME}/conf/core-site.xml``
+    to get the address of the namenode.
+
     The behaviour is the same as Client.
 
     **Example:**
