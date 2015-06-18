@@ -22,6 +22,7 @@ import json
 from urlparse import urlparse
 
 from snakebite.client import HAClient
+from snakebite.service import AsyncHARpcService
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
@@ -35,7 +36,7 @@ from snakebite.formatter import format_du
 from snakebite.config import HDFSConfig
 from snakebite.version import version
 from snakebite.namenode import Namenode
-
+import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 
 def print_error_exit(msg, fd=sys.stderr):
     print >> fd, "Error: %s" % msg
@@ -439,7 +440,9 @@ class CommandLineParser(object):
             use_trash = self.args.usetrash and not self.args.skiptrash
         else:
             use_trash = self.args.usetrash
-        self.client = HAClient(self.namenodes, use_trash)
+        service = AsyncHARpcService(client_proto.ClientNamenodeProtocol_Stub,
+                                    self.namenodes)
+        self.client = HAClient(self.namenodes, use_trash, service=service)
 
     def execute(self):
         if self.args.help:

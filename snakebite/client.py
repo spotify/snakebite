@@ -16,7 +16,7 @@
 import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 import snakebite.glob as glob
 from snakebite.errors import RequestError
-from snakebite.service import RpcService
+from snakebite.service import RpcService, HARpcService, AsyncHARpcService
 from snakebite.errors import FileAlreadyExistsException
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
@@ -36,8 +36,6 @@ import os.path
 import pwd
 import fnmatch
 import inspect
-import socket
-import errno
 import time
 import re
 import sys
@@ -81,7 +79,12 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False, effective_user=None):
+    def __init__(self,
+                 host,
+                 port=Namenode.DEFAULT_PORT,
+                 hadoop_version=Namenode.DEFAULT_VERSION,
+                 use_trash=False,
+                 effective_user=None):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -99,12 +102,44 @@ class Client(object):
 
         self.host = host
         self.port = port
-        self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
-        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, effective_user)
+        self.service = RpcService(client_proto.ClientNamenodeProtocol_Stub,
+                                  self.port,
+                                  self.host,
+                                  hadoop_version,
+                                  effective_user)
+        self._init_trash(use_trash)
+        log.debug("Created client for %s:%s with trash=%s" % (host, port, use_trash))
+
+    def _init_trash(self, use_trash):
         self.use_trash = use_trash
         self.trash = self._join_user_path(".Trash")
 
-        log.debug("Created client for %s:%s with trash=%s" % (host, port, use_trash))
+
+    def _find_active_namenode(self):
+        self.serverdefaults()
+
+    def _get_namenode(self):
+        ''' Returns (most probably) active namenode.
+
+        :returns: a Namenode object
+
+        Snakebite will try to keep most recent information about active
+        namenode but failover may happen at any time. In single namenode
+        mode it will just return configured namenode. In HA mode it will
+        return most recently active namenode, if that information is not
+        available snakebite will try to fetch that information.
+        '''
+
+        if isinstance(self.service, HARpcService):
+            if not self.service.has_active_service():
+                self._find_active_namenode()
+            active_service = self.service.active_service
+            return Namenode(active_service.host,
+                            active_service.port,
+                            active_service.hadoop_version)
+        else:
+            # this is single namenode client
+            return Namenode(self.host, self.port)
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
         ''' Issues 'ls' command and returns a list of maps that contain fileinfo
@@ -310,7 +345,8 @@ class Client(object):
     def _handle_df(self, path, node):
         request = client_proto.GetFsStatusRequestProto()
         response = self.service.getFsStats(request)
-        entry = {"filesystem": "hdfs://%s:%d" % (self.host, self.port)}
+        nn = self._get_namenode()
+        entry = {"filesystem": "hdfs://%s:%d" % (nn.host, nn.port)}
         for i in ['capacity', 'used', 'remaining', 'under_replicated',
                   'corrupt_blocks', 'missing_blocks']:
             entry[i] = response.__getattribute__(i)
@@ -1317,17 +1353,7 @@ class HAClient(Client):
         in the ``version`` parameter to the Namenode class constructor.
     '''
 
-    @classmethod
-    def _wrap_methods(cls):
-        # Add HA support to all public Client methods, but only do this when we haven't done this before
-        for name, meth in inspect.getmembers(cls, inspect.ismethod):
-            if not name.startswith("_"): # Only public methods
-                if inspect.isgeneratorfunction(meth):
-                    setattr(cls, name, cls._ha_gen_method(meth))
-                else:
-                    setattr(cls, name, cls._ha_return_method(meth))
-
-    def __init__(self, namenodes, use_trash=False, effective_user=None):
+    def __init__(self, namenodes, use_trash=False, effective_user=None, service=None):
         '''
         :param namenodes: Set of namenodes for HA setup
         :type namenodes: list
@@ -1335,81 +1361,25 @@ class HAClient(Client):
         :type use_trash: boolean
         :param effective_user: Effective user for the HDFS operations (default: None - current user)
         :type effective_user: string
+        :param service: RPC service to handle calls
+        :type service: RpcService
         '''
         self.use_trash = use_trash
         self.effective_user = effective_user
 
         if not namenodes:
             raise OutOfNNException("List of namenodes is empty - couldn't create the client")
-        self.namenode = self._switch_namenode(namenodes)
-        self.namenode.next()
 
-    def _switch_namenode(self, namenodes):
-        for namenode in namenodes:
-            log.debug("Switch to namenode: %s:%d" % (namenode.host, namenode.port))
-
-            yield super(HAClient, self).__init__(namenode.host,
-                                                 namenode.port,
-                                                 namenode.version,
-                                                 self.use_trash,
-                                                 self.effective_user)
+        self._init_trash(use_trash)
+        if service is None:
+            self.service = HARpcService(client_proto.ClientNamenodeProtocol_Stub,
+                                         namenodes,
+                                         effective_user)
         else:
-            msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
-            for namenode in namenodes:
-                msg += "\n\t* %s:%d" % (namenode.host, namenode.port)
-            msg += "\nLook into debug messages - add -D flag!"
-            raise OutOfNNException(msg)
+            if not isinstance(service, RpcService):
+                raise InvalidInputException("Service must be of RpcService class")
+            self.service = service
 
-    def __handle_request_error(self, exception):
-        log.debug("Request failed with %s" % exception)
-        if exception.args[0].startswith("org.apache.hadoop.ipc.StandbyException"):
-            pass
-        else:
-            # There's a valid NN in active state, but there's still request error - raise
-            raise
-        self.namenode.next()
-
-    def __handle_socket_error(self, exception):
-        log.debug("Request failed with %s" % exception)
-        if exception.errno in (errno.ECONNREFUSED, errno.EHOSTUNREACH):
-            # if NN is down or machine is not available, pass it:
-            pass
-        elif isinstance(exception, socket.timeout):
-            # if there's communication/socket timeout, pass it:
-            pass
-        else:
-            raise
-        self.namenode.next()
-
-    @staticmethod
-    def _ha_return_method(func):
-        ''' Method decorator for 'return type' methods '''
-        def wrapped(self, *args, **kw):
-            while(True): # switch between all namenodes
-                try:
-                    return func(self, *args, **kw)
-                except RequestError as e:
-                    self.__handle_request_error(e)
-                except socket.error as e:
-                    self.__handle_socket_error(e)
-        return wrapped
-
-    @staticmethod
-    def _ha_gen_method(func):
-        ''' Method decorator for 'generator type' methods '''
-        def wrapped(self, *args, **kw):
-            while(True): # switch between all namenodes
-                try:
-                    results = func(self, *args, **kw)
-                    while(True): # yield all results
-                        yield results.next()
-                except RequestError as e:
-                    self.__handle_request_error(e)
-                except socket.error as e:
-                    self.__handle_socket_error(e)
-        return wrapped
-
-HAClient._wrap_methods()
 
 class AutoConfigClient(HAClient):
     ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_HOME`` environment variable.
@@ -1431,16 +1401,18 @@ class AutoConfigClient(HAClient):
         Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
         in the ``hadoop_version`` parameter to the constructor.
     '''
-    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION, effective_user=None):
+    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION, effective_user=None, service=None):
         '''
         :param hadoop_version: What hadoop protocol version should be used (default: 9)
         :type hadoop_version: int
         :param effective_user: Effective user for the HDFS operations (default: None - current user)
         :type effective_user: string
+        :param service: RPC service to handle calls
+        :type service: RpcService
         '''
 
         configs = HDFSConfig.get_external_config()
         nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
         if not nns:
             raise OutOfNNException("Tried and failed to find namenodes - couldn't created the client!")
-        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash, effective_user)
+        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash, effective_user, service)

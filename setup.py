@@ -42,7 +42,8 @@ class Tox(TestCommand):
 
 install_requires = [
     'protobuf>2.4.1',
-    'argparse']
+    'argparse',
+    'trollius==1.0.4']
 
 tests_require = [
     'tox',
