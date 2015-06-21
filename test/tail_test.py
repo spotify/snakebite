@@ -15,36 +15,58 @@
 
 from minicluster_testbase import MiniClusterTestBase
 import os
+import random
 
 
 class TailTest(MiniClusterTestBase):
 
+    # Test cases
+
     def test_tail_on_one_block(self):
-        expected_output = self.cluster.tail('/test1')
-        client_output = list(self.client.tail('/test1'))[0]
-        self.assertEqual(expected_output, client_output)
+        self._compare_files('/test1')
 
     def test_tail_on_file_smaller_than_1KB(self):
-        p = self.cluster.put_subprocess('-', '/temp_test')
+        path = '/temp_test'
+        p = self.cluster.put_subprocess('-', path)
         print >> p.stdin, "just a couple of bytes"
         p.communicate()
 
-        expected_output = self.cluster.tail('/temp_test')
-        client_output = list(self.client.tail('/temp_test'))[0]
-        self.assertEqual(expected_output, client_output)
+        self._compare_files(path)
 
     def test_tail_over_two_blocks(self):  # Last KB of file spans 2 blocks.
-        testfiles_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testfiles")
-        f = open('%s/test3' % testfiles_path)
+        path = '/temp_test2'
+        self._generate_file_over_two_blocks(path)
+        self._compare_files(path)
 
-        p = self.cluster.put_subprocess('-', '/temp_test2')
+    def test_with_tail_length(self):
+        self._compare_files('/test1', True)
+
+    def test_with_tail_length_over_two_blocks(self):  # Last KB of file spans 2 blocks.
+        path = '/temp_test3'
+        self._generate_file_over_two_blocks(path)
+        self._compare_files(path, True, 40)
+
+    # Helper Methods:
+
+    def _compare_files(self, path, random_tail = False, minimal_tail_length = 1):
+        output = self.cluster.tail(path)
+        tail_length = 1024  # The default tail length
+
+        if random_tail:
+            tail_length = random.randint(minimal_tail_length, len(output))
+
+        expected_output = output[-1 * tail_length:]
+        client_output = list(self.client.tail(path, tail_length))[0]
+        self.assertEqual(expected_output, client_output)
+
+    def _generate_file_over_two_blocks(self, path):
+        f = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'testfiles', 'test3'))
+
+        p = self.cluster.put_subprocess('-', path)
         for _ in xrange(131072):  # 1024 * 131072 = 134,217,728 (default block size)
             f.seek(0)
             for line in f.readlines():
                 print >> p.stdin, line
-        print >> p.stdin, "some extra bytes to exceed one blocksize"  # +40
+        print >> p.stdin, 'some extra bytes to exceed one blocksize'  # +40
         p.communicate()
 
-        expected_output = self.cluster.tail('/temp_test2')
-        client_output = list(self.client.tail('/temp_test2'))[0]
-        self.assertEqual(expected_output, client_output)
