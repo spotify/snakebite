@@ -1001,9 +1001,18 @@ class Client(object):
                 yield {"path": path, "result": False, "error": "mkdir: `%s': File exists" % path}
 
     def serverdefaults(self, force_reload=False):
-        '''Get server defaults
+        '''Get server defaults, caching the results. If there are no results saved, or the force_reload flag is True,
+        it will query the HDFS server for its default parameter values. Otherwise, it will simply return the results
+        it has already queried.
 
-        :returns: dictionary
+        Note: This function returns a copy of the results loaded from the server, so you can manipulate or change
+        them as you'd like. If for any reason you need to change the results the client saves, you must access
+        the property client._server_defaults directly.
+
+        :param force_reload: Should the server defaults be reloaded even if they already exist?
+        :type force_reload: bool
+        :returns: dictionary with the following keys: blockSize, bytesPerChecksum, writePacketSize, replication,
+        fileBufferSize, encryptDataTransfer, trashInterval, checksumType
 
         **Example:**
 
@@ -1019,7 +1028,7 @@ class Client(object):
                 'fileBufferSize': response.fileBufferSize, 'encryptDataTransfer': response.encryptDataTransfer,
                 'trashInterval': response.trashInterval, 'checksumType': response.checksumType}
 
-        # return a copy so if the user changes values they won't be saved in the client
+        # return a copy, so if the user changes any values, they won't be saved in the client
         return self._server_defaults.copy()
 
     def _is_directory(self, should_check, node):
