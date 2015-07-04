@@ -158,9 +158,7 @@ class SocketRpcChannel(RpcChannel):
     AUTH_PROTOCOL_NONE = 0x00
     RPC_PROTOCOL_BUFFFER = 0x02
 
-
-    '''Socket implementation of an RpcChannel.
-    '''
+    '''Socket implementation of an RpcChannel.'''
 
     def __init__(self, host, port, version, effective_user=None):
         '''SocketRpcChannel to connect to a socket server on a user defined port.
@@ -219,7 +217,7 @@ class SocketRpcChannel(RpcChannel):
         rpc_header = self.create_rpc_request_header()
         context = self.create_connection_context()
 
-        header_length = len(rpc_header) + encoder._VarintSize(len(rpc_header)) +len(context) + encoder._VarintSize(len(context))
+        header_length = len(rpc_header) + encoder._VarintSize(len(rpc_header)) + len(context) + encoder._VarintSize(len(context))
 
         if log.getEffectiveLevel() == logging.DEBUG:
             log.debug("Header length: %s (%s)" % (header_length, format_bytes(struct.pack('!I', header_length))))
@@ -228,7 +226,7 @@ class SocketRpcChannel(RpcChannel):
 
         self.write_delimited(rpc_header)
         self.write_delimited(context)
-    
+
     def write(self, data):
         if log.getEffectiveLevel() == logging.DEBUG:
             log.debug("Sending: %s", format_bytes(data))
@@ -289,18 +287,18 @@ class SocketRpcChannel(RpcChannel):
         '''
         log.debug("############## SENDING ##############")
 
-        #0. RpcRequestHeaderProto
+        # 0. RpcRequestHeaderProto
         rpc_request_header = self.create_rpc_request_header()
-        #1. RequestHeaderProto
+        # 1. RequestHeaderProto
         request_header = self.create_request_header(method)
-        #2. Param
+        # 2. Param
         param = request.SerializeToString()
         if log.getEffectiveLevel() == logging.DEBUG:
             log_protobuf_message("Request", request)
 
         rpc_message_length = len(rpc_request_header) + encoder._VarintSize(len(rpc_request_header)) + \
-                             len(request_header) + encoder._VarintSize(len(request_header)) + \
-                             len(param) + encoder._VarintSize(len(param))
+            len(request_header) + encoder._VarintSize(len(request_header)) + \
+            len(param) + encoder._VarintSize(len(param))
 
         if log.getEffectiveLevel() == logging.DEBUG:
             log.debug("RPC message length: %s (%s)" % (rpc_message_length, format_bytes(struct.pack('!I', rpc_message_length))))
@@ -589,7 +587,7 @@ class DataXceiverChannel(object):
                 else:
                     self._read_bytes(checksum_len * chunks_per_packet)
 
-                # We use a fixed size buffer (a "load") to read only a couple of chunks at once. 
+                # We use a fixed size buffer (a "load") to read only a couple of chunks at once.
                 bytes_per_load = self.LOAD_SIZE - (self.LOAD_SIZE % bytes_per_chunk)
                 chunks_per_load = int(bytes_per_load / bytes_per_chunk)
                 loads_per_packet = int(math.ceil(bytes_per_chunk * chunks_per_packet / bytes_per_load))
@@ -609,7 +607,7 @@ class DataXceiverChannel(object):
                         total_read += len(chunk)
                         read_on_packet += len(chunk)
                     yield load
-           
+
             # Send ClientReadStatusProto message confirming successful read
             request = ClientReadStatusProto()
             request.status = 0  # SUCCESS

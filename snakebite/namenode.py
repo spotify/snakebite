@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+
 class Namenode(object):
     '''Namenode class - represents HDFS namenode'''
     DEFAULT_PORT = 8020

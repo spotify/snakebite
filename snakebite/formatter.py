@@ -155,9 +155,9 @@ def format_counts(results, json_output=False, human_readable=False):
                 length = _sizeof_fmt(int(length))
 
             yield "%12s %12s %18s %s" % (result.get('directoryCount'),
-                                                result.get('fileCount'),
-                                                length,
-                                                result.get('path'))
+                                         result.get('fileCount'),
+                                         length,
+                                         result.get('path'))
 
 
 def format_fs_stats(result, json_output=False, human_readable=False):
@@ -227,16 +227,18 @@ def _create_count_listing(nodes, human_readable):
         ret.append(templ % (node['length'], node['path']))
     return "\n".join(ret)
 
+
 def _format_permission(decimal_permissions):
     """ formats a decimal representation of UNIX-style permissions,
         removing leading 0 for octal numbers with length > 4,
         into a string representation """
     return "{0:04o}".format(decimal_permissions)[-4:]
 
+
 def format_stat(results, json_output=False):
     ret = results
     # By default snakebite returns permissions in decimal.
-    if ret.has_key('permission'):
+    if 'permission' in ret:
         ret['permission'] = _format_permission(ret['permission'])
     if json_output:
         return json.dumps(ret)
@@ -246,4 +248,4 @@ def format_stat(results, json_output=False):
 def format_bytes(bytes):
     ascii = binascii.b2a_hex(bytes)
     byte_array = [ascii[i:i + 2] for i in range(0, len(ascii), 2)]
-    return  "%s (len: %d)"% (" ".join(byte_array), len(byte_array))
+    return "%s (len: %d)" % (" ".join(byte_array), len(byte_array))
