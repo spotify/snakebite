@@ -14,19 +14,9 @@
 # the License.
 
 
-class FileNotFoundException(Exception):
+class ConnectionFailureException(Exception):
     def __init__(self, msg):
-        super(FileNotFoundException, self).__init__(msg)
-
-
-class FileAlreadyExistsException(Exception):
-    def __init__(self, msg):
-        super(FileAlreadyExistsException, self).__init__(msg)
-
-
-class RequestError(Exception):
-    def __init__(self, msg):
-        super(RequestError, self).__init__(msg)
+        super(ConnectionFailureException, self).__init__(msg)
 
 
 class DirectoryException(Exception):
@@ -34,9 +24,19 @@ class DirectoryException(Exception):
         super(DirectoryException, self).__init__(msg)
 
 
+class FileAlreadyExistsException(Exception):
+    def __init__(self, msg):
+        super(FileAlreadyExistsException, self).__init__(msg)
+
+
 class FileException(Exception):
     def __init__(self, msg):
         super(FileException, self).__init__(msg)
+
+
+class FileNotFoundException(Exception):
+    def __init__(self, msg):
+        super(FileNotFoundException, self).__init__(msg)
 
 
 class InvalidInputException(Exception):
@@ -47,3 +47,8 @@ class InvalidInputException(Exception):
 class OutOfNNException(Exception):
     def __init__(self, msg):
         super(OutOfNNException, self).__init__(msg)
+
+
+class RequestError(Exception):
+    def __init__(self, msg):
+        super(RequestError, self).__init__(msg)
