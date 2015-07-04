@@ -1,3 +1,9 @@
+snakebite (2.5.5) unstable; urgency=low
+
+   * Added tail length to the client.tail method
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 4 Jul 2015 11:10:25 -0000
+
 snakebite (2.5.4) unstable; urgency=low
 
    * Handles broken pipe errors in snakebite commands #150
