@@ -41,7 +41,6 @@ May 2012
 # Standard library imports
 import socket
 import os
-import pwd
 import math
 
 # Third party imports
@@ -53,6 +52,7 @@ from snakebite.protobuf.IpcConnectionContext_pb2 import IpcConnectionContextProt
 from snakebite.protobuf.ProtobufRpcEngine_pb2 import RequestHeaderProto
 from snakebite.protobuf.datatransfer_pb2 import OpReadBlockProto, BlockOpResponseProto, PacketHeaderProto, ClientReadStatusProto
 
+from snakebite.platformutils import get_current_username
 from snakebite.formatter import format_bytes
 from snakebite.errors import RequestError
 from snakebite.crc32c import crc
@@ -181,7 +181,7 @@ class SocketRpcChannel(RpcChannel):
             kerberos = Kerberos()
             self.effective_user = effective_user or kerberos.user_principal().name
         else: 
-            self.effective_user = effective_user or pwd.getpwuid(os.getuid())[0]
+            self.effective_user = effective_user or get_current_username()
 
     def validate_request(self, request):
         '''Validate the client request against the protocol file.'''

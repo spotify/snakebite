@@ -15,6 +15,7 @@
 
 import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 import snakebite.glob as glob
+from snakebite.platformutils import get_current_username
 from snakebite.channel import DataXceiverChannel
 from snakebite.config import HDFSConfig
 from snakebite.errors import (
@@ -36,7 +37,6 @@ import bz2
 import logging
 import os
 import os.path
-import pwd
 import fnmatch
 import inspect
 import socket
@@ -1176,7 +1176,7 @@ class Client(object):
         '''
 
         if not paths:
-            paths = [os.path.join("/user", pwd.getpwuid(os.getuid())[0])]
+            paths = [os.path.join("/user", get_current_username())]
 
         # Expand paths if necessary (/foo/{bar,baz} --> ['/foo/bar', '/foo/baz'])
         paths = glob.expand_paths(paths)
@@ -1326,10 +1326,10 @@ class Client(object):
         return self.service.getFileInfo(request)
 
     def _join_user_path(self, path):
-        return os.path.join("/user", pwd.getpwuid(os.getuid())[0], path)
+        return os.path.join("/user", get_current_username(), path)
 
     def _remove_user_path(self, path):
-        dir_to_remove = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
+        dir_to_remove = os.path.join("/user", get_current_username())
         return path.replace(dir_to_remove+'/', "", 1)
 
     def _normalize_path(self, path):

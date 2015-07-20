@@ -14,9 +14,9 @@
 # the License.
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
+from snakebite.platformutils import get_current_username
 from minicluster_testbase import MiniClusterTestBase
 
-import pwd
 import os
 import re
 
@@ -59,7 +59,7 @@ class DeleteWithTrashTest(MiniClusterTestBase):
     def setUp(self):
         super(DeleteWithTrashTest, self).setUp()
         self.client.use_trash = True
-        self.username = pwd.getpwuid(os.getuid())[0]
+        self.username = get_current_username()
         self.trash_location = "/user/%s/.Trash/Current" % self.username
 
     def assertNotExists(self, location_under_test):
