@@ -180,6 +180,7 @@ class CommandLineParser(object):
         self._build_parent_parser()
         self._add_subparsers()
         self.namenodes = []
+        self.user = None
         self.use_sasl = False
 
     def _build_parent_parser(self):
@@ -346,6 +347,8 @@ class CommandLineParser(object):
                 if self.__usetrash_unset():
                     # commandline setting has higher priority
                     self.args.usetrash = configs.get("use_trash", self.configs['use_trash'])
+
+                self.user = configs.get("user")
             else:
                 # config is a single namenode - no HA
                 self.namenodes.append(Namenode(configs['namenode'],
@@ -440,7 +443,7 @@ class CommandLineParser(object):
             use_trash = self.args.usetrash and not self.args.skiptrash
         else:
             use_trash = self.args.usetrash
-        self.client = HAClient(self.namenodes, use_trash, None, self.use_sasl, self.configs['hdfs_namenode_principal'])
+        self.client = HAClient(self.namenodes, use_trash, self.user, self.use_sasl, self.configs['hdfs_namenode_principal'])
 
     def execute(self):
         if self.args.help:

@@ -995,6 +995,30 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.assert_namenodes_spec("foobar5", 54310, Namenode.DEFAULT_VERSION)
 
 
+    valid_user_rc_v2 = {
+        "config_version": 2,
+        "use_trash": True,
+        "user": "hdfs_user",
+        "namenodes": [
+            {"host": "foobar4", "version": 100},
+            {"host": "foobar5", "port": 54310}
+        ]
+    }
+
+    @patch("os.path.exists")
+    def test_read_config_snakebiterc_user_valid_v2(self, exists_mock):
+        m = mock_open(read_data=json.dumps(self.valid_user_rc_v2))
+
+        with patch("snakebite.commandlineparser.open", m, create=True):
+            self.parser.args = MockParseArgs()
+            self.parser.read_config()
+            self.parser.setup_client()
+            self.assertTrue(self.parser.args.usetrash)
+            self.assertEquals(self.parser.client.effective_user, "hdfs_user")
+            self.assert_namenodes_spec("foobar4", Namenode.DEFAULT_PORT, 100)
+            self.assert_namenodes_spec("foobar5", 54310, Namenode.DEFAULT_VERSION)
+
+
     def test_cl_default_port(self):
         self.parser.args = MockParseArgs(dir=["hdfs://foobar/user/rav"],
                                          single_arg="hdfs://foobar/user/rav",
