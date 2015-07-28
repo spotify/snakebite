@@ -17,7 +17,6 @@ import argparse
 import errno
 import sys
 import os
-import pwd
 import json
 from urlparse import urlparse
 
@@ -35,6 +34,7 @@ from snakebite.formatter import format_du
 from snakebite.config import HDFSConfig
 from snakebite.version import version
 from snakebite.namenode import Namenode
+from snakebite.platformutils import get_current_username
 
 
 def print_error_exit(msg, fd=sys.stderr):
@@ -194,7 +194,7 @@ class CommandLineParser(object):
                     self.parser.add_argument(opt_data['short'], opt_data['long'], help=opt_data['help'], type=opt_data['type'])
 
     def _add_subparsers(self):
-        default_dir = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
+        default_dir = os.path.join("/user", get_current_username())
 
         #sub-options
         arg_parsers = {}

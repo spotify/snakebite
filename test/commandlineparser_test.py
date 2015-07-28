@@ -14,7 +14,6 @@
 # the License.
 import unittest2
 import os
-import pwd
 import json
 import sys
 import traceback
@@ -24,6 +23,7 @@ from mock import MagicMock, patch, mock_open
 from snakebite.config import HDFSConfig
 from snakebite.commandlineparser import Commands, CommandLineParser
 from snakebite.namenode import Namenode
+from snakebite.platformutils import get_current_username
 
 from config_test import ConfigTest
 
@@ -31,7 +31,7 @@ class CommandLineParserTest(unittest2.TestCase):
 
     def setUp(self):
         self.parser = CommandLineParser()
-        self.default_dir = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
+        self.default_dir = os.path.join("/user", get_current_username())
 
     def test_general_options(self):
         parser = self.parser
@@ -660,7 +660,7 @@ class MockParseArgs(object):
 class CommandLineParserInternalConfigTest(unittest2.TestCase):
     def setUp(self):
         self.parser = CommandLineParser()
-        self.default_dir = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
+        self.default_dir = os.path.join("/user", get_current_username())
 
 
     def assert_namenode_spec(self, host, port, version=None):
