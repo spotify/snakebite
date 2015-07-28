@@ -1,3 +1,9 @@
+snakebite (2.6.1) unstable; urgency=low
+
+   * Wraps use of the Python 'pwd' module in a utility procedure for Windows compatibility
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 28 Jul 2015 13:12:25 -0000
+
 snakebite (2.6.0) unstable; urgency=low
 
    * Add SASL authentication
