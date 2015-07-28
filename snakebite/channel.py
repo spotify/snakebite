@@ -60,6 +60,10 @@ from snakebite.crc32c import crc
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
+# SASL
+from snakebite.rpc_sasl import SaslRpcClient
+from snakebite.kerberos import Kerberos
+
 # Module imports
 
 import logger
@@ -156,13 +160,14 @@ class SocketRpcChannel(RpcChannel):
     RPC_HEADER = "hrpc"
     RPC_SERVICE_CLASS = 0x00
     AUTH_PROTOCOL_NONE = 0x00
+    AUTH_PROTOCOL_SASL = 0xDF
     RPC_PROTOCOL_BUFFFER = 0x02
 
 
     '''Socket implementation of an RpcChannel.
     '''
 
-    def __init__(self, host, port, version, effective_user=None):
+    def __init__(self, host, port, version, effective_user=None, use_sasl=False):
         '''SocketRpcChannel to connect to a socket server on a user defined port.
            It possible to define version and effective user for the communication.'''
         self.host = host
@@ -171,7 +176,12 @@ class SocketRpcChannel(RpcChannel):
         self.call_id = -3  # First time (when the connection context is sent, the call_id should be -3, otherwise start with 0 and increment)
         self.version = version
         self.client_id = str(uuid.uuid4())
-        self.effective_user = effective_user or pwd.getpwuid(os.getuid())[0]
+        self.use_sasl = use_sasl
+        if self.use_sasl:
+            kerberos = Kerberos()
+            self.effective_user = effective_user or kerberos.user_principal().name
+        else: 
+            self.effective_user = effective_user or pwd.getpwuid(os.getuid())[0]
 
     def validate_request(self, request):
         '''Validate the client request against the protocol file.'''
@@ -214,7 +224,16 @@ class SocketRpcChannel(RpcChannel):
         self.write(self.RPC_HEADER)                             # header
         self.write(struct.pack('B', self.version))              # version
         self.write(struct.pack('B', self.RPC_SERVICE_CLASS))    # RPC service class
-        self.write(struct.pack('B', self.AUTH_PROTOCOL_NONE))   # serialization type (protobuf = 0)
+        if self.use_sasl:
+            self.write(struct.pack('B', self.AUTH_PROTOCOL_SASL))   # serialization type (protobuf = 0xDF)
+        else:
+            self.write(struct.pack('B', self.AUTH_PROTOCOL_NONE))   # serialization type (protobuf = 0)
+
+        if self.use_sasl:
+            sasl = SaslRpcClient(self)
+            sasl_connected = sasl.connect()
+            if not sasl_connected:
+                raise Exception("SASL is configured, but cannot get connected")
 
         rpc_header = self.create_rpc_request_header()
         context = self.create_connection_context()

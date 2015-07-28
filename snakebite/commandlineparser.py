@@ -180,6 +180,7 @@ class CommandLineParser(object):
         self._build_parent_parser()
         self._add_subparsers()
         self.namenodes = []
+        self.use_sasl = False
 
     def _build_parent_parser(self):
         #general options
@@ -289,6 +290,7 @@ class CommandLineParser(object):
                     self.namenodes.append(nn)
                 if self.__usetrash_unset():
                     self.args.usetrash = HDFSConfig.use_trash
+                self.use_sasl = HDFSConfig.use_sasl
 
         if len(self.namenodes):
             return
@@ -439,7 +441,7 @@ class CommandLineParser(object):
             use_trash = self.args.usetrash and not self.args.skiptrash
         else:
             use_trash = self.args.usetrash
-        self.client = HAClient(self.namenodes, use_trash)
+        self.client = HAClient(self.namenodes, use_trash, None, self.use_sasl)
 
     def execute(self):
         if self.args.help:
