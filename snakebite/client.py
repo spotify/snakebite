@@ -15,13 +15,16 @@
 
 import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
 import snakebite.glob as glob
+from snakebite.config import HDFSConfig
 from snakebite.errors import RequestError
 from snakebite.service import RpcService
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import DirectoryException
 from snakebite.errors import FileException
 from snakebite.errors import InvalidInputException
+from snakebite.errors import OutOfNNException
 from snakebite.channel import DataXceiverChannel
+from snakebite.namenode import Namenode
 
 import Queue
 import zlib
@@ -31,6 +34,9 @@ import os
 import os.path
 import pwd
 import fnmatch
+import inspect
+import socket
+import errno
 
 log = logging.getLogger(__name__)
 
@@ -1152,3 +1158,132 @@ class Client(object):
     def _remove_user_path(self, path):
         dir_to_remove = os.path.join("/user", pwd.getpwuid(os.getuid())[0])
         return path.replace(dir_to_remove+'/', "", 1)
+
+class HAClient(Client):
+    ''' Snakebite client with support for High Availability
+    HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.
+    **Example:**
+    >>> from snakebite.client import HAClient
+    >>> from snakebite.namenode import Namenode
+    >>> n1 = Namenode("namenode1.mydomain", 8020)
+    >>> n2 = Namenode("namenode2.mydomain", 8020)
+    >>> client = HAClient([n1, n2])
+    >>> for x in client.ls(['/']):
+    ...     print x
+    .. note::
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
+        in the ``version`` parameter to the Namenode class constructor.
+    '''
+
+    @classmethod
+    def _wrap_methods(cls):
+        # Add HA support to all public Client methods, but only do this when we haven't done this before
+        for name, meth in inspect.getmembers(cls, inspect.ismethod):
+            if not name.startswith("_"): # Only public methods
+                if inspect.isgeneratorfunction(meth):
+                    setattr(cls, name, cls._ha_gen_method(meth))
+                else:
+                    setattr(cls, name, cls._ha_return_method(meth))
+
+    def __init__(self, namenodes):
+        '''
+        :param namenodes: Set of namenodes for HA setup
+        :type namenodes: list
+        '''
+
+        if not namenodes:
+            raise OutOfNNException("List of namenodes is empty - couldn't create the client")
+        self.namenode = self._switch_namenode(namenodes)
+        self.namenode.next()
+
+    def _switch_namenode(self, namenodes):
+        for namenode in namenodes:
+            log.debug("Switch to namenode: %s:%d" % (namenode.host, namenode.port))
+
+            yield super(HAClient, self).__init__(namenode.host,
+                                                 namenode.port,
+                                                 namenode.version)
+        else:
+            msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
+            for namenode in namenodes:
+                msg += "\n\t* %s:%d" % (namenode.host, namenode.port)
+            msg += "\nLook into debug messages - add -D flag!"
+            raise OutOfNNException(msg)
+
+    def __handle_request_error(self, exception):
+        log.debug("Request failed with %s" % exception)
+        if exception.args[0].startswith("Operation category READ is not supported in state standby"):
+            pass
+        else:
+            # There's a valid NN in active state, but there's still request error - raise
+            raise
+        self.namenode.next()
+
+    def __handle_socket_error(self, exception):
+        log.debug("Request failed with %s" % exception)
+        if exception.errno in (errno.ECONNREFUSED, errno.EHOSTUNREACH):
+            # if NN is down or machine is not available, pass it:
+            pass
+        elif isinstance(exception, socket.timeout):
+            # if there's communication/socket timeout, pass it:
+            pass
+        else:
+            raise
+        self.namenode.next()
+
+    @staticmethod
+    def _ha_return_method(func):
+        ''' Method decorator for 'return type' methods '''
+        def wrapped(self, *args, **kw):
+            while(True): # switch between all namenodes
+                try:
+                    return func(self, *args, **kw)
+                except RequestError as e:
+                    self.__handle_request_error(e)
+                except socket.error as e:
+                    self.__handle_socket_error(e)
+        return wrapped
+
+    @staticmethod
+    def _ha_gen_method(func):
+        ''' Method decorator for 'generator type' methods '''
+        def wrapped(self, *args, **kw):
+            while(True): # switch between all namenodes
+                try:
+                    results = func(self, *args, **kw)
+                    while(True): # yield all results
+                        yield results.next()
+                except RequestError as e:
+                    self.__handle_request_error(e)
+                except socket.error as e:
+                    self.__handle_socket_error(e)
+        return wrapped
+
+HAClient._wrap_methods()
+
+class AutoConfigClient(HAClient):
+    ''' A pure python HDFS client that support HA and is auto configured through the ``HADOOP_HOME`` environment variable.
+    HAClient is fully backwards compatible with the vanilla Client and can be used for a non HA cluster as well.
+    This client tries to read ``${HADOOP_HOME}/conf/hdfs-site.xml`` and ``${HADOOP_HOME}/conf/core-site.xml``
+    to get the address of the namenode.
+    The behaviour is the same as Client.
+    **Example:**
+    >>> from snakebite.client import AutoConfigClient
+    >>> client = AutoConfigClient()
+    >>> for x in client.ls(['/']):
+    ...     print x
+    .. note::
+        Different Hadoop distributions use different protocol versions. Snakebite defaults to 9, but this can be set by passing
+        in the ``hadoop_version`` parameter to the constructor.
+    '''
+    def __init__(self, hadoop_version=Namenode.DEFAULT_VERSION):
+        '''
+        :param hadoop_version: What hadoop protocol version should be used (default: 9)
+        :type hadoop_version: int
+        '''
+
+        configs = HDFSConfig.get_external_config()
+        nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
+        if not nns:
+            raise OutOfNNException("Tried and failed to find namenodes - couldn't created the client!")
+        super(AutoConfigClient, self).__init__(nns)
