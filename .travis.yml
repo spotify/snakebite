@@ -1,6 +1,7 @@
 language: python
 python: 2.7
 jdk: oraclejdk7
+sudo: false
 branches:
   except:
     - gh-pages
