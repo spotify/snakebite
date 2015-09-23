@@ -1,3 +1,9 @@
+snakebite (2.7.0) unstable; urgency=low
+
+   * Make kerberos/sasl optional in python packaging
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 24 Sep 2015 13:12:25 -0000
+
 snakebite (2.6.1) unstable; urgency=low
 
    * Wraps use of the Python 'pwd' module in a utility procedure for Windows compatibility

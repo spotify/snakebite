@@ -60,10 +60,6 @@ from snakebite.crc32c import crc
 import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
-# SASL
-from snakebite.rpc_sasl import SaslRpcClient
-from snakebite.kerberos import Kerberos
-
 # Module imports
 
 import logger
@@ -178,6 +174,13 @@ class SocketRpcChannel(RpcChannel):
         self.client_id = str(uuid.uuid4())
         self.use_sasl = use_sasl
         if self.use_sasl:
+            try:
+                # Only import if SASL is enabled
+                from snakebite.rpc_sasl import SaslRpcClient
+                from snakebite.kerberos import Kerberos
+            except ImportError:
+                raise Exception("Kerberos libs not found. Please install snakebite using 'pip install snakebite[kerberos]'")
+
             kerberos = Kerberos()
             self.effective_user = effective_user or kerberos.user_principal().name
         else: 
