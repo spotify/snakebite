@@ -1017,13 +1017,13 @@ class Client(object):
 
         :param force_reload: Should the server defaults be reloaded even if they already exist?
         :type force_reload: bool
-        :returns: dictionary with the following keys: blockSize, bytesPerChecksum, writePacketSize, replication,
-        fileBufferSize, encryptDataTransfer, trashInterval, checksumType
+        :returns: dictionary with the following keys: blockSize, bytesPerChecksum, writePacketSize, replication, fileBufferSize, encryptDataTransfer, trashInterval, checksumType
 
         **Example:**
 
         >>> client.serverdefaults()
         [{'writePacketSize': 65536, 'fileBufferSize': 4096, 'replication': 1, 'bytesPerChecksum': 512, 'trashInterval': 0L, 'blockSize': 134217728L, 'encryptDataTransfer': False, 'checksumType': 2}]
+
         '''
 
         if not self._server_defaults or force_reload:

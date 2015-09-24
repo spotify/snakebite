@@ -1,7 +1,7 @@
 ***********
 Minicluster
 ***********
-.. automodule:: minicluster
+.. automodule:: snakebite.minicluster
 
 .. autoclass:: MiniCluster
     :members:

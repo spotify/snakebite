@@ -12,7 +12,7 @@ performance overhead - but it's not a problem (yet).
 Snakebite by default uses `nose <https://nose.readthedocs.org/en/latest/>`_
 and `tox <https://tox.readthedocs.org/en/latest/>`_ for testing. Tests
 are integrated with `setup.py`, so to start tests one can simply:
-  ``$ python setup.py test``
+``$ python setup.py test``
 
 Because we require minicluster to fully test snakebite,
 java needs to be present on the system.
@@ -39,7 +39,7 @@ We bootstrap environment with ``pip install -r requirements-dev.txt`` (deps sect
 And then we setup environment via ``/scripts/ci/setup_env.sh`` script.
 ``setup_env.sh`` script downloads hadoop distribution tar, and extracts it.
 Help for ``setup_env.sh``::
-  Setup environment for snakebite tests
+Setup environment for snakebite tests
 
   options:
           -h, --help            show brief help
@@ -80,12 +80,12 @@ fresh and isolated test environments using Docker.
 Currently we use base testing image ``ravwojdyla/snakebite_test:base``,
 it was created using ``/scripts/build-base-test-docker.sh`` and
 ``/scripts/Dockerfile``. Base test image is a Ubuntu Trusty with:
- * oracle java 7
- * python 2.6
- * python 2.7
- * pip
- * CDH distribution
- * HDP distribution
+* oracle java 7
+* python 2.6
+* python 2.7
+* pip
+* CDH distribution
+* HDP distribution
 
 Base docker image doesn't change, to create new test image with
 current working tree, based on ``ravwojdyla/snakebite_test:base``:
@@ -95,10 +95,10 @@ current working tree, based on ``ravwojdyla/snakebite_test:base``:
 Fig will create new image based on ``ravwojdyla/snakebite_test:base``,
 with current working tree, that can be used for tests.
 Fig currently specifies 4 tests:
- * ``testPy26cdh``: python 2.6 + CDH
- * ``testPy26hdp``: python 2.6 + HDP
- * ``testPy27cdh``: python 2.7 + CDH
- * ``testPy27hdp``: python 2.7 + HDP
+* ``testPy26cdh``: python 2.6 + CDH
+* ``testPy26hdp``: python 2.6 + HDP
+* ``testPy27cdh``: python 2.7 + CDH
+* ``testPy27hdp``: python 2.7 + HDP
 
 To run specific test (eg. testPy26cdh):
 

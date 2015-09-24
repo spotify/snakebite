@@ -1,7 +1,7 @@
 **************
 Client library
 **************
-.. automodule:: client
+.. automodule:: snakebite.client
 
 .. autoclass:: Client
     :members:
