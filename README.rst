@@ -31,6 +31,14 @@ To install snakebite 2.x run:
 
   pip install snakebite
 
+
+
+To install snakebite 2.x with Kerberos/SASL support, make sure you can install python-krbV (https://fedorahosted.org/python-krbV/) and then run:
+
+  pip install "snakebite[kerberos]"
+
+
+
 Documentation
 *************
 More information and documentation can be found at http://spotify.github.io/snakebite/
