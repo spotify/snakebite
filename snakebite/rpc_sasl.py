@@ -32,8 +32,11 @@ Bolke de Bruin (bolke@xs4all.nl)
 
 import struct
 import sasl
+import re
 
 from snakebite.protobuf.RpcHeader_pb2 import RpcRequestHeaderProto, RpcResponseHeaderProto, RpcSaslProto
+from snakebite.config import HDFSConfig
+
 import google.protobuf.internal.encoder as encoder
 
 import logger
@@ -77,12 +80,15 @@ class SaslRpcClient:
         return sasl_response
 
     def connect(self):
+        # use service name component from principal
+        service = re.split('[\/@]', str(HDFSConfig.hdfs_namenode_principal))[0]
+
         negotiate = RpcSaslProto()
         negotiate.state = 1
         self._send_sasl_message(negotiate)
 
         self.sasl = sasl.Client()
-        self.sasl.setAttr("service", "hdfs")
+        self.sasl.setAttr("service", service)
         self.sasl.setAttr("host", self._trans.host)
         self.sasl.init()
 
