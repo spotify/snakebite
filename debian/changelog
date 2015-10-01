@@ -1,3 +1,9 @@
+snakebite (2.7.1) unstable; urgency=low
+
+   * Fix ISSUE-#167 by getting the kerberos principal from the hdfs config
+
+ -- Wouter de Bie <wouter@spotify.com>  Tue, 1 Oct 2015 13:12:25 -0000
+
 snakebite (2.7.0) unstable; urgency=low
 
    * Make kerberos/sasl optional in python packaging
