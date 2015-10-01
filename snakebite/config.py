@@ -12,6 +12,8 @@ class HDFSConfig(object):
     use_trash = False
     use_sasl = False
 
+    hdfs_namenode_principal = None
+
     @classmethod
     def get_config_from_env(cls):
         """
@@ -86,6 +88,10 @@ class HDFSConfig(object):
 
             if property.findall('name')[0].text == 'fs.trash.interval':
                 cls.use_trash = True
+
+            if property.findall('name')[0].text == 'dfs.namenode.kerberos.principal':
+                log.debug("hdfs principal found: '%s'" % (property.findall('value')[0].text))
+                cls.hdfs_namenode_principal = property.findall('value')[0].text
 
         return configs
 

@@ -32,8 +32,11 @@ Bolke de Bruin (bolke@xs4all.nl)
 
 import struct
 import sasl
+import re
 
 from snakebite.protobuf.RpcHeader_pb2 import RpcRequestHeaderProto, RpcResponseHeaderProto, RpcSaslProto
+from snakebite.config import HDFSConfig
+
 import google.protobuf.internal.encoder as encoder
 
 import logger
@@ -61,8 +64,8 @@ class SaslRpcClient:
 
         s_rpcheader = rpcheader.SerializeToString()
         s_message = message.SerializeToString()
-        
-        header_length = len(s_rpcheader) + encoder._VarintSize(len(s_rpcheader)) + len(s_message) + encoder._VarintSize(len(s_message)) 
+
+        header_length = len(s_rpcheader) + encoder._VarintSize(len(s_rpcheader)) + len(s_message) + encoder._VarintSize(len(s_message))
 
         self._trans.write(struct.pack('!I', header_length))
         self._trans.write_delimited(s_rpcheader)
@@ -77,12 +80,15 @@ class SaslRpcClient:
         return sasl_response
 
     def connect(self):
+        # use service name component from principal
+        service = re.split('[\/@]', str(HDFSConfig.hdfs_namenode_principal))[0]
+
         negotiate = RpcSaslProto()
         negotiate.state = 1
         self._send_sasl_message(negotiate)
 
         self.sasl = sasl.Client()
-        self.sasl.setAttr("service", "hdfs")
+        self.sasl.setAttr("service", service)
         self.sasl.setAttr("host", self._trans.host)
         self.sasl.init()
 
@@ -132,4 +138,35 @@ class SaslRpcClient:
           raise Exception("Bad SASL results: %s" % (self.sasl.getError()))
 
         return response 
+
+    def wrap(self, message):
+        ret, encoded = self.sasl.encode(message)
+        if not ret:
+            raise Exception("Cannot encode message: %s" % (self.sasl.getError()))
+
+        sasl_message = RpcSaslProto()
+        sasl_message.state = 5 #  WRAP
+        sasl_message.token = encoded
+
+        self._send_sasl_message(sasl_message)
+
+    def unwrap(self):
+        response = self._recv_sasl_message()
+        if response.state != 5:
+            raise Exception("Server send non-wrapped response")
+
+        ret, decoded = self.sasl.decode(response.token)
+        if not ret:
+            raise Exception("Cannot decode message: %s" % (self.sasl.getError()))
+
+        return response
+
+    def use_wrap(self):
+        # SASL wrapping is only used if the connection has a QOP, and
+        # the value is not auth.  ex. auth-int & auth-priv
+        ret, use_wrap = self.sasl.getSSF()
+        if not ret:
+            raise Exception("Cannot get negotiated security: %s" % (self.sasl.getError()))
+
+        return use_wrap
 
