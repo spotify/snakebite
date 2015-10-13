@@ -67,6 +67,14 @@ import logging
 import struct
 import uuid
 
+_kerberos_available = False
+try:
+    from snakebite.rpc_sasl import SaslRpcClient
+    from snakebite.kerberos import Kerberos
+    _kerberos_available = True
+except ImportError:
+    pass
+
 # Configure package logging
 log = logger.getLogger(__name__)
 
@@ -174,11 +182,7 @@ class SocketRpcChannel(RpcChannel):
         self.client_id = str(uuid.uuid4())
         self.use_sasl = use_sasl
         if self.use_sasl:
-            try:
-                # Only import if SASL is enabled
-                from snakebite.rpc_sasl import SaslRpcClient
-                from snakebite.kerberos import Kerberos
-            except ImportError:
+            if not _kerberos_available:
                 raise Exception("Kerberos libs not found. Please install snakebite using 'pip install snakebite[kerberos]'")
 
             kerberos = Kerberos()
