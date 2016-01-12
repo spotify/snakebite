@@ -105,6 +105,8 @@ class SaslRpcClient:
             s_mechs = str(",".join(mechs))
             ret, chosen_mech, initial_response = self.sasl.start(s_mechs)
             log.debug("Chosen mech: %s" % chosen_mech)
+            if not ret:
+                raise Exception("Sasl failed to start: %s" % self.sasl.getError())
 
             initiate = RpcSaslProto()
             initiate.state = 2
