@@ -27,7 +27,7 @@ from snakebite.errors import (
     InvalidInputException,
     OutOfNNException,
     RequestError,
-    )
+    FatalException, TransientException)
 from snakebite.namenode import Namenode
 from snakebite.service import RpcService
 
@@ -101,7 +101,7 @@ class Client(object):
         :type use_sasl: boolean
         '''
         if hadoop_version < 9:
-            raise Exception("Only protocol versions >= 9 supported")
+            raise FatalException("Only protocol versions >= 9 supported")
 
         self.host = host
         self.port = port
@@ -530,7 +530,7 @@ class Client(object):
                 if result['result']:
                     result['message'] = ". Moved %s to %s" % (path, trash_path)
                     return result
-            raise Exception("Failed to move to trash: %s" % path)
+            raise FatalException("Failed to move to trash: %s" % path)
         else:
             request = client_proto.DeleteRequestProto()
             request.src = path
@@ -544,7 +544,7 @@ class Client(object):
         if path.startswith(self.trash):
             return False  # Path already in trash
         if posixpath.dirname(self.trash).startswith(path):
-            raise Exception("Cannot move %s to the trash, as it contains the trash" % path)
+            raise FatalException("Cannot move %s to the trash, as it contains the trash" % path)
 
         return True
 
@@ -795,7 +795,7 @@ class Client(object):
                     elif not load['error'] is '':
                         if os.path.isfile(temporary_target):
                             os.remove(temporary_target)
-                        raise Exception(load['error'])
+                        raise FatalException(load['error'])
                 if newline and load['response']:
                     f.write("\n")
             yield {"path": dst, "response": '', "result": True, "error": load['error'], "source_path": path}
@@ -1142,7 +1142,7 @@ class Client(object):
                             successful_read = True
                             yield load
                     except Exception as e:
-                        log.error(e)
+                        log.getChild('transient').error(e)
                         if not location.id.storageID in failed_nodes:
                             failed_nodes.append(location.id.storageID)
                         successful_read = False
@@ -1154,7 +1154,7 @@ class Client(object):
                 if successful_read:
                     break
             if successful_read is False:
-                raise Exception("Failure to read block %s" % block.b.blockId)
+                raise TransientException("Failure to read block %s" % block.b.blockId)
 
     def _find_items(self, paths, processor, include_toplevel=False, include_children=False, recurse=False, check_nonexistence=False):
         ''' Request file info from the NameNode and call the processor on the node(s) returned
@@ -1380,7 +1380,9 @@ class HAClient(Client):
         self.use_sasl = use_sasl
 
         if not namenodes:
-            raise OutOfNNException("List of namenodes is empty - couldn't create the client")
+            # Using InvalidInputException instead of OutOfNNException because the later is transient but current case
+            # is not.
+            raise InvalidInputException("List of namenodes is empty - couldn't create the client")
         self.namenode = self._switch_namenode(namenodes)
         self.namenode.next()
 
