@@ -1,8 +1,9 @@
-snakebite (2.7.1) unstable; urgency=low
+snakebite (2.7.3) unstable; urgency=low
 
-   * Fix ISSUE-#174 Do conditional import higher up to make sure import stays in scope
+   * Add support for null checksum type. Fixes #87
+   * Start using posixpath where appropriate.
 
- -- Wouter de Bie <wouter@spotify.com>  Tue, 13 Oct 2015 13:12:25 -0000
+ -- Wouter de Bie <wouter@spotify.com>  Mon, 23 Jan 2016 13:12:25 -0000
 
 snakebite (2.7.1) unstable; urgency=low
 
