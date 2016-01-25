@@ -37,6 +37,7 @@ import bz2
 import logging
 import os
 import os.path
+import posixpath
 import fnmatch
 import inspect
 import socket
@@ -507,11 +508,11 @@ class Client(object):
             else:
                 suffix_path = path[1:]
 
-            trash_path = os.path.join(self.trash, "Current", suffix_path)
+            trash_path = posixpath.join(self.trash, "Current", suffix_path)
             if trash_path.endswith("/"):
                 trash_path = trash_path[:-1]
 
-            base_trash_path = os.path.join(self.trash, "Current", os.path.dirname(suffix_path))
+            base_trash_path = posixpath.join(self.trash, "Current", posixpath.dirname(suffix_path))
             if base_trash_path.endswith("/"):
                 base_trash_path = base_trash_path[:-1]
 
@@ -542,7 +543,7 @@ class Client(object):
             return False
         if path.startswith(self.trash):
             return False  # Path already in trash
-        if os.path.dirname(self.trash).startswith(path):
+        if posixpath.dirname(self.trash).startswith(path):
             raise Exception("Cannot move %s to the trash, as it contains the trash" % path)
 
         return True
@@ -620,7 +621,7 @@ class Client(object):
             response = self._create_file(path, replication, blocksize, overwrite=True)
         else:
             # Check if the parent directory exists
-            parent = self._get_file_info(os.path.dirname(path))
+            parent = self._get_file_info(posixpath.dirname(path))
             if not parent:
                 raise DirectoryException("touchz: `%s': No such file or directory" % path)
             else:
@@ -724,7 +725,7 @@ class Client(object):
         if not self.base_source:
             # base_source is shared for whole dir tree, and can
             # be computed only once per dir tree
-            self.base_source = os.path.dirname(path)
+            self.base_source = posixpath.dirname(path)
             self.base_source = self.base_source if self.base_source.endswith("/") else self.base_source + "/"
 
         # If input destination is an existing directory, include toplevel
@@ -1049,7 +1050,7 @@ class Client(object):
 
     def _get_full_path(self, path, node):
         if node.path:
-            return os.path.join(path, node.path)
+            return posixpath.join(path, node.path)
         else:
             return path
 
@@ -1176,7 +1177,7 @@ class Client(object):
         '''
 
         if not paths:
-            paths = [os.path.join("/user", get_current_username())]
+            paths = [posixpath.join("/user", get_current_username())]
 
         # Expand paths if necessary (/foo/{bar,baz} --> ['/foo/bar', '/foo/baz'])
         paths = glob.expand_paths(paths)
@@ -1221,7 +1222,7 @@ class Client(object):
                         # Recurse into directories
                         if recurse and self._is_dir(node):
                             # Construct the full path before processing
-                            full_path = os.path.join(path, node.path)
+                            full_path = posixpath.join(path, node.path)
                             for item in self._find_items([full_path],
                                                          processor,
                                                          include_toplevel=False,
@@ -1291,7 +1292,7 @@ class Client(object):
                             yield item
                     elif rest:
                         # we have more rest, but it's not magic, which is either a file or a directory
-                        final_path = os.path.join(full_path, rest)
+                        final_path = posixpath.join(full_path, rest)
                         fi = self._get_file_info(final_path)
                         if fi and self._is_dir(fi.fs):
                             for n in self._get_dir_listing(final_path):
@@ -1326,14 +1327,14 @@ class Client(object):
         return self.service.getFileInfo(request)
 
     def _join_user_path(self, path):
-        return os.path.join("/user", get_current_username(), path)
+        return posixpath.join("/user", get_current_username(), path)
 
     def _remove_user_path(self, path):
-        dir_to_remove = os.path.join("/user", get_current_username())
+        dir_to_remove = posixpath.join("/user", get_current_username())
         return path.replace(dir_to_remove+'/', "", 1)
 
     def _normalize_path(self, path):
-        return os.path.normpath(re.sub('/+', '/', path))
+        return posixpath.normpath(re.sub('/+', '/', path))
 
 class HAClient(Client):
     ''' Snakebite client with support for High Availability
