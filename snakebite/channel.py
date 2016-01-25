@@ -574,7 +574,9 @@ class DataXceiverChannel(object):
         checksum_type = block_op_response.readOpChecksumInfo.checksum.type
         bytes_per_chunk = block_op_response.readOpChecksumInfo.checksum.bytesPerChecksum
         log.debug("Checksum type: %s, bytesPerChecksum: %s" % (checksum_type, bytes_per_chunk))
-        if checksum_type in [self.CHECKSUM_CRC32C, self.CHECKSUM_CRC32]:
+        if checksum_type in [self.CHECKSUM_NULL]:
+            checksum_len = 0
+        elif checksum_type in [self.CHECKSUM_CRC32C, self.CHECKSUM_CRC32]:
             checksum_len = 4
         else:
             raise Exception("Checksum type %s not implemented" % checksum_type)
@@ -606,7 +608,7 @@ class DataXceiverChannel(object):
                 byte_stream.reset()
 
                 # Collect checksums
-                if check_crc:
+                if check_crc and checksum_type != self.CHECKSUM_NULL:
                     checksums = []
                     for _ in xrange(0, chunks_per_packet):
                         checksum = self._read_bytes(checksum_len)
@@ -627,7 +629,7 @@ class DataXceiverChannel(object):
                         log.debug("Reading chunk %s in load %s:", j, i)
                         bytes_to_read = min(bytes_per_chunk, data_len - read_on_packet)
                         chunk = self._read_bytes(bytes_to_read)
-                        if check_crc:
+                        if check_crc and checksum_type != self.CHECKSUM_NULL:
                             checksum_index = i * chunks_per_load + j
                             if checksum_index < len(checksums) and crc(chunk) != checksums[checksum_index]:
                                 raise Exception("Checksum doesn't match")
