@@ -98,6 +98,21 @@ class HDFSConfig(object):
                 log.debug("hdfs principal found: '%s'" % (property.findall('value')[0].text))
                 configs['hdfs_namenode_principal'] = property.findall('value')[0].text
 
+            if property.findall('name')[0].text == 'dfs.client.retry.max.attempts':
+                configs['client_retries'] = int(property.findall('value')[0].text)
+
+            if property.findall('name')[0].text == 'dfs.client.socket-timeout':
+                configs['socket_timeout_millis'] = int(property.findall('value')[0].text)
+
+            if property.findall('name')[0].text == 'dfs.client.failover.sleep.base.millis':
+                configs['client_sleep_base_millis'] = int(property.findall('value')[0].text)
+
+            if property.findall('name')[0].text == 'dfs.client.failover.sleep.max.millis':
+                configs['client_sleep_max_millis'] = int(property.findall('value')[0].text)
+
+            if property.findall('name')[0].text == 'dfs.client.failover.max.attempts':
+                configs['failover_max_attempts'] = int(property.findall('value')[0].text)
+
         if namenodes:
             configs['namenodes'] = namenodes
 
@@ -141,7 +156,12 @@ class HDFSConfig(object):
             'use_trash': hdfs_configs.get('use_trash', core_configs.get('use_trash', False)),
             'use_sasl': core_configs.get('use_sasl', False),
             'hdfs_namenode_principal': hdfs_configs.get('hdfs_namenode_principal', None),
-            'namenodes': hdfs_configs.get('namenodes', []) or core_configs.get('namenodes', [])
+            'namenodes': hdfs_configs.get('namenodes', []) or core_configs.get('namenodes', []),
+            'client_retries' : hdfs_configs.get('client_retries', 10),
+            'client_sleep_base_millis' : hdfs_configs.get('client_sleep_base_millis', 500),
+            'client_sleep_max_millis' : hdfs_configs.get('client_sleep_max_millis', 15000),
+            'socket_timeout_millis' : hdfs_configs.get('socket_timeout_millis', 60000),
+            'failover_max_attempts' : hdfs_configs.get('failover_max_attempts', 15)
         }
 
         return configs

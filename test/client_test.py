@@ -2,7 +2,7 @@ import unittest2
 import inspect
 import errno
 import socket
-from mock import patch, Mock
+from mock import patch, Mock, call
 
 from snakebite.client import HAClient, AutoConfigClient, Client
 from snakebite.config import HDFSConfig
@@ -71,3 +71,74 @@ class ClientTest(unittest2.TestCase):
         HDFSConfig.hdfs_try_paths = ()
         HDFSConfig.core_try_paths = ()
         self.assertRaises(InvalidInputException, AutoConfigClient)
+
+    @patch('snakebite.service.RpcService.call')
+    def test_ha_client_failover_retry(self, rpc_call):
+        failover_attempts = 3
+        e = socket.timeout
+        e.message = "socket.timeout"
+        rpc_call.side_effect=e
+        nns = [Namenode("foo"), Namenode("bar")]
+        ha_client = HAClient(nns, max_failovers=failover_attempts)
+        cat_result_gen = ha_client.cat(['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
+        self.assertEquals(rpc_call.call_count, 1 + failover_attempts)
+
+    @patch('snakebite.channel.SocketRpcChannel.get_connection')
+    def test_ha_client_failover_retry2(self, get_connection):
+        failover_attempts = 2
+        e = socket.timeout
+        e.message = "socket.timeout"
+        get_connection.side_effect=e
+        nns = [Namenode("foo", 8020), Namenode("bar", 8020)]
+        ha_client = HAClient(nns, max_failovers=failover_attempts)
+        cat_result_gen = ha_client.cat(['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
+        calls = [call("foo", 8020), call("bar", 8020), call("foo", 8020)]
+        get_connection.assert_has_calls(calls)
+
+    @patch('snakebite.service.RpcService.call')
+    def test_ha_client_failover_retry_for_exception(self, rpc_call):
+        failover_attempts = 3
+        e = RequestError("org.apache.hadoop.ipc.StandbyException foo bar")
+        rpc_call.side_effect=e
+        nns = [Namenode("foo", 8020), Namenode("bar", 8020)]
+        ha_client = HAClient(nns, max_failovers=failover_attempts)
+        cat_result_gen = ha_client.cat(['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
+        self.assertEquals(rpc_call.call_count, 1 + failover_attempts)
+
+    @patch('snakebite.channel.SocketRpcChannel.get_connection')
+    def test_ha_client_failover_retry_for_exception2(self, get_connection):
+        failover_attempts = 2
+        e = RequestError("org.apache.hadoop.ipc.StandbyException foo bar")
+        get_connection.side_effect=e
+        nns = [Namenode("foo"), Namenode("bar")]
+        ha_client = HAClient(nns, max_failovers=failover_attempts)
+        cat_result_gen = ha_client.cat(['foobar'])
+        self.assertRaises(OutOfNNException, all, cat_result_gen)
+        calls = [call("foo", 8020), call("bar", 8020), call("foo", 8020)]
+        get_connection.assert_has_calls(calls)
+
+    @patch('snakebite.service.RpcService.call')
+    def test_ha_client_retry(self, rpc_call):
+        retry_attempts = 3
+        e = RequestError("org.apache.hadoop.ipc.RetriableException foo bar")
+        rpc_call.side_effect=e
+        nns = [Namenode("foo"), Namenode("bar")]
+        ha_client = HAClient(nns, max_retries=retry_attempts)
+        cat_result_gen = ha_client.cat(['foobar'])
+        self.assertRaises(RequestError, all, cat_result_gen)
+        self.assertEquals(rpc_call.call_count, 1 + retry_attempts)
+
+    @patch('snakebite.channel.SocketRpcChannel.get_connection')
+    def test_ha_client_retry2(self, get_connection):
+        retry_attempts = 2
+        e = RequestError("org.apache.hadoop.ipc.RetriableException foo bar")
+        get_connection.side_effect=e
+        nns = [Namenode("foo", 8020), Namenode("bar", 8020)]
+        ha_client = HAClient(nns, max_retries=retry_attempts)
+        cat_result_gen = ha_client.cat(['foobar'])
+        self.assertRaises(RequestError, all, cat_result_gen)
+        calls = [call("foo", 8020), call("foo", 8020), call("foo", 8020)]
+        get_connection.assert_has_calls(calls)
