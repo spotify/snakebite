@@ -85,7 +85,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False, effective_user=None, use_sasl=False):
+    def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -99,6 +99,8 @@ class Client(object):
         :type effective_user: string
         :param use_sasl: Use SASL authentication or not
         :type use_sasl: boolean
+        :param hdfs_namenode_principal: Kerberos principal to use for HDFS
+        :type hdfs_namenode_principal: string
         '''
         if hadoop_version < 9:
             raise Exception("Only protocol versions >= 9 supported")
@@ -106,8 +108,9 @@ class Client(object):
         self.host = host
         self.port = port
         self.use_sasl = use_sasl
+        self.hdfs_namenode_principal = hdfs_namenode_principal
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
-        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, effective_user, self.use_sasl)
+        self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version, effective_user, self.use_sasl, self.hdfs_namenode_principal)
         self.use_trash = use_trash
         self.trash = self._join_user_path(".Trash")
         self._server_defaults = None
@@ -1366,7 +1369,7 @@ class HAClient(Client):
                 else:
                     setattr(cls, name, cls._ha_return_method(meth))
 
-    def __init__(self, namenodes, use_trash=False, effective_user=None, use_sasl=False):
+    def __init__(self, namenodes, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None):
         '''
         :param namenodes: Set of namenodes for HA setup
         :type namenodes: list
@@ -1374,10 +1377,15 @@ class HAClient(Client):
         :type use_trash: boolean
         :param effective_user: Effective user for the HDFS operations (default: None - current user)
         :type effective_user: string
+        :param use_sasl: Use SASL authentication or not
+        :type use_sasl: boolean
+        :param hdfs_namenode_principal: Kerberos principal to use for HDFS
+        :type hdfs_namenode_principal: string
         '''
         self.use_trash = use_trash
         self.effective_user = effective_user
         self.use_sasl = use_sasl
+        self.hdfs_namenode_principal = hdfs_namenode_principal
 
         if not namenodes:
             raise OutOfNNException("List of namenodes is empty - couldn't create the client")
@@ -1393,7 +1401,8 @@ class HAClient(Client):
                                                  namenode.version,
                                                  self.use_trash,
                                                  self.effective_user,
-                                                 self.use_sasl)
+                                                 self.use_sasl,
+                                                 self.hdfs_namenode_principal)
         else:
             msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
             for namenode in namenodes:
@@ -1483,7 +1492,7 @@ class AutoConfigClient(HAClient):
         '''
 
         configs = HDFSConfig.get_external_config()
-        nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
+        nns = [Namenode(nn['namenode'], nn['port'], hadoop_version) for nn in configs['namenodes']]
         if not nns:
             raise OutOfNNException("Tried and failed to find namenodes - couldn't created the client!")
-        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_trash, effective_user, HDFSConfig.use_sasl)
+        super(AutoConfigClient, self).__init__(nns, configs.get('use_trash', False), effective_user, configs.get('use_sasl', False), configs.get('hdfs_namenode_principal', None))
