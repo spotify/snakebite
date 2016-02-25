@@ -14,41 +14,65 @@
 # the License.
 
 
-class ConnectionFailureException(Exception):
+class SnakebiteException(Exception):
+    """
+    Common base class for all snakebite exceptions.
+    """
+    pass
+
+
+class FatalException(SnakebiteException):
+    """
+    FatalException indicates that retry of current operation alone would have the same effect.
+    """
+    pass
+
+
+class TransientException(SnakebiteException):
+    """
+    TransientException indicates that retry of current operation could help.
+    """
+    pass
+
+
+class ConnectionFailureException(TransientException):
     def __init__(self, msg):
         super(ConnectionFailureException, self).__init__(msg)
 
 
-class DirectoryException(Exception):
+class DirectoryException(FatalException):
     def __init__(self, msg):
         super(DirectoryException, self).__init__(msg)
 
 
-class FileAlreadyExistsException(Exception):
+class FileAlreadyExistsException(FatalException):
     def __init__(self, msg):
         super(FileAlreadyExistsException, self).__init__(msg)
 
 
-class FileException(Exception):
+class FileException(FatalException):
     def __init__(self, msg):
         super(FileException, self).__init__(msg)
 
 
-class FileNotFoundException(Exception):
+class FileNotFoundException(FatalException):
     def __init__(self, msg):
         super(FileNotFoundException, self).__init__(msg)
 
 
-class InvalidInputException(Exception):
+class InvalidInputException(FatalException):
     def __init__(self, msg):
         super(InvalidInputException, self).__init__(msg)
 
 
-class OutOfNNException(Exception):
+class OutOfNNException(TransientException):
     def __init__(self, msg):
         super(OutOfNNException, self).__init__(msg)
 
 
-class RequestError(Exception):
+class RequestError(TransientException):
+    """
+    Note: request error could be transient and could be fatal, depending on underlying error.
+    """
     def __init__(self, msg):
         super(RequestError, self).__init__(msg)

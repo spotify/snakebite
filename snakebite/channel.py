@@ -54,7 +54,7 @@ from snakebite.protobuf.datatransfer_pb2 import OpReadBlockProto, BlockOpRespons
 
 from snakebite.platformutils import get_current_username
 from snakebite.formatter import format_bytes
-from snakebite.errors import RequestError
+from snakebite.errors import RequestError, TransientException, FatalException
 from snakebite.crc32c import crc
 
 import google.protobuf.internal.encoder as encoder
@@ -139,7 +139,9 @@ class RpcBufferedReader(object):
                 log.debug("Bytes read: %d, total: %d" % (len(bytes_read), self.buffer_length))
                 return n
         if len(bytes_read) < n:
-            raise Exception("RpcBufferedReader only managed to read %s out of %s bytes" % (len(bytes_read), n))
+            # we'd like to distinguish transient (e.g. network-related) problems
+            # note: but this error could also be a logic error
+            raise TransientException("RpcBufferedReader only managed to read %s out of %s bytes" % (len(bytes_read), n))
 
     def rewind(self, places):
         '''Rewinds the current buffer to a position. Needed for reading varints,
@@ -184,7 +186,7 @@ class SocketRpcChannel(RpcChannel):
         self.hdfs_namenode_principal = hdfs_namenode_principal
         if self.use_sasl:
             if not _kerberos_available:
-                raise Exception("Kerberos libs not found. Please install snakebite using 'pip install snakebite[kerberos]'")
+                raise FatalException("Kerberos libs not found. Please install snakebite using 'pip install snakebite[kerberos]'")
 
             kerberos = Kerberos()
             self.effective_user = effective_user or kerberos.user_principal().name
@@ -196,7 +198,7 @@ class SocketRpcChannel(RpcChannel):
 
         # Check the request is correctly initialized
         if not request.IsInitialized():
-            raise Exception("Client request (%s) is missing mandatory fields" % type(request))
+            raise FatalException("Client request (%s) is missing mandatory fields" % type(request))
 
     def get_connection(self, host, port):
         '''Open a socket connection to a given host and port and writes the Hadoop header
@@ -241,7 +243,7 @@ class SocketRpcChannel(RpcChannel):
             sasl = SaslRpcClient(self, hdfs_namenode_principal=self.hdfs_namenode_principal)
             sasl_connected = sasl.connect()
             if not sasl_connected:
-                raise Exception("SASL is configured, but cannot get connected")
+                raise TransientException("SASL is configured, but cannot get connected")
 
         rpc_header = self.create_rpc_request_header()
         context = self.create_connection_context()
@@ -486,7 +488,7 @@ class DataXceiverChannel(object):
 
     def _read_bytes(self, n, depth=0):
         if depth > self.MAX_READ_ATTEMPTS:
-            raise Exception("Tried to read %d more bytes, but failed after %d attempts" % (n, self.MAX_READ_ATTEMPTS))
+            raise TransientException("Tried to read %d more bytes, but failed after %d attempts" % (n, self.MAX_READ_ATTEMPTS))
 
         bytes = self.sock.recv(n)
         if len(bytes) < n:
@@ -580,7 +582,7 @@ class DataXceiverChannel(object):
         elif checksum_type in [self.CHECKSUM_CRC32C, self.CHECKSUM_CRC32]:
             checksum_len = 4
         else:
-            raise Exception("Checksum type %s not implemented" % checksum_type)
+            raise FatalException("Checksum type %s not implemented" % checksum_type)
 
         total_read = 0
         if block_op_response.status == 0:  # datatransfer_proto.Status.Value('SUCCESS')
@@ -633,7 +635,8 @@ class DataXceiverChannel(object):
                         if check_crc and checksum_type != self.CHECKSUM_NULL:
                             checksum_index = i * chunks_per_load + j
                             if checksum_index < len(checksums) and crc(chunk) != checksums[checksum_index]:
-                                raise Exception("Checksum doesn't match")
+                                # it makes sense to retry, so TransientError
+                                raise TransientException("Checksum doesn't match")
                         load += chunk
                         total_read += len(chunk)
                         read_on_packet += len(chunk)
