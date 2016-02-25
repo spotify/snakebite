@@ -70,4 +70,4 @@ class ClientTest(unittest2.TestCase):
         environ_get.return_value = False
         HDFSConfig.hdfs_try_paths = ()
         HDFSConfig.core_try_paths = ()
-        self.assertRaises(OutOfNNException, AutoConfigClient)
+        self.assertRaises(InvalidInputException, AutoConfigClient)
