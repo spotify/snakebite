@@ -9,8 +9,8 @@ from snakebite.client import AutoConfigClient
 from mock import patch, mock_open
 
 class ConfigTest(unittest2.TestCase):
-    original_hdfs_try_path = set(HDFSConfig.hdfs_try_paths)
-    original_core_try_path = set(HDFSConfig.core_try_paths)
+    original_hdfs_try_path = HDFSConfig.hdfs_try_paths
+    original_core_try_path = HDFSConfig.core_try_paths
 
     def setUp(self):
         # Make sure HDFSConfig is in vanilla state
@@ -23,22 +23,24 @@ class ConfigTest(unittest2.TestCase):
         return os.path.abspath(os.path.join(snakebite.__file__, os.pardir, os.pardir, 'test/testconfig/conf/%s' % config_name))
 
     def _verify_hdfs_settings(self, config):
-        self.assertEquals(len(config), 2)
+        namenodes = config['namenodes']
+        self.assertEquals(len(namenodes), 2)
         # assert first NN
-        self.assertEqual('namenode1.mydomain', config[0]['namenode'])
-        self.assertEqual(8888, config[0]['port'])
+        self.assertEqual('namenode1.mydomain', namenodes[0]['namenode'])
+        self.assertEqual(8888, namenodes[0]['port'])
         # assert second NN
-        self.assertEqual('namenode2.mydomain', config[1]['namenode'])
-        self.assertEqual(8888, config[1]['port'])
+        self.assertEqual('namenode2.mydomain', namenodes[1]['namenode'])
+        self.assertEqual(8888, namenodes[1]['port'])
 
     def _verify_hdfs_noport_settings(self, config):
-        self.assertEquals(len(config), 2)
+        namenodes = config['namenodes']
+        self.assertEquals(len(namenodes), 2)
         # assert first NN
-        self.assertEqual('namenode1.mydomain', config[0]['namenode'])
-        self.assertEqual(8020, config[0]['port'])
+        self.assertEqual('namenode1.mydomain', namenodes[0]['namenode'])
+        self.assertEqual(8020, namenodes[0]['port'])
         # assert second NN
-        self.assertEqual('namenode2.mydomain', config[1]['namenode'])
-        self.assertEqual(8020, config[1]['port'])
+        self.assertEqual('namenode2.mydomain', namenodes[1]['namenode'])
+        self.assertEqual(8020, namenodes[1]['port'])
 
     def test_read_hdfs_config_ha(self):
         hdfs_site_path = self.get_config_path('ha-port-hdfs-site.xml')
@@ -48,18 +50,18 @@ class ConfigTest(unittest2.TestCase):
     def test_read_core_config_ha(self):
         core_site_path = self.get_config_path('ha-core-site.xml')
         config = HDFSConfig.read_core_config(core_site_path)
-        self.assertEquals(len(config), 1)
-        self.assertEquals('testha', config[0]['namenode'])
-        self.assertEquals(8020, config[0]['port'])
-        self.assertFalse(HDFSConfig.use_trash)
+        namenodes = config['namenodes']
+        self.assertEquals(len(namenodes), 1)
+        self.assertEquals('testha', namenodes[0]['namenode'])
+        self.assertEquals(8020, namenodes[0]['port'])
 
     def test_read_core_config_emr(self):
         core_site_path = self.get_config_path('emr-core-site.xml')
         config = HDFSConfig.read_core_config(core_site_path)
-        self.assertEquals(len(config), 1)
-        self.assertEquals('testha', config[0]['namenode'])
-        self.assertEquals(8020, config[0]['port'])
-        self.assertFalse(HDFSConfig.use_trash)
+        namenodes = config['namenodes']
+        self.assertEquals(len(namenodes), 1)
+        self.assertEquals('testha', namenodes[0]['namenode'])
+        self.assertEquals(8020, namenodes[0]['port'])
 
     @patch('os.environ.get')
     def test_read_config_ha_with_ports(self, environ_get):
@@ -77,10 +79,11 @@ class ConfigTest(unittest2.TestCase):
         HDFSConfig.hdfs_try_paths = ()
         config = HDFSConfig.get_external_config()
 
-        self.assertEquals(len(config), 1)
-        self.assertEquals(config[0]['namenode'], 'testhost.net')
-        self.assertEquals(config[0]['port'], 8888)
-        self.assertFalse(HDFSConfig.use_trash)
+        namenodes = config['namenodes']
+        self.assertEquals(len(namenodes), 1)
+        self.assertEquals(namenodes[0]['namenode'], 'testhost.net')
+        self.assertEquals(namenodes[0]['port'], 8888)
+        self.assertFalse(config['use_trash'])
 
     @patch('os.environ.get')
     def test_ha_without_ports(self, environ_get):
@@ -99,7 +102,7 @@ class ConfigTest(unittest2.TestCase):
         config = HDFSConfig.get_external_config()
 
         self._verify_hdfs_noport_settings(config)
-        self.assertTrue(HDFSConfig.use_trash)
+        self.assertTrue(config['use_trash'])
 
     @patch('os.environ.get')
     def test_ha_config_trash_in_hdfs(self, environ_get):
@@ -109,7 +112,7 @@ class ConfigTest(unittest2.TestCase):
         config = HDFSConfig.get_external_config()
 
         self._verify_hdfs_noport_settings(config)
-        self.assertTrue(HDFSConfig.use_trash)
+        self.assertTrue(config['use_trash'])
 
     @patch('os.environ.get')
     def test_autoconfig_client_trash_true(self, environ_get):

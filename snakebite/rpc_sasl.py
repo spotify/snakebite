@@ -48,11 +48,12 @@ def log_protobuf_message(header, message):
     log.debug("%s:\n\n\033[92m%s\033[0m" % (header, message))
 
 class SaslRpcClient:
-    def __init__(self, trans):
+    def __init__(self, trans, hdfs_namenode_principal=None):
         #self.sasl_client_factory = sasl_client_factory
         self.sasl = None
         #self.mechanism = mechanism
         self._trans = trans
+        self.hdfs_namenode_principal = hdfs_namenode_principal
 
     def _send_sasl_message(self, message):
         rpcheader = RpcRequestHeaderProto()
@@ -81,7 +82,7 @@ class SaslRpcClient:
 
     def connect(self):
         # use service name component from principal
-        service = re.split('[\/@]', str(HDFSConfig.hdfs_namenode_principal))[0]
+        service = re.split('[\/@]', str(self.hdfs_namenode_principal))[0]
 
         negotiate = RpcSaslProto()
         negotiate.state = 1

@@ -10,8 +10,8 @@ from snakebite.namenode import Namenode
 from snakebite.errors import OutOfNNException, RequestError
 
 class ClientTest(unittest2.TestCase):
-    original_hdfs_try_path = set(HDFSConfig.hdfs_try_paths)
-    original_core_try_path = set(HDFSConfig.core_try_paths)
+    original_hdfs_try_path = HDFSConfig.hdfs_try_paths
+    original_core_try_path = HDFSConfig.core_try_paths
 
     def setUp(self):
         # Make sure HDFSConfig is in vanilla state

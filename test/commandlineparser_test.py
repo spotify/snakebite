@@ -818,7 +818,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.parser.args = MockParseArgs()
             self.parser.read_config()
             self.assert_namenodes_spec("foobar", 54310, 9)
-            self.assertEquals(self.parser.args.usetrash, HDFSConfig.use_trash)
+            self.assertEquals(self.parser.args.usetrash, self.parser.configs['use_trash'])
 
     @patch("os.path.exists")
     def test_read_config_snakebiterc_ha_valid(self, exists_mock):
@@ -829,7 +829,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.parser.read_config()
             self.assert_namenodes_spec("foobar", 54310, 9)
             self.assert_namenodes_spec("foobar2", 54310, 9)
-            self.assertEquals(self.parser.args.usetrash, HDFSConfig.use_trash)
+            self.assertEquals(self.parser.args.usetrash, self.parser.configs['use_trash'])
 
     @patch("os.path.exists")
     def test_read_config_snakebiterc_invalid(self, exists_mock):
@@ -852,7 +852,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.parser.args = MockParseArgs()
             self.parser.read_config()
             self.assert_namenodes_spec("foobar", Namenode.DEFAULT_PORT, 11)
-            self.assertEquals(self.parser.args.usetrash, HDFSConfig.use_trash)
+            self.assertEquals(self.parser.args.usetrash, self.parser.configs['use_trash'])
 
     @patch("os.path.exists")
     def test_read_config_snakebiterc_noport_ha_valid(self, exists_mock):
@@ -863,7 +863,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.parser.read_config()
             self.assert_namenodes_spec("foobar", Namenode.DEFAULT_PORT, 100)
             self.assert_namenodes_spec("foobar2", Namenode.DEFAULT_PORT, 100)
-            self.assertEquals(self.parser.args.usetrash, HDFSConfig.use_trash)
+            self.assertEquals(self.parser.args.usetrash, self.parser.configs['use_trash'])
 
 
     valid_snake_noport_nov_one_rc = {"namenode": "foobar"}
@@ -878,7 +878,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.parser.args = MockParseArgs()
             self.parser.read_config()
             self.assert_namenodes_spec("foobar", Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
-            self.assertEquals(self.parser.args.usetrash, HDFSConfig.use_trash)
+            self.assertEquals(self.parser.args.usetrash, self.parser.configs['use_trash'])
 
     @patch("os.path.exists")
     def test_read_config_snakebiterc_noport_nov_ha_valid(self, exists_mock):
@@ -889,7 +889,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.parser.read_config()
             self.assert_namenodes_spec("foobar", Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
             self.assert_namenodes_spec("foobar2", Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
-            self.assertEquals(self.parser.args.usetrash, HDFSConfig.use_trash)
+            self.assertEquals(self.parser.args.usetrash, self.parser.configs['use_trash'])
 
     valid_snake_noport_mix_rc = [{"namenode": "foobar", "version": 100},
                                  {"namenode": "foobar2", "port": 66}]
@@ -903,7 +903,7 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
             self.parser.read_config()
             self.assert_namenodes_spec("foobar", Namenode.DEFAULT_PORT, 100)
             self.assert_namenodes_spec("foobar2", 66, Namenode.DEFAULT_VERSION)
-            self.assertEquals(self.parser.args.usetrash, HDFSConfig.use_trash)
+            self.assertEquals(self.parser.args.usetrash, self.parser.configs['use_trash'])
 
     valid_snake_one_rc_v2 = {
                                 "config_version": 2,
@@ -1015,7 +1015,8 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
 
     def _revert_hdfs_try_paths(self):
         # Make sure HDFSConfig is in vanilla state
-        HDFSConfig.use_trash = False
+        self.parser.configs['use_trash'] = False
+
         HDFSConfig.hdfs_try_paths = ConfigTest.original_hdfs_try_path
         HDFSConfig.core_try_paths = ConfigTest.original_core_try_path
 

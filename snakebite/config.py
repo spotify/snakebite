@@ -9,11 +9,6 @@ log = logging.getLogger(__name__)
 
 
 class HDFSConfig(object):
-    use_trash = False
-    use_sasl = False
-
-    hdfs_namenode_principal = None
-
     @classmethod
     def get_config_from_env(cls):
         """
@@ -23,17 +18,20 @@ class HDFSConfig(object):
         Returns list of dicts - list of namenode representations
         """
         core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
-        configs = cls.read_core_config(core_path)
+        core_configs = cls.read_core_config(core_path)
 
         hdfs_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'hdfs-site.xml')
-        tmp_config = cls.read_hdfs_config(hdfs_path)
+        hdfs_configs = cls.read_hdfs_config(hdfs_path)
 
-        if tmp_config:
-            # if config exists in hdfs - it's HA config, update configs
-            configs = tmp_config
-
-        if not configs:
+        if (not core_configs) and (not hdfs_configs):
             raise Exception("No config found in %s nor in %s" % (core_path, hdfs_path))
+
+        configs = {
+            'use_trash': hdfs_configs.get('use_trash', core_configs.get('use_trash', False)),
+            'use_sasl': core_configs.get('use_sasl', False),
+            'hdfs_namenode_principal': hdfs_configs.get('hdfs_namenode_principal', None),
+            'namenodes': hdfs_configs.get('namenodes', []) or core_configs.get('namenodes', [])
+        }
 
         return configs
 
@@ -51,7 +49,9 @@ class HDFSConfig(object):
 
     @classmethod
     def read_core_config(cls, core_site_path):
-        config = []
+        configs = {}
+
+        namenodes = []
         for property in cls.read_hadoop_config(core_site_path):
 
             # fs.default.name is the key name for the file system on EMR clusters
@@ -59,39 +59,47 @@ class HDFSConfig(object):
                 parse_result = urlparse(property.findall('value')[0].text)
                 log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), core_site_path))
 
-                config.append({"namenode": parse_result.hostname,
+                namenodes.append({"namenode": parse_result.hostname,
                                "port": parse_result.port if parse_result.port
                                                          else Namenode.DEFAULT_PORT})
 
             if property.findall('name')[0].text == 'fs.trash.interval':
-                cls.use_trash = True
+                configs['use_trash'] = True
 
             if property.findall('name')[0].text == 'hadoop.security.authentication':
                 log.debug("Got hadoop.security.authentication '%s'" % (property.findall('value')[0].text))
                 if property.findall('value')[0].text == 'kerberos':
-                    cls.use_sasl = True
+                    configs['use_sasl'] = True
                 else:
-                    cls.use_sasl = False
- 
-        return config
+                    configs['use_sasl'] = False
+
+        if namenodes: 
+            configs['namenodes'] = namenodes
+
+        return configs
 
     @classmethod
     def read_hdfs_config(cls, hdfs_site_path):
-        configs = []
+        configs = {}
+
+        namenodes = []
         for property in cls.read_hadoop_config(hdfs_site_path):
             if property.findall('name')[0].text.startswith("dfs.namenode.rpc-address"):
                 parse_result = urlparse("//" + property.findall('value')[0].text)
                 log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), hdfs_site_path))
-                configs.append({"namenode": parse_result.hostname,
+                namenodes.append({"namenode": parse_result.hostname,
                                 "port": parse_result.port if parse_result.port
                                                           else Namenode.DEFAULT_PORT})
 
             if property.findall('name')[0].text == 'fs.trash.interval':
-                cls.use_trash = True
+                configs['use_trash'] = True
 
             if property.findall('name')[0].text == 'dfs.namenode.kerberos.principal':
                 log.debug("hdfs principal found: '%s'" % (property.findall('value')[0].text))
-                cls.hdfs_namenode_principal = property.findall('value')[0].text
+                configs['hdfs_namenode_principal'] = property.findall('value')[0].text
+
+        if namenodes:
+            configs['namenodes'] = namenodes
 
         return configs
 
@@ -117,16 +125,23 @@ class HDFSConfig(object):
             cls.core_try_paths = (core_path,) + cls.core_try_paths
 
         # Try to find other paths
-        configs = []
+        core_configs = {}
         for core_conf_path in cls.core_try_paths:
-            configs = cls.read_core_config(core_conf_path)
-            if configs:
+            core_configs = cls.read_core_config(core_conf_path)
+            if core_configs:
                 break
 
+        hdfs_configs = {}
         for hdfs_conf_path in cls.hdfs_try_paths:
-            tmp_config = cls.read_hdfs_config(hdfs_conf_path)
-            if tmp_config:
-                # if there is hdfs-site data available return it
-                return tmp_config
+            hdfs_configs = cls.read_hdfs_config(hdfs_conf_path)
+            if hdfs_configs:
+                break
+
+        configs = {
+            'use_trash': hdfs_configs.get('use_trash', core_configs.get('use_trash', False)),
+            'use_sasl': core_configs.get('use_sasl', False),
+            'hdfs_namenode_principal': hdfs_configs.get('hdfs_namenode_principal', None),
+            'namenodes': hdfs_configs.get('namenodes', []) or core_configs.get('namenodes', [])
+        }
 
         return configs

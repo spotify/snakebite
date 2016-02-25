@@ -171,7 +171,7 @@ class SocketRpcChannel(RpcChannel):
     '''Socket implementation of an RpcChannel.
     '''
 
-    def __init__(self, host, port, version, effective_user=None, use_sasl=False):
+    def __init__(self, host, port, version, effective_user=None, use_sasl=False, hdfs_namenode_principal=None):
         '''SocketRpcChannel to connect to a socket server on a user defined port.
            It possible to define version and effective user for the communication.'''
         self.host = host
@@ -181,6 +181,7 @@ class SocketRpcChannel(RpcChannel):
         self.version = version
         self.client_id = str(uuid.uuid4())
         self.use_sasl = use_sasl
+        self.hdfs_namenode_principal = hdfs_namenode_principal
         if self.use_sasl:
             if not _kerberos_available:
                 raise Exception("Kerberos libs not found. Please install snakebite using 'pip install snakebite[kerberos]'")
@@ -237,7 +238,7 @@ class SocketRpcChannel(RpcChannel):
             self.write(struct.pack('B', self.AUTH_PROTOCOL_NONE))   # serialization type (protobuf = 0)
 
         if self.use_sasl:
-            sasl = SaslRpcClient(self)
+            sasl = SaslRpcClient(self, hdfs_namenode_principal=self.hdfs_namenode_principal)
             sasl_connected = sasl.connect()
             if not sasl_connected:
                 raise Exception("SASL is configured, but cannot get connected")
