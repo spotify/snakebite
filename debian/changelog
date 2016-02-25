@@ -1,3 +1,10 @@
+snakebite (2.8.0) unstable; urgency=low
+
+   * Handle hdfs_namenode_principal properly and refactor auto configuration logic
+   * Common base class for exceptions; differentiating transient and fatal exceptions
+
+ -- Wouter de Bie <wouter@spotify.com>  Thu, 25 Feb 2016 13:12:25 -0000
+
 snakebite (2.7.3) unstable; urgency=low
 
    * Add support for null checksum type. Fixes #87
