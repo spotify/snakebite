@@ -51,8 +51,8 @@ Development
 ===========
 
 Make sure to read about development
-[here](http://spotify.github.io/snakebite/development.html) and about
-testing over [here](http://spotify.github.io/snakebite/testing.html),
+[here](http://snakebite.readthedocs.org/en/latest/development.html) and about
+testing over [here](http://snakebite.readthedocs.org/en/latest/testing.html),
 hack and come back with a pull requests &lt;3
 
 Travis CI status: [![Travis](https://api.travis-ci.org/spotify/snakebite.png)](https://travis-ci.org/spotify/snakebite)
