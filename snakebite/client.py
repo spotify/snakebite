@@ -1496,5 +1496,5 @@ class AutoConfigClient(HAClient):
         configs = HDFSConfig.get_external_config()
         nns = [Namenode(nn['namenode'], nn['port'], hadoop_version) for nn in configs['namenodes']]
         if not nns:
-            raise OutOfNNException("Tried and failed to find namenodes - couldn't created the client!")
+            raise InvalidInputException("List of namenodes is empty - couldn't create the client")
         super(AutoConfigClient, self).__init__(nns, configs.get('use_trash', False), effective_user, configs.get('use_sasl', False), configs.get('hdfs_namenode_principal', None))
