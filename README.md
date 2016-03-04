@@ -57,4 +57,4 @@ hack and come back with a pull requests &lt;3
 
 Travis CI status: [![Travis](https://api.travis-ci.org/spotify/snakebite.png)](https://travis-ci.org/spotify/snakebite)
 
-Copyright 2013-2015 Spotify AB
+Copyright 2013-2016 Spotify AB
