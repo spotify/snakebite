@@ -912,7 +912,7 @@ class Client(object):
         :param exists: Check if the path exists
         :type exists: boolean
         :param directory: Check if the path is a directory
-        :type exists: boolean
+        :type directory: boolean
         :param zero_length: Check if the path is zero-length
         :type zero_length: boolean
         :returns: a boolean
