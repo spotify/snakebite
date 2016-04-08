@@ -753,7 +753,7 @@ class Client(object):
         # Source is a file
         elif self._is_file(node):
             temporary_target = "%s._COPYING_" % target
-            f = open(temporary_target, 'w')
+            f = open(temporary_target, 'wb')
             try:
                 for load in self._read_file(path, node, tail_only=False, check_crc=check_crc):
                     f.write(load)
