@@ -443,7 +443,10 @@ class CommandLineParser(object):
             use_trash = self.args.usetrash and not self.args.skiptrash
         else:
             use_trash = self.args.usetrash
-        self.client = HAClient(self.namenodes, use_trash, self.user, self.use_sasl, self.configs['hdfs_namenode_principal'])
+        self.client = HAClient(self.namenodes, use_trash, self.user, self.use_sasl, self.configs['hdfs_namenode_principal'],
+                               self.configs['failover_max_attempts'], self.configs['client_retries'],
+                               self.configs['client_sleep_base_millis'], self.configs['client_sleep_max_millis'],
+                               self.configs['socket_timeout_millis'])
 
     def execute(self):
         if self.args.help:

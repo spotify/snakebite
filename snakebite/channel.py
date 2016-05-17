@@ -173,7 +173,8 @@ class SocketRpcChannel(RpcChannel):
     '''Socket implementation of an RpcChannel.
     '''
 
-    def __init__(self, host, port, version, effective_user=None, use_sasl=False, hdfs_namenode_principal=None):
+    def __init__(self, host, port, version, effective_user=None, use_sasl=False, hdfs_namenode_principal=None,
+                 sock_connect_timeout=10000, sock_request_timeout=10000):
         '''SocketRpcChannel to connect to a socket server on a user defined port.
            It possible to define version and effective user for the communication.'''
         self.host = host
@@ -192,6 +193,8 @@ class SocketRpcChannel(RpcChannel):
             self.effective_user = effective_user or kerberos.user_principal().name
         else: 
             self.effective_user = effective_user or get_current_username()
+        self.sock_connect_timeout = sock_connect_timeout
+        self.sock_request_timeout = sock_request_timeout
 
     def validate_request(self, request):
         '''Validate the client request against the protocol file.'''
@@ -226,9 +229,10 @@ class SocketRpcChannel(RpcChannel):
         # Open socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.sock.settimeout(10)
+        self.sock.settimeout(self.sock_connect_timeout / 1000)
         # Connect socket to server - defined by host and port arguments
         self.sock.connect((host, port))
+        self.sock.settimeout(self.sock_request_timeout / 1000)
 
         # Send RPC headers
         self.write(self.RPC_HEADER)                             # header

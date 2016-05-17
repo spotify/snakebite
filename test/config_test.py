@@ -129,3 +129,12 @@ class ConfigTest(unittest2.TestCase):
         HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-noport-hdfs-site.xml'),)
         client = AutoConfigClient()
         self.assertFalse(client.use_trash)
+
+    def test_retry_configs(self):
+        conf_path = self.get_config_path('ha-retry-hdfs-site.xml')
+        config = HDFSConfig.read_hdfs_config(conf_path)
+        self.assertEquals(config['client_retries'], 5)
+        self.assertEquals(config['client_sleep_base_millis'], 400)
+        self.assertEquals(config['client_sleep_max_millis'], 14000)
+        self.assertEquals(config['socket_timeout_millis'], 25000)
+        self.assertEquals(config['failover_max_attempts'], 7)
