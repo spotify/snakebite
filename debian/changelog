@@ -1,3 +1,9 @@
+snakebite (2.9.0) unstable; urgency=low
+
+  Add retry logic
+
+ -- Rafal Wojdyla <rav@spotify.com>  Tue, 17 May 2016 21:16:14 -0000
+
 snakebite (2.8.1) unstable; urgency=low
 
    * Use InvalidInputException instead of OutOfNNException.
