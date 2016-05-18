@@ -28,11 +28,7 @@ Installing
 Snakebite releases are available through pypi at
 <https://pypi.python.org/pypi/snakebite/>
 
-The quickest way to install snakebite (1.3.x) is to run:
-
-`pip install -I snakebite==1.3.x`
-
-To install snakebite 2.x run:
+To install snakebite run:
 
 `pip install snakebite`
 
@@ -41,6 +37,13 @@ install python-krbV (<https://fedorahosted.org/python-krbV/>) and then
 run:
 
 `pip install "snakebite[kerberos]"`
+
+Since the older version of snakebite (1.3.x) supports Hadoop 1.0 (instead of Hadoop 2), you
+might want to install an older version by running:
+
+`pip install -I snakebite==1.3.x`
+
+Note that the 1.3 branch is unmaintained and doesn't include any of the fixes in the 2.x branch.
 
 Documentation
 =============
