@@ -9,8 +9,8 @@ tests ``MiniClusterTestBase`` - on setup for such test class minicluster is
 started, when tests are done minicluster is destroyed. There's some
 performance overhead - but it's not a problem (yet).
 
-Snakebite by default uses `nose <https://nose.readthedocs.org/en/latest/>`_
-and `tox <https://tox.readthedocs.org/en/latest/>`_ for testing. Tests
+Snakebite by default uses `nose <https://nose.readthedocs.io/en/latest/>`_
+and `tox <https://tox.readthedocs.io/en/latest/>`_ for testing. Tests
 are integrated with `setup.py`, so to start tests one can simply:
 ``$ python setup.py test``
 
@@ -24,7 +24,7 @@ java needs to be present on the system.
 Tox
 ===
 
-`Tox <https://tox.readthedocs.org/en/latest/>`_ allow us to create automated
+`Tox <https://tox.readthedocs.io/en/latest/>`_ allow us to create automated
 isolated python test environments. It's also a place where we can prepare environment
 for testing - like download hadoop distributions, set environment variables etc.
 Tox configuration is available in ``tox.ini`` file in root directory.
