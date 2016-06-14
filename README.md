@@ -48,14 +48,14 @@ Note that the 1.3 branch is unmaintained and doesn't include any of the fixes in
 Documentation
 =============
 
-More information and documentation can be found at http://snakebite.readthedocs.org/en/latest/
+More information and documentation can be found at https://snakebite.readthedocs.io/en/latest/
 
 Development
 ===========
 
 Make sure to read about development
-[here](http://snakebite.readthedocs.org/en/latest/development.html) and about
-testing over [here](http://snakebite.readthedocs.org/en/latest/testing.html),
+[here](https://snakebite.readthedocs.io/en/latest/development.html) and about
+testing over [here](https://snakebite.readthedocs.io/en/latest/testing.html),
 hack and come back with a pull requests &lt;3
 
 Travis CI status: [![Travis](https://api.travis-ci.org/spotify/snakebite.png)](https://travis-ci.org/spotify/snakebite)

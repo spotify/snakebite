@@ -14,7 +14,7 @@ environment for snakebite:
 2. create development environment:
 ``$ mkvirtualenv snakebite_dev``
 
-More about virtualenvwrapper and virtualenv `here <http://virtualenvwrapper.readthedocs.org/en/latest/>`_
+More about virtualenvwrapper and virtualenv `here <https://virtualenvwrapper.readthedocs.io/en/latest/>`_
 
 Below is the list of recommended steps to start development:
 
