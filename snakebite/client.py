@@ -27,7 +27,8 @@ from snakebite.errors import (
     InvalidInputException,
     OutOfNNException,
     RequestError,
-    FatalException, TransientException)
+    FatalException, TransientException,
+    BlockReadException)
 from snakebite.namenode import Namenode
 from snakebite.service import RpcService
 
@@ -1497,6 +1498,13 @@ class HAClient(Client):
             # thus we should not simply retry everything here. Let's fail it for now.
             raise
 
+    def __handle_block_read_error(self, exception):
+        log.debug("Block read failed with %s" % exception)
+        if self.__should_retry():
+            return
+        else:
+            raise
+
     def __handle_socket_error(self, exception):
         log.debug("Request failed with %s" % exception)
         if exception.errno in (errno.ECONNREFUSED, errno.EHOSTUNREACH):
@@ -1517,6 +1525,8 @@ class HAClient(Client):
                     return func(self, *args, **kw)
                 except RequestError as e:
                     self.__handle_request_error(e)
+                except BlockReadException as e:
+                    self.__handle_block_read_error(e)
                 except socket.error as e:
                     self.__handle_socket_error(e)
         return wrapped
@@ -1533,6 +1543,8 @@ class HAClient(Client):
                         yield results.next()
                 except RequestError as e:
                     self.__handle_request_error(e)
+                except BlockReadException as e:
+                    self.__handle_block_read_error(e)
                 except socket.error as e:
                     self.__handle_socket_error(e)
         return wrapped
