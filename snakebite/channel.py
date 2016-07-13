@@ -54,7 +54,7 @@ from snakebite.protobuf.datatransfer_pb2 import OpReadBlockProto, BlockOpRespons
 
 from snakebite.platformutils import get_current_username
 from snakebite.formatter import format_bytes
-from snakebite.errors import RequestError, TransientException, FatalException
+from snakebite.errors import RequestError, TransientException, FatalException, BlockReadException
 from snakebite.crc32c import crc
 
 import google.protobuf.internal.encoder as encoder
@@ -141,7 +141,7 @@ class RpcBufferedReader(object):
         if len(bytes_read) < n:
             # we'd like to distinguish transient (e.g. network-related) problems
             # note: but this error could also be a logic error
-            raise TransientException("RpcBufferedReader only managed to read %s out of %s bytes" % (len(bytes_read), n))
+            raise BlockReadException("RpcBufferedReader only managed to read %s out of %s bytes" % (len(bytes_read), n))
 
     def rewind(self, places):
         '''Rewinds the current buffer to a position. Needed for reading varints,
@@ -492,7 +492,7 @@ class DataXceiverChannel(object):
 
     def _read_bytes(self, n, depth=0):
         if depth > self.MAX_READ_ATTEMPTS:
-            raise TransientException("Tried to read %d more bytes, but failed after %d attempts" % (n, self.MAX_READ_ATTEMPTS))
+            raise BlockReadException("Tried to read %d more bytes, but failed after %d attempts" % (n, self.MAX_READ_ATTEMPTS))
 
         bytes = self.sock.recv(n)
         if len(bytes) < n:
@@ -640,7 +640,7 @@ class DataXceiverChannel(object):
                             checksum_index = i * chunks_per_load + j
                             if checksum_index < len(checksums) and crc(chunk) != checksums[checksum_index]:
                                 # it makes sense to retry, so TransientError
-                                raise TransientException("Checksum doesn't match")
+                                raise BlockReadException("Checksum doesn't match")
                         load += chunk
                         total_read += len(chunk)
                         read_on_packet += len(chunk)
