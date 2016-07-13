@@ -1,3 +1,14 @@
+snakebite (2.10.0) unstable; urgency=low
+
+  Add client retry for block read failures
+
+  Currently the client will fail on any block read errors even
+  though these might be transient failures. This patch enables
+  the client to retry block read failures to make it more
+  failure tolerant.
+
+ -- Wouter de Bie <wouter@spotify.com>  Fri, 13 Jul 2016 13:12:25 -0000
+
 snakebite (2.9.0) unstable; urgency=low
 
   Add retry logic
