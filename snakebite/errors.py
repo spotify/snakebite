@@ -76,7 +76,3 @@ class RequestError(TransientException):
     """
     def __init__(self, msg):
         super(RequestError, self).__init__(msg)
-
-class BlockReadException(TransientException):
-    def __init__(self, msg):
-        super(BlockReadException, self).__init__(msg)
