@@ -7,7 +7,7 @@ from mock import patch, Mock, call
 from snakebite.client import HAClient, AutoConfigClient, Client
 from snakebite.config import HDFSConfig
 from snakebite.namenode import Namenode
-from snakebite.errors import OutOfNNException, RequestError, InvalidInputException, BlockReadException
+from snakebite.errors import OutOfNNException, RequestError, InvalidInputException
 
 
 class ClientTest(unittest2.TestCase):
@@ -142,14 +142,3 @@ class ClientTest(unittest2.TestCase):
         self.assertRaises(RequestError, all, cat_result_gen)
         calls = [call("foo", 8020), call("foo", 8020), call("foo", 8020)]
         get_connection.assert_has_calls(calls)
-
-    @patch('snakebite.service.RpcService.call')
-    def test_ha_client_retry(self, rpc_call):
-        retry_attempts = 3
-        e = BlockReadException("Block read failure")
-        rpc_call.side_effect=e
-        nns = [Namenode("foo"), Namenode("bar")]
-        ha_client = HAClient(nns, max_retries=retry_attempts)
-        cat_result_gen = ha_client.cat(['foobar'])
-        self.assertRaises(BlockReadException, all, cat_result_gen)
-        self.assertEquals(rpc_call.call_count, 1 + retry_attempts)
