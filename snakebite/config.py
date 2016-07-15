@@ -113,6 +113,9 @@ class HDFSConfig(object):
             if property.findall('name')[0].text == 'dfs.client.failover.max.attempts':
                 configs['failover_max_attempts'] = int(property.findall('value')[0].text)
 
+            if property.findall('name')[0].text == 'dfs.client.use.datanode.hostname':
+                configs['use_datanode_hostname'] = bool(property.findall('value')[0].text)
+
         if namenodes:
             configs['namenodes'] = namenodes
 
@@ -161,7 +164,8 @@ class HDFSConfig(object):
             'client_sleep_base_millis' : hdfs_configs.get('client_sleep_base_millis', 500),
             'client_sleep_max_millis' : hdfs_configs.get('client_sleep_max_millis', 15000),
             'socket_timeout_millis' : hdfs_configs.get('socket_timeout_millis', 60000),
-            'failover_max_attempts' : hdfs_configs.get('failover_max_attempts', 15)
+            'failover_max_attempts' : hdfs_configs.get('failover_max_attempts', 15),
+            'use_datanode_hostname' : hdfs_configs.get('use_datanode_hostname', False)
         }
 
         return configs
