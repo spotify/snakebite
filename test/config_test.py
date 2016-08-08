@@ -138,3 +138,8 @@ class ConfigTest(unittest2.TestCase):
         self.assertEquals(config['client_sleep_max_millis'], 14000)
         self.assertEquals(config['socket_timeout_millis'], 25000)
         self.assertEquals(config['failover_max_attempts'], 7)
+
+    def test_use_datanode_hostname_configs(self):
+        conf_path = self.get_config_path('use-datanode-hostname-hdfs-site.xml')
+        config = HDFSConfig.read_hdfs_config(conf_path)
+        self.assertTrue(config['use_datanode_hostname'])

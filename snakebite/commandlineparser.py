@@ -446,7 +446,7 @@ class CommandLineParser(object):
         self.client = HAClient(self.namenodes, use_trash, self.user, self.use_sasl, self.configs['hdfs_namenode_principal'],
                                self.configs['failover_max_attempts'], self.configs['client_retries'],
                                self.configs['client_sleep_base_millis'], self.configs['client_sleep_max_millis'],
-                               self.configs['socket_timeout_millis'])
+                               self.configs['socket_timeout_millis'], use_datanode_hostname=self.configs['use_datanode_hostname'])
 
     def execute(self):
         if self.args.help:

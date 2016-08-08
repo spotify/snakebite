@@ -1093,6 +1093,20 @@ class CommandLineParserInternalConfigTest(unittest2.TestCase):
         finally:
             self._revert_hdfs_try_paths()
 
+    @patch('os.environ.get')
+    def test_use_datanode_hostname(self, environ_get):
+        environ_get.return_value = False
+        # no snakebiterc
+        # read external config (hdfs-site, core-site)
+        self.parser.args = MockParseArgs()
+        try:
+            HDFSConfig.core_try_paths = (ConfigTest.get_config_path('ha-core-site.xml'),)
+            HDFSConfig.hdfs_try_paths = (ConfigTest.get_config_path('use-datanode-hostname-hdfs-site.xml'),)
+            self.parser.init()
+
+            self.assertTrue(self.parser.client.use_datanode_hostname)
+        finally:
+            self._revert_hdfs_try_paths()
 
 
 class CommandLineParserExecuteTest(unittest2.TestCase):

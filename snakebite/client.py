@@ -88,7 +88,7 @@ class Client(object):
 
     def __init__(self, host, port=Namenode.DEFAULT_PORT, hadoop_version=Namenode.DEFAULT_VERSION,
                  use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None,
-                 sock_connect_timeout=10000, sock_request_timeout=10000):
+                 sock_connect_timeout=10000, sock_request_timeout=10000, use_datanode_hostname=False):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -108,6 +108,8 @@ class Client(object):
         :type sock_connect_timeout: int
         :param sock_request_timeout: Request timeout in seconds
         :type sock_request_timeout: int
+        :param use_datanode_hostname: Use hostname instead of IP address to commuicate with datanodes
+        :type use_datanode_hostname: boolean
         '''
         if hadoop_version < 9:
             raise FatalException("Only protocol versions >= 9 supported")
@@ -123,6 +125,7 @@ class Client(object):
         self.use_trash = use_trash
         self.trash = self._join_user_path(".Trash")
         self._server_defaults = None
+        self.use_datanode_hostname = use_datanode_hostname
 
         log.debug("Created client for %s:%s with trash=%s and sasl=%s" % (host, port, use_trash, use_sasl))
 
@@ -1143,7 +1146,7 @@ class Client(object):
             successful_read = False
             while not locations_queue.empty():
                 location = locations_queue.get()[1]
-                host = location.id.ipAddr
+                host = location.id.hostName if self.use_datanode_hostname else location.id.ipAddr
                 port = int(location.id.xferPort)
                 data_xciever = DataXceiverChannel(host, port)
                 if data_xciever.connect():
@@ -1385,7 +1388,7 @@ class HAClient(Client):
 
     def __init__(self, namenodes, use_trash=False, effective_user=None, use_sasl=False, hdfs_namenode_principal=None,
                  max_failovers=15, max_retries=10, base_sleep=500, max_sleep=15000, sock_connect_timeout=10000,
-                 sock_request_timeout=10000):
+                 sock_request_timeout=10000, use_datanode_hostname=False):
         '''
         :param namenodes: Set of namenodes for HA setup
         :type namenodes: list
@@ -1409,6 +1412,8 @@ class HAClient(Client):
         :type sock_connect_timeout: int
         :param sock_request_timeout: Request timeout in seconds
         :type sock_request_timeout: int
+        :param use_datanode_hostname: Use hostname instead of IP address to commuicate with datanodes
+        :type use_datanode_hostname: boolean
         '''
         self.use_trash = use_trash
         self.effective_user = effective_user
@@ -1420,6 +1425,7 @@ class HAClient(Client):
         self.max_sleep = max_sleep
         self.sock_connect_timeout = sock_connect_timeout
         self.sock_request_timeout = sock_request_timeout
+        self.use_datanode_hostname = use_datanode_hostname
 
         self.failovers = -1
         self.retries = -1
@@ -1458,7 +1464,8 @@ class HAClient(Client):
                                                      self.use_sasl,
                                                      self.hdfs_namenode_principal,
                                                      self.sock_connect_timeout,
-                                                     self.sock_request_timeout)
+                                                     self.sock_request_timeout,
+                                                     self.use_datanode_hostname)
 
 
     def __calculate_exponential_time(self, time, retries, cap):
@@ -1573,8 +1580,10 @@ class AutoConfigClient(HAClient):
         nns = [Namenode(nn['namenode'], nn['port'], hadoop_version) for nn in configs['namenodes']]
         if not nns:
             raise InvalidInputException("List of namenodes is empty - couldn't create the client")
+
         super(AutoConfigClient, self).__init__(nns, configs.get('use_trash', False), effective_user,
                                                configs.get('use_sasl', False), configs.get('hdfs_namenode_principal', None),
                                                configs.get('failover_max_attempts'), configs.get('client_retries'),
                                                configs.get('client_sleep_base_millis'), configs.get('client_sleep_max_millis'),
-                                               10000, configs.get('socket_timeout_millis'))
+                                               10000, configs.get('socket_timeout_millis'),
+                                               use_datanode_hostname=configs.get('use_datanode_hostname', False))
