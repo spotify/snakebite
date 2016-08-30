@@ -74,7 +74,7 @@ class Client(object):
         3: "s"
     }
 
-    def __init__(self, host, port, hadoop_version=7):
+    def __init__(self, host, port, hadoop_version=7, use_datanode_hostname=False):
         '''
         :param host: Hostname or IP address of the NameNode
         :type host: string
@@ -82,6 +82,8 @@ class Client(object):
         :type port: int
         :param hadoop_version: What hadoop protocol version should be used (default: 7)
         :type hadoop_version: int
+        :param use_datanode_hostname: Use hostname instead of IP address to commuicate with datanodes
+        :type use_datanode_hostname: boolean
         '''
         if hadoop_version not in [7, 8]:
             raise Exception("Only protocol versions 7 and 8 are supported")
@@ -90,6 +92,8 @@ class Client(object):
         self.port = port
         self.service_stub_class = client_proto.ClientNamenodeProtocol_Stub
         self.service = RpcService(self.service_stub_class, self.port, self.host, hadoop_version)
+
+        self.use_datanode_hostname = use_datanode_hostname
 
     def ls(self, paths, recurse=False, include_toplevel=False, include_children=True):
         ''' Issues 'ls' command and returns a list of maps that contain fileinfo
@@ -961,7 +965,7 @@ class Client(object):
             successful_read = False
             while not locations_queue.empty():
                 location = locations_queue.get()[1]
-                host = location.id.ipAddr
+                host = location.id.hostName if self.use_datanode_hostname else location.id.ipAddr
                 port = int(location.id.xferPort)
                 data_xciever = DataXceiverChannel(host, port)
                 if data_xciever.connect():
@@ -1185,14 +1189,19 @@ class HAClient(Client):
                 else:
                     setattr(cls, name, cls._ha_return_method(meth))
 
-    def __init__(self, namenodes):
+    def __init__(self, namenodes, use_datanode_hostname=False):
         '''
         :param namenodes: Set of namenodes for HA setup
         :type namenodes: list
+        :param use_datanode_hostname: Use hostname instead of IP address to commuicate with datanodes
+        :type use_datanode_hostname: boolean
         '''
 
         if not namenodes:
             raise OutOfNNException("List of namenodes is empty - couldn't create the client")
+
+        self.use_datanode_hostname = use_datanode_hostname
+
         self.namenode = self._switch_namenode(namenodes)
         self.namenode.next()
 
@@ -1202,7 +1211,8 @@ class HAClient(Client):
 
             yield super(HAClient, self).__init__(namenode.host,
                                                  namenode.port,
-                                                 namenode.version)
+                                                 namenode.version,
+                                                 self.use_datanode_hostname)
         else:
             msg = "Request tried and failed for all %d namenodes: " % len(namenodes)
             for namenode in namenodes:
@@ -1286,4 +1296,4 @@ class AutoConfigClient(HAClient):
         nns = [Namenode(c['namenode'], c['port'], hadoop_version) for c in configs]
         if not nns:
             raise OutOfNNException("Tried and failed to find namenodes - couldn't created the client!")
-        super(AutoConfigClient, self).__init__(nns)
+        super(AutoConfigClient, self).__init__(nns, HDFSConfig.use_datanode_hostname)
