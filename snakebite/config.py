@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 class HDFSConfig(object):
     use_trash = False
     use_sasl = False
+    use_datanode_hostname = False
 
     @classmethod
     def get_config_from_env(cls):
@@ -63,6 +64,9 @@ class HDFSConfig(object):
             if property.findall('name')[0].text == 'fs.trash.interval':
                 cls.use_trash = True
 
+            if property.findall('name')[0].text == 'dfs.client.use.datanode.hostname':
+                cls.use_datanode_hostname = bool(property.findall('value')[0].text)
+
             if property.findall('name')[0].text == 'hadoop.security.authentication':
                 log.debug("Got hadoop.security.authentication '%s'" % (property.findall('value')[0].text))
                 if property.findall('value')[0].text == 'kerberos':
@@ -85,6 +89,9 @@ class HDFSConfig(object):
 
             if property.findall('name')[0].text == 'fs.trash.interval':
                 cls.use_trash = True
+
+            if property.findall('name')[0].text == 'dfs.client.use.datanode.hostname':
+                cls.use_datanode_hostname = bool(property.findall('value')[0].text)
 
         return configs
 
