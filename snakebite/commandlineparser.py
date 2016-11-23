@@ -118,7 +118,11 @@ class CommandLineParser(object):
                     'v': {"short": '-v',
                           "long": '--ver',
                           "help": 'Display snakebite version',
-                          "type": int}
+                          "type": int},
+                    'u': {"short": '-u',
+                          "long": '--user',
+                          "help": 'Effective HDFS username',
+                          "type": str}
                     }
 
     SUB_OPTS = {'R': {"short": '-R',
@@ -443,6 +447,9 @@ class CommandLineParser(object):
             use_trash = self.args.usetrash and not self.args.skiptrash
         else:
             use_trash = self.args.usetrash
+        if 'user' in self.args:
+            self.user = self.args.user
+
         self.client = HAClient(self.namenodes, use_trash, self.user, self.use_sasl, self.configs['hdfs_namenode_principal'],
                                self.configs['failover_max_attempts'], self.configs['client_retries'],
                                self.configs['client_sleep_base_millis'], self.configs['client_sleep_max_millis'],
