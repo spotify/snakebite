@@ -93,16 +93,16 @@ class HDFSConfig(object):
 
         namenodes = []
         for property in cls.read_hadoop_config(hdfs_site_path):
-            if property.findall('name')[0].text.startswith("dfs.namenode.rpc-address"):
+            if property.findall('name')[0].text.startswith('dfs.namenode.rpc-address'):
+                prop_name = property.findall('name')[0].text
                 parse_result = urlparse("//" + property.findall('value')[0].text)
 
-                if (not maybe_ha_name or
-                    not ha_configs or
+                if (prop_name == 'dfs.namenode.rpc-address' or
                     cls.valid_ha_namenode(maybe_ha_name,
                                           ha_configs,
                                           parse_result.geturl(),
                                           hdfs_site_path,
-                                          property.findall('name')[0].text)):
+                                          prop_name)):
                     log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), hdfs_site_path))
                     namenodes.append({"namenode": parse_result.hostname,
                                     "port": parse_result.port if parse_result.port
@@ -208,6 +208,11 @@ class HDFSConfig(object):
                           (nn_url, hdfs_site_path, maybe_ha_name))
             return False
 
+        if cluster not in ha_configs.get('clusters', []):
+            log.debug("Skipping %s from %s, becuause it is no in the configured cluster list: %s" %
+                          (nn_url, hdfs_site_path, ha_configs.get('clusters')))
+            return False
+
         logical_namenode = name_parts[-1]
         cluster_logical_namenodes = (ha_configs
                                      .get('logical_namenodes', {})
@@ -240,7 +245,4 @@ class HDFSConfig(object):
                     ha_configs['logical_namenodes'] = {}
                 cluster = name_parts[-1]
                 ha_configs['logical_namenodes'][cluster] = value.split(',')
-
-        if 'clusters' not in ha_configs:
-            return {}
         return ha_configs
