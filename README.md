@@ -23,7 +23,7 @@ Snakebite 1.3.x has been tested mainly against Cloudera `CDH4.1.3`
 `Snakebite 2.x` has been tested on `Hortonworks HDP2.0`, `CDH5 Beta` and
 ONLY supports `Hadoop 2.2.0` and up (protocol version 9)!
 
-installation
+Installation
 ============
 
 Snakebite releases are available through pypi at
