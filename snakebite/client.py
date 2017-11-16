@@ -1470,7 +1470,7 @@ class HAClient(Client):
 
     def __calculate_exponential_time(self, time, retries, cap):
         # Same calculation as the original Hadoop client but converted to seconds
-        baseTime = min(time * (1L << retries), cap);
+        baseTime = min(time * (long(1) << retries), cap);
         return (baseTime * (random.random() + 0.5)) / 1000;
 
     def __do_retry_sleep(self, retries):

@@ -42,6 +42,10 @@ May 2012
 import socket
 import os
 import math
+import sys
+
+if sys.version_info[0] == 3:
+    long = int
 
 # Third party imports
 from google.protobuf.service import RpcChannel
@@ -61,7 +65,6 @@ import google.protobuf.internal.encoder as encoder
 import google.protobuf.internal.decoder as decoder
 
 # Module imports
-
 import logger
 import logging
 import struct
@@ -162,7 +165,7 @@ class RpcBufferedReader(object):
 
 
 class SocketRpcChannel(RpcChannel):
-    ERROR_BYTES = 18446744073709551615L
+    ERROR_BYTES = long(18446744073709551615)
     RPC_HEADER = "hrpc"
     RPC_SERVICE_CLASS = 0x00
     AUTH_PROTOCOL_NONE = 0x00
@@ -191,7 +194,7 @@ class SocketRpcChannel(RpcChannel):
 
             kerberos = Kerberos()
             self.effective_user = effective_user or kerberos.user_principal().name
-        else: 
+        else:
             self.effective_user = effective_user or get_current_username()
         self.sock_connect_timeout = sock_connect_timeout
         self.sock_request_timeout = sock_request_timeout
@@ -261,7 +264,7 @@ class SocketRpcChannel(RpcChannel):
 
         self.write_delimited(rpc_header)
         self.write_delimited(context)
-    
+
     def write(self, data):
         if log.getEffectiveLevel() == logging.DEBUG:
             log.debug("Sending: %s", format_bytes(data))
@@ -624,7 +627,7 @@ class DataXceiverChannel(object):
                 else:
                     self._read_bytes(checksum_len * chunks_per_packet)
 
-                # We use a fixed size buffer (a "load") to read only a couple of chunks at once. 
+                # We use a fixed size buffer (a "load") to read only a couple of chunks at once.
                 bytes_per_load = self.LOAD_SIZE - (self.LOAD_SIZE % bytes_per_chunk)
                 chunks_per_load = int(bytes_per_load / bytes_per_chunk)
                 loads_per_packet = int(math.ceil(bytes_per_chunk * chunks_per_packet / bytes_per_load))
@@ -645,7 +648,7 @@ class DataXceiverChannel(object):
                         total_read += len(chunk)
                         read_on_packet += len(chunk)
                     yield load
-           
+
             # Send ClientReadStatusProto message confirming successful read
             request = ClientReadStatusProto()
             request.status = 0  # SUCCESS
