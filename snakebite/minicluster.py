@@ -12,11 +12,17 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from __future__ import print_function
 import os
 import subprocess
 import select
 import re
 import datetime
+
+try:
+    long        # Python 2
+except NameError:
+    long = int  # Python 3
 
 
 class MiniCluster(object):
@@ -195,7 +201,7 @@ class MiniCluster(object):
             rlist, wlist, xlist = select.select([self.hdfs.stderr, self.hdfs.stdout], [], [])
             for f in rlist:
                 line = f.readline()
-                print(line,)
+                print((line,))
                 m = re.match(".*Started MiniDFSCluster -- namenode on port (\d+).*", line)
                 if m:
                     return int(m.group(1))

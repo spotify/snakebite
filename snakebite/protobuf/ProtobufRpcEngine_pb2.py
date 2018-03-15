@@ -26,14 +26,14 @@ _REQUESTHEADERPROTO = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='methodName', full_name='hadoop.common.RequestHeaderProto.methodName', index=0,
       number=1, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='declaringClassProtocolName', full_name='hadoop.common.RequestHeaderProto.declaringClassProtocolName', index=1,
       number=2, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -62,7 +62,7 @@ DESCRIPTOR.message_types_by_name['RequestHeaderProto'] = _REQUESTHEADERPROTO
 class RequestHeaderProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _REQUESTHEADERPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.RequestHeaderProto)
 
 # @@protoc_insertion_point(module_scope)

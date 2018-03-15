@@ -1,15 +1,20 @@
 language: python
-python: 2.7
+matrix:
+  include:
+    - python: 2.7
+      env: TOX_ENV=py27-cdh
+    - python: 2.7
+      env: TOX_ENV=py27-hdp
+    - python: 3.6
+      env: TOX_ENV=py36-cdh
+    - python: 3.6
+      env: TOX_ENV=py36-hdp
+  allow_failures:
+  - python: 3.6
 jdk: oraclejdk7
-sudo: false
 branches:
   except:
     - gh-pages
-env:
-  - TOX_ENV=py26-cdh
-  - TOX_ENV=py27-cdh
-  - TOX_ENV=py26-hdp
-  - TOX_ENV=py27-hdp
 install:
   - pip install tox
 script:

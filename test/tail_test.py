@@ -13,9 +13,12 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-from minicluster_testbase import MiniClusterTestBase
+from __future__ import print_function
+from __future__ import absolute_import
+from .minicluster_testbase import MiniClusterTestBase
 import os
 import random
+from six.moves import xrange
 
 
 class TailTest(MiniClusterTestBase):
@@ -28,7 +31,7 @@ class TailTest(MiniClusterTestBase):
     def test_tail_on_file_smaller_than_1KB(self):
         path = '/temp_test'
         p = self.cluster.put_subprocess('-', path)
-        print >> p.stdin, "just a couple of bytes"
+        print("just a couple of bytes", file=p.stdin)
         p.communicate()
 
         self._compare_files(path)
@@ -66,7 +69,6 @@ class TailTest(MiniClusterTestBase):
         for _ in xrange(131072):  # 1024 * 131072 = 134,217,728 (default block size)
             f.seek(0)
             for line in f.readlines():
-                print >> p.stdin, line
-        print >> p.stdin, 'some extra bytes to exceed one blocksize'  # +40
+                print(line, file=p.stdin)
+        print('some extra bytes to exceed one blocksize', file=p.stdin)  # +40
         p.communicate()
-

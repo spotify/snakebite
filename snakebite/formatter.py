@@ -90,7 +90,7 @@ def format_listing(listing, json_output=False, human_readable=False, recursive=F
         last_dir = None
         try:
             while True:
-                node = listing.next()
+                node = next(listing)
                 dir_name = os.path.dirname(node['path'])
                 if dir_name != last_dir:
                     if last_dir:
@@ -204,7 +204,7 @@ def format_du(listing, json_output=False, human_readable=False):
         last_dir = None
         try:
             while True:
-                node = listing.next()
+                node = next(listing)
                 dir_name = os.path.dirname(node['path'])
                 if dir_name != last_dir:
                     if last_dir:
@@ -236,7 +236,7 @@ def _format_permission(decimal_permissions):
 def format_stat(results, json_output=False):
     ret = results
     # By default snakebite returns permissions in decimal.
-    if ret.has_key('permission'):
+    if 'permission' in ret:
         ret['permission'] = _format_permission(ret['permission'])
     if json_output:
         return json.dumps(ret)

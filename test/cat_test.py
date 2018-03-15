@@ -13,8 +13,11 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-from minicluster_testbase import MiniClusterTestBase
+from __future__ import print_function
+from __future__ import absolute_import
+from .minicluster_testbase import MiniClusterTestBase
 import os
+from six.moves import xrange
 
 
 class CatTest(MiniClusterTestBase):
@@ -78,5 +81,5 @@ class CatTest(MiniClusterTestBase):
         for _ in xrange(times):
             f.seek(0)
             for line in f.readlines():
-                print >> p.stdin, line
+                print(line, file=p.stdin)
         p.communicate()

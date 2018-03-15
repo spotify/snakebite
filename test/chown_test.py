@@ -12,7 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-from minicluster_testbase import MiniClusterTestBase
+from __future__ import absolute_import
+from .minicluster_testbase import MiniClusterTestBase
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
 

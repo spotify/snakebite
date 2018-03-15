@@ -12,10 +12,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from __future__ import absolute_import
 import os
 import shutil
 
-from minicluster_testbase import MiniClusterTestBase
+from .minicluster_testbase import MiniClusterTestBase
 
 TESTFILES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testfiles/temp_testfiles")
 

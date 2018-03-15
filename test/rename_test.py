@@ -12,14 +12,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from __future__ import print_function
+from __future__ import absolute_import
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
-from minicluster_testbase import MiniClusterTestBase
+from .minicluster_testbase import MiniClusterTestBase
 
 
 class RenameTest(MiniClusterTestBase):
     def test_rename_file(self):
-        print list(self.client.rename(['/zerofile'], '/zerofile2'))
+        print(list(self.client.rename(['/zerofile'], '/zerofile2')))
         expected_output = list(self.client.ls(['/zerofile2'], include_toplevel=True))
         self.assertEqual(len(expected_output), 1)
         self.assertEqual(expected_output[0]['path'], '/zerofile2')

@@ -29,6 +29,7 @@ May 2015
 Bolke de Bruin (bolke@xs4all.nl)
 
 '''
+from __future__ import absolute_import
 
 import struct
 import sasl
@@ -39,7 +40,7 @@ from snakebite.config import HDFSConfig
 
 import google.protobuf.internal.encoder as encoder
 
-import logger
+from . import logger
 
 # Configure package logging
 log = logger.getLogger(__name__)

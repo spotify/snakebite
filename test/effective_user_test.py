@@ -1,4 +1,6 @@
-from minicluster_testbase import MiniClusterTestBase
+from __future__ import print_function
+from __future__ import absolute_import
+from .minicluster_testbase import MiniClusterTestBase
 from snakebite.client import Client
 import os
 
@@ -16,14 +18,14 @@ class EffectiveUserTest(MiniClusterTestBase):
                                            effective_user='__foobar')
 
     def test_touch(self):
-        print tuple(self.custom_client.touchz([self.VALID_FILE]))
+        print(tuple(self.custom_client.touchz([self.VALID_FILE])))
         try:
             tuple(self.custom_foobar_client.touchz([self.INVALID_FILE]))
-	except Exception, e:
+        except Exception as e:
             self.assertTrue(e.message.startswith(self.ERR_MSG_TOUCH))
 
         self.custom_client.stat([self.VALID_FILE])
         try:
             self.custom_client.stat([self.INVALID_FILE])
-        except Exception, e:
+        except Exception as e:
             self.assertEquals(e.message, self.ERR_MSG_STAT)

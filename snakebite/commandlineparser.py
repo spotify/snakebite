@@ -13,12 +13,15 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+from __future__ import print_function
 import argparse
 import errno
 import sys
 import os
 import json
-from urlparse import urlparse
+
+import six
+from six.moves.urllib.parse import urlparse
 
 from snakebite.client import HAClient
 from snakebite.errors import FileNotFoundException
@@ -38,28 +41,30 @@ from snakebite.platformutils import get_current_username
 
 
 def print_error_exit(msg, fd=sys.stderr):
-    print >> fd, "Error: %s" % msg
+    print("Error: %s" % msg, file=fd)
     sys.exit(-1)
 
+
 def print_info(msg, fd=sys.stderr):
-    print >> fd, "Info: %s" % msg
+    print("Info: %s" % msg, file=fd)
+
 
 def exitError(exc_info):
     exc_type, exc_value, exc_traceback = exc_info
     if isinstance(
         exc_value, (FileNotFoundException, DirectoryException, FileException),
     ):
-        print str(exc_value)
+        print(str(exc_value))
     elif isinstance(exc_value, RequestError):
-        print "Request error: %s" % str(exc_value)
+        print("Request error: %s" % str(exc_value))
     else:
-        raise exc_type, exc_value, exc_traceback
+        six.reraise(exc_type, exc_value, exc_traceback)
     sys.exit(-1)
 
 
 def command(args="", descr="", allowed_opts="", visible=True):
     def wrap(f):
-        Commands.methods[f.func_name] = {"method": f,
+        Commands.methods[f.__name__] = {"method": f,
                                          "args": args,
                                          "descr": descr,
                                          "allowed_opts": allowed_opts,
@@ -82,7 +87,7 @@ class ArgumentParserError(Exception):
 
 class Parser(argparse.ArgumentParser):
     def print_help(self):
-        print ''.join([self.usage, self.epilog])
+        print(''.join([self.usage, self.epilog]))
 
     def error(self, message):  # Override error message to show custom help.
         raise ArgumentParserError("SystemExit", message, self.prog)
@@ -295,22 +300,22 @@ class CommandLineParser(object):
         if len(self.namenodes):
             return
         else:
-            print "No ~/.snakebiterc found, no HADOOP_HOME set and no -n and -p provided"
-            print "Tried to find core-site.xml in:"
+            print("No ~/.snakebiterc found, no HADOOP_HOME set and no -n and -p provided")
+            print("Tried to find core-site.xml in:")
             for core_conf_path in HDFSConfig.core_try_paths:
-                print " - %s" % core_conf_path
-            print "Tried to find hdfs-site.xml in:"
+                print(" - %s" % core_conf_path)
+            print("Tried to find hdfs-site.xml in:")
             for hdfs_conf_path in HDFSConfig.hdfs_try_paths:
-                print " - %s" % hdfs_conf_path
-            print "\nYou can manually create ~/.snakebiterc with the following content:"
-            print '{'
-            print '  "config_version": 2,'
-            print '  "use_trash": true,'
-            print '  "namenodes": ['
-            print '    {"host": "namenode-ha1", "port": %d, "version": %d},' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
-            print '    {"host": "namenode-ha2", "port": %d, "version": %d}' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION)
-            print '  ]'
-            print '}'
+                print(" - %s" % hdfs_conf_path)
+            print("\nYou can manually create ~/.snakebiterc with the following content:")
+            print('{')
+            print('  "config_version": 2,')
+            print('  "use_trash": true,')
+            print('  "namenodes": [')
+            print('    {"host": "namenode-ha1", "port": %d, "version": %d},' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION))
+            print('    {"host": "namenode-ha2", "port": %d, "version": %d}' % (Namenode.DEFAULT_PORT, Namenode.DEFAULT_VERSION))
+            print('  ]')
+            print('}')
 
             sys.exit(1)
 
@@ -418,7 +423,7 @@ class CommandLineParser(object):
 
         try:
             args = self.parser.parse_args(non_cli_input)
-        except ArgumentParserError, error:
+        except ArgumentParserError as error:
             if "-h" in sys.argv or "--help" in sys.argv:  # non cli input?
                 commands = [cmd for (cmd, description) in Commands.methods.iteritems() if description['visible'] is True]
                 command = error.prog.split()[-1]
@@ -428,7 +433,7 @@ class CommandLineParser(object):
                     self.parser.print_help()
                 self.parser.exit(2)
             elif "-v" in sys.argv or "--ver" in sys.argv:
-                print version()
+                print(version())
                 self.parser.exit(0)
             else:
                 self.parser.print_usage(sys.stderr)
@@ -466,7 +471,7 @@ class CommandLineParser(object):
 
     def command(args="", descr="", allowed_opts="", visible=True, req_args=None):
         def wrap(f):
-            Commands.methods[f.func_name] = {"method": f,
+            Commands.methods[f.__name__] = {"method": f,
                                              "args": args,
                                              "descr": descr,
                                              "allowed_opts": allowed_opts,
@@ -476,7 +481,7 @@ class CommandLineParser(object):
 
     @command(visible=False)
     def commands(self):
-        print "\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']]))
+        print("\n".join(sorted([k for k, v in Commands.methods.iteritems() if v['visible']])))
 
     @command(args="[path]", descr="Used for command line completion", visible=False, req_args=['[dirs]'])
     def complete(self):
@@ -486,14 +491,14 @@ class CommandLineParser(object):
         self.args.human = False
         try:
             for line in self._listing():
-                print line.replace(" ", "\\\\ ")
+                print(line.replace(" ", "\\\\ "))
         except FileNotFoundException:
             pass
 
     @command(args="[paths]", descr="list a path", allowed_opts=["d", "R", "s", "h"], req_args=['[dirs]'])
     def ls(self):
         for line in self._listing():
-            print line
+            print(line)
 
     def _listing(self):
         # Mimicking hadoop client behaviour
@@ -520,13 +525,13 @@ class CommandLineParser(object):
     def mkdir(self):
         creations = self.client.mkdir(self.args.dir)
         for line in format_results(creations, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="[paths]", descr="create directories and their parents", req_args=['dir [dirs]'])
     def mkdirp(self):
         creations = self.client.mkdir(self.args.dir, create_parent=True)
         for line in format_results(creations, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="<owner:grp> [paths]", descr="change owner", allowed_opts=["R"], req_args=['arg', 'dir [dirs]'])
     def chown(self):
@@ -534,7 +539,7 @@ class CommandLineParser(object):
         try:
             mods = self.client.chown(self.args.dir, owner, recurse=self.args.recurse)
             for line in format_results(mods, json_output=self.args.json):
-                print line
+                print(line)
         except FileNotFoundException:
             exitError(sys.exc_info())
 
@@ -543,28 +548,28 @@ class CommandLineParser(object):
         mode = int(str(self.args.single_int_arg), 8)
         mods = self.client.chmod(self.args.dir, mode, recurse=self.args.recurse)
         for line in format_results(mods, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="<grp> [paths]", descr="change group", allowed_opts=["R"], req_args=['arg', 'dir [dirs]'])
     def chgrp(self):
         grp = self.args.single_arg
         mods = self.client.chgrp(self.args.dir, grp, recurse=self.args.recurse)
         for line in format_results(mods, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="[paths]", descr="display stats for paths", allowed_opts=['h'], req_args=['[dirs]'])
     def count(self):
         counts = self.client.count(self.args.dir)
         for line in format_counts(counts, json_output=self.args.json,
                                   human_readable=self.args.human):
-            print line
+            print(line)
 
     @command(args="", descr="display fs stats", allowed_opts=['h'])
     def df(self):
         result = self.client.df()
         for line in format_fs_stats(result, json_output=self.args.json,
                                     human_readable=self.args.human):
-            print line
+            print(line)
 
     @command(args="[paths]", descr="display disk usage statistics", allowed_opts=["s", "h"], req_args=['[dirs]'])
     def du(self):
@@ -576,7 +581,7 @@ class CommandLineParser(object):
             include_toplevel = False
         result = self.client.du(self.args.dir, include_toplevel=include_toplevel, include_children=include_children)
         for line in format_du(result, json_output=self.args.json, human_readable=self.args.human):
-            print line
+            print(line)
 
     @command(args="[paths] dst", descr="move paths to destination", req_args=['dir [dirs]', 'arg'])
     def mv(self):
@@ -584,36 +589,36 @@ class CommandLineParser(object):
         dst = self.args.single_arg
         result = self.client.rename(paths, dst)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="[paths]", descr="remove paths", allowed_opts=["R", "S", "T"], req_args=['dir [dirs]'])
     def rm(self):
         result = self.client.delete(self.args.dir, recurse=self.args.recurse)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="[paths]", descr="creates a file of zero length", req_args=['dir [dirs]'])
     def touchz(self):
         result = self.client.touchz(self.args.dir)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="", descr="show server information")
     def serverdefaults(self):
-        print self.client.serverdefaults()
+        print(self.client.serverdefaults())
 
     @command(args="[dirs]", descr="delete a directory", req_args=['dir [dirs]'])
     def rmdir(self):
         result = self.client.rmdir(self.args.dir)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="<rep> [paths]", descr="set replication factor", allowed_opts=['R'], req_args=['(int) arg', 'dir [dirs]'])
     def setrep(self):
         rep_factor = int(self.args.single_int_arg)
         result = self.client.setrep(self.args.dir, rep_factor, recurse=self.args.recurse)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="<cmd>", descr="show cmd usage", req_args=['[args]'])
     def usage(self):
@@ -639,18 +644,18 @@ class CommandLineParser(object):
         if args:
             cmd_args.append(args)
 
-        print "usage: snakebite [general options] %s %s" % (command, " ".join(cmd_args))
+        print("usage: snakebite [general options] %s %s" % (command, " ".join(cmd_args)))
 
         general_opts = "\ngeneral options:\n"
         general_opts += "\n".join(sorted(["  %-30s %s" % ("%s %s" % (v['short'], v['long']), v['help']) for k, v in self.GENERIC_OPTS.iteritems()]))
-        print general_opts
+        print(general_opts)
 
         if allowed_opts:
-            print cmd_descriptions
+            print(cmd_descriptions)
 
     @command(args="[paths]", descr="stat information", req_args=['dir [dirs]'])
     def stat(self):
-        print format_stat(self.client.stat(self.args.dir), json_output=self.args.json)
+        print(format_stat(self.client.stat(self.args.dir), json_output=self.args.json))
 
     @command(args="path", descr="test a path", allowed_opts=['d', 'z', 'e'], req_args=['arg'])
     def test(self):
@@ -678,7 +683,7 @@ class CommandLineParser(object):
         dst = self.args.single_arg
         result = self.client.copyFromLocal(src, dst)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="[paths] dst", descr="copy paths to local file system destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
     def copyToLocal(self):
@@ -686,7 +691,7 @@ class CommandLineParser(object):
         dst = self.args.single_arg
         result = self.client.copyToLocal(paths, dst, check_crc=self.args.checkcrc)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="[paths] dst", descr="copy files from source to destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'], visible=False)
     def cp(self):
@@ -694,7 +699,7 @@ class CommandLineParser(object):
         dst = self.args.single_arg
         result = self.client.cp(paths, dst, checkcrc=self.args.checkcrc)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="file dst", descr="copy files to local file system destination", allowed_opts=['checkcrc'], req_args=['dir [dirs]', 'arg'])
     def get(self):
@@ -702,7 +707,7 @@ class CommandLineParser(object):
         dst = self.args.single_arg
         result = self.client.copyToLocal(paths, dst, check_crc=self.args.checkcrc)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     @command(args="dir dst", descr="concatenates files in source dir into destination local file", allowed_opts=['nl'], req_args=['src dst'])
     def getmerge(self):
@@ -710,7 +715,7 @@ class CommandLineParser(object):
         dst = self.args.src_dst[1]
         result = self.client.getmerge(source, dst, newline=self.args.newline)
         for line in format_results(result, json_output=self.args.json):
-            print line
+            print(line)
 
     # @command(args="[paths] dst", descr="copy sources from local file system to destination", req_args=['dir [dirs]', 'arg'])
     # def put(self):
@@ -725,11 +730,11 @@ class CommandLineParser(object):
         path = self.args.single_arg
         result = self.client.tail(path, append=self.args.append)
         for line in result:
-            print line
+            print(line)
 
     @command(args="path [paths]", descr="output file in text format", allowed_opts=['checkcrc'], req_args=['dir [dirs]'])
     def text(self):
         paths = self.args.dir
         result = self.client.text(paths)
         for line in result:
-            print line
+            print(line)

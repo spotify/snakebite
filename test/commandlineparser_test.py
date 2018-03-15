@@ -12,6 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from __future__ import absolute_import
 import unittest2
 import os
 import json
@@ -25,7 +26,7 @@ from snakebite.commandlineparser import Commands, CommandLineParser
 from snakebite.namenode import Namenode
 from snakebite.platformutils import get_current_username
 
-from config_test import ConfigTest
+from .config_test import ConfigTest
 
 class CommandLineParserTest(unittest2.TestCase):
 

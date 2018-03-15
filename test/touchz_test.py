@@ -13,8 +13,9 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+from __future__ import absolute_import
 from snakebite.errors import DirectoryException, FileException
-from minicluster_testbase import MiniClusterTestBase
+from .minicluster_testbase import MiniClusterTestBase
 
 class TouchZTest(MiniClusterTestBase):
     counter = 0

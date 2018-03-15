@@ -12,12 +12,19 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from __future__ import absolute_import
 import re
 import unittest2
 
-from minicluster_testbase import MiniClusterTestBase
+from .minicluster_testbase import MiniClusterTestBase
 
 from snakebite.formatter import format_fs_stats
+
+try:
+    long        # Python 2
+except NameError:
+    long = int  # Python 3
+
 
 class DfTest(MiniClusterTestBase):
 
@@ -48,7 +55,7 @@ class StatsMock(dict):
             "filesystem": filesystem})
 
 class DfFormatTest(unittest2.TestCase):
-  
+
     def test_middle(self):
         fake = StatsMock(100, 50, 50, 0, 0, 0, "foobar.com")
         output = format_fs_stats(fake).next().split('\n')
@@ -61,7 +68,7 @@ class DfFormatTest(unittest2.TestCase):
         output = format_fs_stats(fake).next().split('\n')
         stats = output[1].split()
         self.assertEqual(stats[4], "7.50%")
- 
+
     def test_zero_size(self):
         fake = StatsMock(0, 0, 0, 0, 0, 0, "foobar.com")
         output = format_fs_stats(fake).next().split('\n')
@@ -79,6 +86,3 @@ class DfFormatTest(unittest2.TestCase):
         output = format_fs_stats(fake).next().split('\n')
         stats = output[1].split()
         self.assertEqual(stats[4], "100.00%")
-
-
- 

@@ -40,14 +40,14 @@ _TOKENPROTO = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='kind', full_name='hadoop.common.TokenProto.kind', index=2,
       number=3, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='service', full_name='hadoop.common.TokenProto.service', index=3,
       number=4, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -75,7 +75,7 @@ _GETDELEGATIONTOKENREQUESTPROTO = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='renewer', full_name='hadoop.common.GetDelegationTokenRequestProto.renewer', index=0,
       number=1, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -239,43 +239,43 @@ DESCRIPTOR.message_types_by_name['CancelDelegationTokenResponseProto'] = _CANCEL
 class TokenProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _TOKENPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.TokenProto)
 
 class GetDelegationTokenRequestProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _GETDELEGATIONTOKENREQUESTPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.GetDelegationTokenRequestProto)
 
 class GetDelegationTokenResponseProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _GETDELEGATIONTOKENRESPONSEPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.GetDelegationTokenResponseProto)
 
 class RenewDelegationTokenRequestProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _RENEWDELEGATIONTOKENREQUESTPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.RenewDelegationTokenRequestProto)
 
 class RenewDelegationTokenResponseProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _RENEWDELEGATIONTOKENRESPONSEPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.RenewDelegationTokenResponseProto)
 
 class CancelDelegationTokenRequestProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CANCELDELEGATIONTOKENREQUESTPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.CancelDelegationTokenRequestProto)
 
 class CancelDelegationTokenResponseProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _CANCELDELEGATIONTOKENRESPONSEPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.CancelDelegationTokenResponseProto)
 
 # @@protoc_insertion_point(module_scope)

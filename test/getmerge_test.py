@@ -12,7 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
-from minicluster_testbase import MiniClusterTestBase
+from __future__ import absolute_import
+from .minicluster_testbase import MiniClusterTestBase
 
 import os
 import shutil
@@ -30,7 +31,7 @@ class GetmergeTest(MiniClusterTestBase):
         os.mkdir(TESTFILES_PATH)
         self.cluster.getmerge('/test3', '%s/expected' % TESTFILES_PATH)
         expected_output = self._read_file('%s/expected' % TESTFILES_PATH)
-        self.client.getmerge('/test3', '%s/client' % TESTFILES_PATH).next()
+        next(self.client.getmerge('/test3', '%s/client' % TESTFILES_PATH))
         client_output = self._read_file('%s/client' % TESTFILES_PATH)
         self.assertEqual(expected_output, client_output)
 
@@ -38,7 +39,7 @@ class GetmergeTest(MiniClusterTestBase):
         os.mkdir(TESTFILES_PATH)
         self.cluster.getmerge('/dir2/dir3', '%s/expected' % TESTFILES_PATH)
         expected_output = self._read_file('%s/expected' % TESTFILES_PATH)
-        self.client.getmerge('/dir2/dir3', '%s/client' % TESTFILES_PATH).next()
+        next(self.client.getmerge('/dir2/dir3', '%s/client' % TESTFILES_PATH))
         client_output = self._read_file('%s/client' % TESTFILES_PATH)
         self.assertEqual(expected_output, client_output)
 
@@ -46,7 +47,7 @@ class GetmergeTest(MiniClusterTestBase):
         os.mkdir(TESTFILES_PATH)
         self.cluster.getmerge('/dir2/dir3', '%s/expected' % TESTFILES_PATH, extra_args=['-nl'])
         expected_output = self._read_file('%s/expected' % TESTFILES_PATH)
-        self.client.getmerge('/dir2/dir3', '%s/client' % TESTFILES_PATH, newline=True).next()
+        next(self.client.getmerge('/dir2/dir3', '%s/client' % TESTFILES_PATH, newline=True))
         client_output = self._read_file('%s/client' % TESTFILES_PATH)
         self.assertEqual(expected_output, client_output)
 
@@ -55,7 +56,7 @@ class GetmergeTest(MiniClusterTestBase):
         os.mkdir(TESTFILES_PATH)
         self.cluster.getmerge('/dir2', '%s/expected' % TESTFILES_PATH)
         expected_output = self._read_file('%s/expected' % TESTFILES_PATH)
-        self.client.getmerge('/dir2', '%s/client' % TESTFILES_PATH).next()
+        next(self.client.getmerge('/dir2', '%s/client' % TESTFILES_PATH))
         client_output = self._read_file('%s/client' % TESTFILES_PATH)
         self.assertEqual(expected_output, client_output)
 

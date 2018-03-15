@@ -12,10 +12,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under
 # the License.
+from __future__ import absolute_import
 from snakebite.errors import FileNotFoundException
 from snakebite.errors import InvalidInputException
 from snakebite.platformutils import get_current_username
-from minicluster_testbase import MiniClusterTestBase
+from .minicluster_testbase import MiniClusterTestBase
 
 import os
 import re

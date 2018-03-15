@@ -281,14 +281,14 @@ _RPCRESPONSEHEADERPROTO = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='exceptionClassName', full_name='hadoop.common.RpcResponseHeaderProto.exceptionClassName', index=3,
       number=4, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='errorMsg', full_name='hadoop.common.RpcResponseHeaderProto.errorMsg', index=4,
       number=5, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -339,28 +339,28 @@ _RPCSASLPROTO_SASLAUTH = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='method', full_name='hadoop.common.RpcSaslProto.SaslAuth.method', index=0,
       number=1, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='mechanism', full_name='hadoop.common.RpcSaslProto.SaslAuth.mechanism', index=1,
       number=2, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='protocol', full_name='hadoop.common.RpcSaslProto.SaslAuth.protocol', index=2,
       number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     descriptor.FieldDescriptor(
       name='serverId', full_name='hadoop.common.RpcSaslProto.SaslAuth.serverId', index=3,
       number=4, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=u"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -451,25 +451,25 @@ DESCRIPTOR.message_types_by_name['RpcSaslProto'] = _RPCSASLPROTO
 class RpcRequestHeaderProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _RPCREQUESTHEADERPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.RpcRequestHeaderProto)
 
 class RpcResponseHeaderProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
   DESCRIPTOR = _RPCRESPONSEHEADERPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.RpcResponseHeaderProto)
 
 class RpcSaslProto(message.Message):
   __metaclass__ = reflection.GeneratedProtocolMessageType
-  
+
   class SaslAuth(message.Message):
     __metaclass__ = reflection.GeneratedProtocolMessageType
     DESCRIPTOR = _RPCSASLPROTO_SASLAUTH
-    
+
     # @@protoc_insertion_point(class_scope:hadoop.common.RpcSaslProto.SaslAuth)
   DESCRIPTOR = _RPCSASLPROTO
-  
+
   # @@protoc_insertion_point(class_scope:hadoop.common.RpcSaslProto)
 
 # @@protoc_insertion_point(module_scope)

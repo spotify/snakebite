@@ -1,9 +1,11 @@
+from __future__ import absolute_import
 import os
 import logging
 import xml.etree.ElementTree as ET
-from urlparse import urlparse
 
-from namenode import Namenode
+from six.moves.urllib.parse import urlparse
+
+from .namenode import Namenode
 
 log = logging.getLogger(__name__)
 
@@ -73,7 +75,7 @@ class HDFSConfig(object):
                 else:
                     configs['use_sasl'] = False
 
-        if namenodes: 
+        if namenodes:
             configs['namenodes'] = namenodes
 
         return configs

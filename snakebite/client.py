@@ -13,42 +13,41 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
-import snakebite.glob as glob
-from snakebite.platformutils import get_current_username
-from snakebite.channel import DataXceiverChannel
-from snakebite.config import HDFSConfig
-from snakebite.errors import (
-    ConnectionFailureException,
-    DirectoryException,
-    FileAlreadyExistsException,
-    FileException,
-    FileNotFoundException,
-    InvalidInputException,
-    OutOfNNException,
-    RequestError,
-    FatalException, TransientException)
-from snakebite.namenode import Namenode
-from snakebite.service import RpcService
+from __future__ import print_function
 
-import Queue
-import zlib
 import bz2
-import logging
-import os
-import os.path
-import posixpath
+import errno
 import fnmatch
 import inspect
-import socket
-import errno
-import time
-import re
-import sys
+import logging
+import os
+import posixpath
 import random
+import re
+import socket
+import time
+import zlib
 
-if sys.version_info[0] == 3:
-    long = int
+from six import string_types
+from six.moves import queue as Queue
+
+import snakebite.glob as glob
+import snakebite.protobuf.ClientNamenodeProtocol_pb2 as client_proto
+from snakebite.channel import DataXceiverChannel
+from snakebite.config import HDFSConfig
+from snakebite.errors import (ConnectionFailureException, DirectoryException,
+                              FatalException, FileAlreadyExistsException,
+                              FileException, FileNotFoundException,
+                              InvalidInputException, OutOfNNException,
+                              RequestError, TransientException)
+from snakebite.namenode import Namenode
+from snakebite.platformutils import get_current_username
+from snakebite.service import RpcService
+
+try:
+    long        # Python 2
+except NameError:
+    long = int  # Python 3
 
 log = logging.getLogger(__name__)
 
@@ -454,7 +453,7 @@ class Client(object):
             raise InvalidInputException("rename2: no path given")
         if not dst:
             raise InvalidInputException("rename2: no destination given")
-        if not isinstance(path, (str, unicode)):
+        if not isinstance(path, string_types):
             raise InvalidInputException("rename2: Path should be a string")
 
         processor = lambda path, node, dst=dst, overwriteDest=overwriteDest: self._handle_rename2(path, node, dst, overwriteDest)
@@ -931,7 +930,7 @@ class Client(object):
 
         .. note:: directory and zero length are AND'd.
         '''
-        if not isinstance(path, (str, unicode)):
+        if not isinstance(path, string_types):
             raise InvalidInputException("Path should be a string")
         if not path:
             raise InvalidInputException("test: no path given")
@@ -1435,7 +1434,7 @@ class HAClient(Client):
             # is not.
             raise InvalidInputException("List of namenodes is empty - couldn't create the client")
         self.namenode = self._switch_namenode(namenodes)
-        self.namenode.next()
+        next(self.namenode)
 
     def _check_failover(self, namenodes):
         if (self.failovers == -1):
@@ -1470,7 +1469,7 @@ class HAClient(Client):
 
     def __calculate_exponential_time(self, time, retries, cap):
         # Same calculation as the original Hadoop client but converted to seconds
-        baseTime = min(time * (1L << retries), cap);
+        baseTime = min(time * (1 << retries), cap);
         return (baseTime * (random.random() + 0.5)) / 1000;
 
     def __do_retry_sleep(self, retries):
@@ -1494,7 +1493,7 @@ class HAClient(Client):
     def __handle_request_error(self, exception):
         log.debug("Request failed with %s" % exception)
         if exception.args[0].startswith("org.apache.hadoop.ipc.StandbyException"):
-            self.namenode.next() # Failover and retry until self.max_failovers was reached
+            next(self.namenode) # Failover and retry until self.max_failovers was reached
         elif exception.args[0].startswith("org.apache.hadoop.ipc.RetriableException") and self.__should_retry():
             return
         else:
@@ -1508,9 +1507,9 @@ class HAClient(Client):
         log.debug("Request failed with %s" % exception)
         if exception.errno in (errno.ECONNREFUSED, errno.EHOSTUNREACH):
             # if NN is down or machine is not available, pass it:
-            self.namenode.next() # Failover and retry until self.max_failovers was reached
+            next(self.namenode) # Failover and retry until self.max_failovers was reached
         elif isinstance(exception, socket.timeout):
-            self.namenode.next() # Failover and retry until self.max_failovers was reached
+            next(self.namenode) # Failover and retry until self.max_failovers was reached
         else:
             raise
 
@@ -1537,7 +1536,7 @@ class HAClient(Client):
                 try:
                     results = func(self, *args, **kw)
                     while(True): # yield all results
-                        yield results.next()
+                        yield next(results)
                 except RequestError as e:
                     self.__handle_request_error(e)
                 except socket.error as e:
