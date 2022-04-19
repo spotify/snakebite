@@ -1,6 +1,8 @@
 ![Snakebite mini logo](https://github.com/spotify/snakebite/blob/master/doc/logo/logo-mini-typo.png)
 ---
 
+**Note:** this project is inactive and has been archived. 
+
 Snakebite is a python library that provides a pure python HDFS client
 and a wrapper around Hadoops minicluster. The client uses protobuf for
 communicating with the NameNode and comes in the form of a library and a
