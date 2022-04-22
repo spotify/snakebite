@@ -4,28 +4,29 @@
 **Note:** this project is inactive and has been archived. 
 
 Snakebite is a python library that provides a pure python HDFS client
-and a wrapper around Hadoops minicluster. The client uses protobuf for
-communicating with the NameNode and comes in the form of a library and a
-command line interface. Currently, the snakebite client supports most
+and a wrapper around Hadoop's minicluster. The client uses protobuf for
+communicating with the NameNode and it comes in the form of a library and 
+a command line interface. Currently, the snakebite client supports most
 actions that involve the Namenode and reading data from DataNodes.
 
-*Note:* all methods that read data from a data node are able to check
+*Note:* all methods that read data from a DataNode are able to check
 the CRC during transfer, but this is disabled by default because of
 performance reasons. This is the opposite behaviour from the stock
 Hadoop client.
 
-Snakebite requires python2 (python3 is not supported yet) and
-python-protobuf 2.4.1 or higher.
+Snakebite requires `python2` and `python-protobuf 2.4.1` or higher.
+(`python3` is not supported yet)
 
-Snakebite 1.3.x has been tested mainly against Cloudera CDH4.1.3 (hadoop
-2.0.0) in production. Tests pass on HortonWorks HDP 2.0.3.22-alpha
-(protocol versions 7 and 8)
 
-Snakebite 2.x has been tested on Hortonworks HDP2.0 and CDH5 Beta and
-ONLY supports Hadoop 2.2.0 and up (protocol version 9)!
+Snakebite 1.3.x has been tested mainly against Cloudera `CDH4.1.3` 
+(which is `Hadoop2.0.0`) in production. Tests passed on HortonWorks
+`HDP 2.0.3.22-alpha` (protocol versions 7 and 8)
 
-Installing
-==========
+`Snakebite 2.x` has been tested on `Hortonworks HDP2.0`, `CDH5 Beta` and
+ONLY supports `Hadoop 2.2.0` and up (protocol version 9)!
+
+Installation
+============
 
 Snakebite releases are available through pypi at
 <https://pypi.python.org/pypi/snakebite/>
