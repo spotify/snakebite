@@ -44,7 +44,7 @@ class ConfigTest(unittest2.TestCase):
 
     def test_read_hdfs_config_ha(self):
         hdfs_site_path = self.get_config_path('ha-port-hdfs-site.xml')
-        config = HDFSConfig.read_hdfs_config(hdfs_site_path)
+        config = HDFSConfig.read_hdfs_config(hdfs_site_path, 'testha')
         self._verify_hdfs_settings(config)
 
     def test_read_core_config_ha(self):
@@ -97,7 +97,7 @@ class ConfigTest(unittest2.TestCase):
     @patch('os.environ.get')
     def test_ha_config_trash_in_core(self, environ_get):
         environ_get.return_value = False
-        HDFSConfig.core_try_paths = (self.get_config_path('core-with-trash.xml'),)
+        HDFSConfig.core_try_paths = (self.get_config_path('ha-core-with-trash.xml'),)
         HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-noport-hdfs-site.xml'),)
         config = HDFSConfig.get_external_config()
 
@@ -143,3 +143,32 @@ class ConfigTest(unittest2.TestCase):
         conf_path = self.get_config_path('use-datanode-hostname-hdfs-site.xml')
         config = HDFSConfig.read_hdfs_config(conf_path)
         self.assertTrue(config['use_datanode_hostname'])
+
+    def test_ha_multi(self):
+        HDFSConfig.core_try_paths = (self.get_config_path('ha-core-site.xml'),)
+        HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-multi-hdfs-site.xml'),)
+        config = HDFSConfig.get_external_config()
+
+        self._verify_hdfs_settings(config)
+
+    def test_ha_multi_missing_nameservices(self):
+        HDFSConfig.core_try_paths = (self.get_config_path('ha-core-site.xml'),)
+        HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-multi-no-nameservices-hdfs-site.xml'),)
+        config = HDFSConfig.get_external_config()
+
+        self.assertEquals(config['namenodes'], [{'namenode': 'testha', 'port': 8020}])
+
+    def test_ha_multi_bad_logical_nn_mapping(self):
+        HDFSConfig.core_try_paths = (self.get_config_path('ha-core-site.xml'),)
+        HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-multi-bad-nn-hdfs-site.xml'),)
+        config = HDFSConfig.get_external_config()
+
+        self.assertEquals(config['namenodes'], [{'namenode': 'testha', 'port': 8020}])
+
+    def test_ha_multi_missing_default_fs(self):
+        HDFSConfig.core_try_paths = (self.get_config_path('ha-no-default-fs-core-site.xml'),)
+        HDFSConfig.hdfs_try_paths = (self.get_config_path('ha-multi-hdfs-site.xml'),)
+        config = HDFSConfig.get_external_config()
+
+        print config
+        self.assertEquals(config['namenodes'], [])

@@ -20,8 +20,16 @@ class HDFSConfig(object):
         core_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'core-site.xml')
         core_configs = cls.read_core_config(core_path)
 
+        maybe_ha_name = None
+        if len(core_configs.get('namenodes', [])) == 1:
+            # We may have gotten an HA config from core-site.xml, try
+            # to use it to resolve HA names
+            maybe_ha_name = core_configs.get('namenodes')[0].get('namenode')
+
         hdfs_path = os.path.join(os.environ['HADOOP_HOME'], 'conf', 'hdfs-site.xml')
-        hdfs_configs = cls.read_hdfs_config(hdfs_path)
+        # May have interpreted defaultFS as a NN, pass this to
+        # read_hdfs_config to try to resolve an HA configuration
+        hdfs_configs = cls.read_hdfs_config(hdfs_path, maybe_ha_name)
 
         if (not core_configs) and (not hdfs_configs):
             raise Exception("No config found in %s nor in %s" % (core_path, hdfs_path))
@@ -73,23 +81,32 @@ class HDFSConfig(object):
                 else:
                     configs['use_sasl'] = False
 
-        if namenodes: 
+        if namenodes:
             configs['namenodes'] = namenodes
 
         return configs
 
     @classmethod
-    def read_hdfs_config(cls, hdfs_site_path):
+    def read_hdfs_config(cls, hdfs_site_path, maybe_ha_name=None):
         configs = {}
+        ha_configs = cls.read_hdfs_ha_configs(hdfs_site_path)
 
         namenodes = []
         for property in cls.read_hadoop_config(hdfs_site_path):
-            if property.findall('name')[0].text.startswith("dfs.namenode.rpc-address"):
+            if property.findall('name')[0].text.startswith('dfs.namenode.rpc-address'):
+                prop_name = property.findall('name')[0].text
                 parse_result = urlparse("//" + property.findall('value')[0].text)
-                log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), hdfs_site_path))
-                namenodes.append({"namenode": parse_result.hostname,
-                                "port": parse_result.port if parse_result.port
-                                                          else Namenode.DEFAULT_PORT})
+
+                if (prop_name == 'dfs.namenode.rpc-address' or
+                    cls.valid_ha_namenode(maybe_ha_name,
+                                          ha_configs,
+                                          parse_result.geturl(),
+                                          hdfs_site_path,
+                                          prop_name)):
+                    log.debug("Got namenode '%s' from %s" % (parse_result.geturl(), hdfs_site_path))
+                    namenodes.append({"namenode": parse_result.hostname,
+                                    "port": parse_result.port if parse_result.port
+                                    else Namenode.DEFAULT_PORT})
 
             if property.findall('name')[0].text == 'fs.trash.interval':
                 configs['use_trash'] = True
@@ -151,7 +168,11 @@ class HDFSConfig(object):
 
         hdfs_configs = {}
         for hdfs_conf_path in cls.hdfs_try_paths:
-            hdfs_configs = cls.read_hdfs_config(hdfs_conf_path)
+            if len(core_configs.get('namenodes', [])) == 1:
+                hdfs_configs = cls.read_hdfs_config(hdfs_conf_path,
+                                                    core_configs.get('namenodes')[0].get('namenode'))
+            else:
+                hdfs_configs = cls.read_hdfs_config(hdfs_conf_path)
             if hdfs_configs:
                 break
 
@@ -169,3 +190,59 @@ class HDFSConfig(object):
         }
 
         return configs
+
+    @classmethod
+    def valid_ha_namenode(cls, maybe_ha_name, ha_configs, nn_url, hdfs_site_path, name):
+        name_parts = name.split('.')
+
+        if len(name_parts) != 5:
+            log.debug("Could not parse cluster name from %s, skipping %s from %s" %
+                      (name,
+                       nn_url,
+                       hdfs_site_path))
+            return False
+
+        cluster = name_parts[-2]
+        if cluster != maybe_ha_name:
+            log.debug("Skipping %s from %s, becuause it does not belong to our active cluster %s" %
+                          (nn_url, hdfs_site_path, maybe_ha_name))
+            return False
+
+        if cluster not in ha_configs.get('clusters', []):
+            log.debug("Skipping %s from %s, becuause it is no in the configured cluster list: %s" %
+                          (nn_url, hdfs_site_path, ha_configs.get('clusters')))
+            return False
+
+        logical_namenode = name_parts[-1]
+        cluster_logical_namenodes = (ha_configs
+                                     .get('logical_namenodes', {})
+                                     .get(cluster, []))
+        if logical_namenode not in cluster_logical_namenodes:
+            log.debug("Could not find logical mapping for %s in cluster %s from %s, skipping" %
+                          (nn_url,
+                           cluster,
+                           hdfs_site_path))
+            return False
+        return True
+
+    @classmethod
+    def read_hdfs_ha_configs(cls, hdfs_site_path):
+        ha_configs = {}
+        for property in cls.read_hadoop_config(hdfs_site_path):
+            name = property.findall('name')[0].text
+            value = property.findall('value')[0].text
+
+            if name == 'dfs.nameservices':
+                ha_configs['clusters'] = value.split(',')
+
+            if name.startswith('dfs.ha.namenodes'):
+                name_parts = property.findall('name')[0].text.split('.')
+                if len(name_parts) != 4:
+                    log.debug("Could not parse cluster name from %s, skipping" %
+                              (property.findall('name')[0].text))
+                    continue
+                if 'logical_namenodes' not in ha_configs:
+                    ha_configs['logical_namenodes'] = {}
+                cluster = name_parts[-1]
+                ha_configs['logical_namenodes'][cluster] = value.split(',')
+        return ha_configs
