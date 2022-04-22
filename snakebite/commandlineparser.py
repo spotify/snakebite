@@ -583,7 +583,7 @@ class CommandLineParser(object):
         paths = self.args.dir
         dst = self.args.single_arg
         result = self.client.rename(paths, dst)
-        for line in format_results(result, json_output=self.args.json):
+        for line in format_results(result, json_output=self.args.json, continue_on_error=False):
             print line
 
     @command(args="[paths]", descr="remove paths", allowed_opts=["R", "S", "T"], req_args=['dir [dirs]'])

@@ -128,7 +128,7 @@ def _create_dir_listing(nodes, human_readable, recursive, summary):
     return "\n".join(ret)
 
 
-def format_results(results, json_output=False):
+def format_results(results, json_output=False, continue_on_error=True):
     if json_output:
         for result in results:
             yield json.dumps(result)
@@ -141,6 +141,9 @@ def format_results(results, json_output=False):
                     yield "OK: %s" % r.get('path')
             else:
                 yield "ERROR: %s (reason: %s)" % (r.get('path'), r.get('error', ''))
+
+                if not continue_on_error:
+                    break
 
 
 def format_counts(results, json_output=False, human_readable=False):
