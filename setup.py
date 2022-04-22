@@ -47,7 +47,7 @@ install_requires = [
 extras_require = {
     'kerberos': [
         'python-krbV',
-        'sasl']
+        'sasl3']
 }
 
 tests_require = [
