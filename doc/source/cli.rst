@@ -47,8 +47,8 @@ Hadoop config files
 ^^^^^^^^^^^^^^^^^^^
 
 Last two methods of providing config for snakebite is through hadoop config files.
-If ``HADOOP_HOME`` environment variable is set, snakebite will try to find ``core-site.xml``
-and/or ``hdfs-site.xml`` files in ``$HADOOP_HOME`` directory. If ``HADOOP_HOME`` is not set,
+If either ``HADOOP_HOME`` or ``HADOOP_CONF_DIR`` environment variable is set, snakebite will try to find ``core-site.xml``
+and/or ``hdfs-site.xml`` files in ``$HADOOP_HOME/conf`` or ``$HADOOP_CONF_DIR`` directory. If ``HADOOP_HOME`` or ``HADOOP_CONF_DIR`` is not set,
 snakebite will try to find those files in a couple of default hadoop config locations:
 
 * /etc/hadoop/conf/core-site.xml
