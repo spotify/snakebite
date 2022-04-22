@@ -6,9 +6,7 @@ branches:
   except:
     - gh-pages
 env:
-  - TOX_ENV=py26-cdh
   - TOX_ENV=py27-cdh
-  - TOX_ENV=py26-hdp
   - TOX_ENV=py27-hdp
 install:
   - pip install tox
