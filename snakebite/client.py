@@ -19,7 +19,6 @@ from snakebite.platformutils import get_current_username
 from snakebite.channel import DataXceiverChannel
 from snakebite.config import HDFSConfig
 from snakebite.errors import (
-    ConnectionFailureException,
     DirectoryException,
     FileAlreadyExistsException,
     FileException,
@@ -1162,10 +1161,11 @@ class Client(object):
                             failed_nodes.append(location.id.storageID)
                         successful_read = False
                 else:
-                    raise ConnectionFailureException(
+                    log.warning(
                         u"Failure to connect to data node at ({}:{})".format(
                             host, port
                             ))
+                    continue
                 if successful_read:
                     break
             if successful_read is False:
