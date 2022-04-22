@@ -69,13 +69,19 @@ class CommandLineParserTest(unittest2.TestCase):
         output = parser.parse('--version 4 ls some_folder'.split())
         self.assertEqual(output.version, 4)
 
+        output = parser.parse('-u someuser ls some_folder'.split())
+        self.assertEqual(output.user, 'someuser')
+        output = parser.parse('--user someuser ls some_folder'.split())
+        self.assertEqual(output.user, 'someuser')
+
         #all options
-        output = parser.parse('-D -j -n namenode_fqdn -p 1234 -V 4 ls some_folder'.split())
+        output = parser.parse('-D -j -n namenode_fqdn -p 1234 -u someuser -V 4 ls some_folder'.split())
         self.assertTrue(output.debug)
         self.assertTrue(output.json)
         self.assertEqual(output.namenode, "namenode_fqdn")
         self.assertEqual(output.port, 1234)
         self.assertEqual(output.version, 4)
+        self.assertEqual(output.user, 'someuser')
 
         #options in illegal position
         with self.assertRaises(SystemExit):
